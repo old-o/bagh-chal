@@ -3,6 +3,8 @@ package net.doepner.baghchal;
 import javax.swing.*;
 import java.awt.*;
 
+import static net.doepner.baghchal.Piece.TIGER;
+
 public class UI extends JPanel {
 
     private final Color bgColor = Color.white;
@@ -118,7 +120,7 @@ public class UI extends JPanel {
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
                 if (board.get(i, j) != null) {
-                    Image im = board.get(i, j) == Piece.TIGER ? tiger : images.getGoatImage();
+                    Image im = board.get(i, j) == TIGER ? tiger : images.getGoatImage();
                     g2.drawImage(im, 14 + i * 100, 14 + j * 100, this);
                 }
             }
