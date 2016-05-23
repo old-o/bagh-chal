@@ -1,24 +1,7 @@
-package net.doepner.baghchal;/*
- * Copyright 2003, Daniel Newman (danielnewman106@hotmail.com)
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+package net.doepner.baghchal;
 
 import javax.swing.*;
 import java.awt.*;
-
-import static net.doepner.baghchal.Piece.TIGER;
 
 public class UI extends JPanel {
 
@@ -137,7 +120,7 @@ public class UI extends JPanel {
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
                 if (board.get(i, j) != null) {
-                    Image im = board.get(i, j) == TIGER ? tiger : images.getGoatImage();
+                    Image im = board.get(i, j) == Piece.TIGER ? tiger : images.getGoatImage();
                     g2.drawImage(im, 14 + i * 100, 14 + j * 100, this);
                 }
             }
