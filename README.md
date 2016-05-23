@@ -6,3 +6,8 @@
 - Added sounds 
 - Refactored into classes
 - Fixed flicker when dragging goats
+
+Build
+
+[![Build Status](https://travis-ci.org/odoepner/bagchal.svg?branch=master)](https://travis-ci.org/odoepner/bagchal)
+
