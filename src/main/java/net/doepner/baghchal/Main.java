@@ -1,0 +1,47 @@
+package net.doepner.baghchal;
+
+import javax.swing.*;
+import java.awt.*;
+
+/**
+ * Entry point of the game
+ */
+public final class Main {
+
+    public static void main(String... args) {
+
+        final Images images = new Images();
+        final Image goat = images.getGoatImage();
+
+        final Board board = new Board();
+        final Phases phases = new Phases();
+        final Strategy strategy = new Strategy(board);
+
+        final GoatsManager goatsManager = new GoatsManager(goat, board, phases);
+        final UI ui = new UI(board, goatsManager, images, phases);
+
+        goatsManager.setEventHandler(new EventHandler() {
+            @Override
+            public void boardChanged() {
+                ui.repaint();
+            }
+
+            @Override
+            public void goatMoveDone() {
+                strategy.updatePossibleMoves();
+                if (strategy.isOver()) {
+                    phases.setEnd();
+                    ui.offerNextLevel();
+                } else {
+                    strategy.generateMove(ui.getLevel());
+                }
+                ui.repaint();
+            }
+        });
+
+        final JFrame frame = new JFrame();
+        frame.add(ui);
+        frame.setSize(550, 550);
+        frame.setVisible(true);
+    }
+}
