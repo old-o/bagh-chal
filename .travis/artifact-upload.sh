@@ -10,6 +10,6 @@ if [ -z "$file" ]; then
   echo "ERROR: Cannot upload. No jar file found in $build_dir"
   exit 1
 else
-  echo "Uploading $jar_file to $upload_url"
+  echo "Uploading $file to $upload_url"
   curl --user "${user_info}" --upload-file "${file}" "${upload_url}"
 fi
