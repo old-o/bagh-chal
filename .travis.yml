@@ -3,6 +3,8 @@
 language: java
 jdk: oraclejdk8
 
+script: mvn clean verify
+
 env:
   global:
   - secure: T49h8KN1yVL89y7BD0L8yhQw+MZuerj9sEzbh1dX4DaNJ90ZSmdnm7VaAksu7e/sb8t2VkB37T4SGEJdDnHGGbY1bVhTqMt0Aikb+RQFPbzC/OWuTEkp9C4EvCMuAPlMnftqvgl9rrJDXh9fwWsrcLNaBiQ2i3CQiPlau0jVWFg=
