@@ -8,6 +8,11 @@
 - Fixed flicker when dragging goats
 
 Build
+-----
 
 [![Build Status](https://travis-ci.org/odoepner/bagh-chal.svg?branch=master)](https://travis-ci.org/odoepner/bagh-chal)
+
+[Download latest build](https://bintray.com/artifact/download/odoepner/generic/bagh-chal.jar)
+
+
 
