@@ -3,7 +3,7 @@
 user_info="$BINTRAY_USER:$BINTRAY_API_KEY"
 build_dir="$TRAVIS_BUILD_DIR/target"
 
-file="$(ls $build_dir/*.jar | head -n 1)"
+file="$(ls ${build_dir}/*.jar | head -n 1)"
 upload_url='https://api.bintray.com/content/odoepner/generic/baghchal/0.0.1/baghchal.jar?override=1&publish=1'
 
 if [ -z "$file" ]; then
