@@ -1,3 +1,5 @@
+# uploads the jar to bintray
+
 language: java
 jdk: oraclejdk8
 
