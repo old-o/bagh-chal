@@ -9,5 +9,5 @@
 
 Build
 
-[![Build Status](https://travis-ci.org/odoepner/bagchal.svg?branch=master)](https://travis-ci.org/odoepner/bagchal)
+[![Build Status](https://travis-ci.org/odoepner/bagh-chal.svg?branch=master)](https://travis-ci.org/odoepner/bagh-chal)
 
