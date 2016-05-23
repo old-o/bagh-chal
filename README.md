@@ -5,3 +5,4 @@
 - Converted Applet to JFrame
 - Added sounds 
 - Refactored into classes
+- Fixed flicker when dragging goats
