@@ -10,6 +10,7 @@ import java.io.IOException;
 public class Images {
 
     private static final String[] TIGER_IMAGE_NAMES = {
+            "tiger.png",
             "1_BrownMoth.gif", "2_Bunny.gif", "3_Crab.gif", "4_Snail.gif",
             "5_FishGold.gif", "6_FishBlue.gif", "7_CoolShark.gif"
     };
@@ -28,6 +29,6 @@ public class Images {
     }
 
     public Image getGoatImage() {
-        return getImage("1_Buckeye.gif");
+        return getImage("goat.png");
     }
 }

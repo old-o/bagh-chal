@@ -1,17 +1,28 @@
 package net.doepner.baghchal;
 
+import static net.doepner.baghchal.Piece.GOAT;
+import static net.doepner.baghchal.Piece.TIGER;
+
 /**
  * The game board model
  */
 public class Board {
 
-    private final int board[][] = new int[5][5];
+    private final Piece[][] board = new Piece[5][5];
+    private final Sound sound;
+
+    public Board(Sound sound) {
+        this.sound = sound;
+    }
 
     void doMove(Move m) {
-        board[m.x2()][m.y2()] = board[m.x1()][m.y1()];
-        board[m.x1()][m.y1()] = 0;
-        if (isTakingMove(m))
-            board[m.x1() + m.x2() >> 1][m.y1() + m.y2() >> 1] = 0;
+        set(m.x2(), m.y2(), get(m.x1(), m.y1()));
+        clear(m.x1(), m.y1());
+
+        if (isTakingMove(m)) {
+            clear(m.x1() + m.x2() >> 1, m.y1() + m.y2() >> 1);
+            sound.playTiger();
+        }
     }
 
     public boolean isTakingMove(Move m) {
@@ -65,24 +76,20 @@ public class Board {
         return !(j == 0 || i == 0) && (i == j || i == 1 && j == 3 || i == 2 && j == 4 || i == 3 && j == 1 || i == 4 && j == 2);
     }
 
-    int b(int i, int j) {
-        if (i < 0 || i > 4 || j < 0 || j > 4)
-            return -1;
-        else
-            return board[i][j];
-    }
-
     void reset() {
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++)
-                board[i][j] = 0;
+                clear(i, j);
 
         }
-        board[0][0] = board[4][0] = board[0][4] = board[4][4] = 2;
+        set(0, 0, TIGER);
+        set(4, 0, TIGER);
+        set(0, 4, TIGER);
+        set(4, 4, TIGER);
     }
 
-    int[][] copyBoard() {
-        int a[][] = new int[5][5];
+    Piece[][] copyBoard() {
+        Piece a[][] = new Piece[5][5];
         for (int i = 0; i < 5; i++) {
             System.arraycopy(board[i], 0, a[i], 0, 5);
 
@@ -90,11 +97,22 @@ public class Board {
         return a;
     }
 
-    public int get(int i, int j) {
+    public Piece get(int i, int j) {
         return board[i][j];
     }
 
-    public void set(int i, int j, int value) {
-        board[i][j] = value;
+    public void set(int i, int j, Piece piece) {
+        board[i][j] = piece;
+        if (piece == GOAT) {
+            sound.playGoat();
+        }
+    }
+
+    void clear(int i, int j) {
+        set(i, j, null);
+    }
+
+    public boolean empty(int i, int j) {
+        return get(i, j) == null;
     }
 }

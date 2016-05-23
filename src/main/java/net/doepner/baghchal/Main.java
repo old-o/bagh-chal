@@ -3,6 +3,8 @@ package net.doepner.baghchal;
 import javax.swing.*;
 import java.awt.*;
 
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+
 /**
  * Entry point of the game
  */
@@ -10,10 +12,12 @@ public final class Main {
 
     public static void main(String... args) {
 
+        final Sound sound = new Sound();
+
         final Images images = new Images();
         final Image goat = images.getGoatImage();
 
-        final Board board = new Board();
+        final Board board = new Board(sound);
         final Phases phases = new Phases();
         final Strategy strategy = new Strategy(board);
 
@@ -39,7 +43,8 @@ public final class Main {
             }
         });
 
-        final JFrame frame = new JFrame();
+        final JFrame frame = new JFrame("Bagh-Chal");
+        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.add(ui);
         frame.setSize(550, 550);
         frame.setVisible(true);

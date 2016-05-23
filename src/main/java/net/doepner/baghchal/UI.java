@@ -18,6 +18,8 @@ package net.doepner.baghchal;/*
 import javax.swing.*;
 import java.awt.*;
 
+import static net.doepner.baghchal.Piece.TIGER;
+
 public class UI extends JPanel {
 
     private final Color bgColor = Color.white;
@@ -81,35 +83,6 @@ public class UI extends JPanel {
         return level;
     }
 
-    void drawBoard(Graphics2D g2) {
-        g2.setColor(Color.black);
-
-        g2.drawRect(30, 30, 400, 400);
-
-        for (int i = 0; i < 3; i++) {
-            int j = 130 + 100 * i;
-            g2.drawLine(30, j, 430, j);
-            g2.drawLine(j, 30, j, 430);
-        }
-
-        g2.drawLine(30, 30, 430, 430);
-        g2.drawLine(30, 230, 230, 430);
-        g2.drawLine(230, 30, 430, 230);
-        g2.drawLine(30, 230, 230, 30);
-        g2.drawLine(230, 30, 430, 230);
-        g2.drawLine(230, 430, 430, 230);
-        g2.drawLine(30, 430, 430, 30);
-
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
-                if (board.get(i, j) != 0) {
-                    Image im = board.get(i, j) != 1 ? tiger : images.getGoatImage();
-                    g2.drawImage(im, 14 + i * 100, 14 + j * 100, this);
-                }
-            }
-        }
-    }
-
     public void paint(Graphics g) {
         super.paint(g);
         final Graphics2D g2 = (Graphics2D) g;
@@ -141,4 +114,34 @@ public class UI extends JPanel {
         goatsManager.drawRemainingGoats(g2);
         goatsManager.drawDraggedGoat(g2);
     }
+
+    void drawBoard(Graphics2D g2) {
+        g2.setColor(Color.black);
+
+        g2.drawRect(30, 30, 400, 400);
+
+        for (int i = 0; i < 3; i++) {
+            int j = 130 + 100 * i;
+            g2.drawLine(30, j, 430, j);
+            g2.drawLine(j, 30, j, 430);
+        }
+
+        g2.drawLine(30, 30, 430, 430);
+        g2.drawLine(30, 230, 230, 430);
+        g2.drawLine(230, 30, 430, 230);
+        g2.drawLine(30, 230, 230, 30);
+        g2.drawLine(230, 30, 430, 230);
+        g2.drawLine(230, 430, 430, 230);
+        g2.drawLine(30, 430, 430, 30);
+
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                if (board.get(i, j) != null) {
+                    Image im = board.get(i, j) == TIGER ? tiger : images.getGoatImage();
+                    g2.drawImage(im, 14 + i * 100, 14 + j * 100, this);
+                }
+            }
+        }
+    }
+
 }

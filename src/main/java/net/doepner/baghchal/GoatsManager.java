@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import static net.doepner.baghchal.Piece.GOAT;
+
 /**
  * Manages the goats
  */
@@ -62,10 +64,10 @@ public class GoatsManager extends MouseAdapter {
         if (phases.isMiddle() && x >= 20 && x <= 450 && y >= 20 && y <= 450) {
             int i = (int) ((double) x / 100D + 0.25D);
             int j = (int) ((double) y / 100D + 0.25D);
-            if (board.get(i, j) == 1) {
+            if (board.get(i, j) == GOAT) {
                 draggedPieceX = i;
                 draggedPieceY = j;
-                board.set(i, j, 0);
+                board.clear(i, j);
                 dragging = true;
             }
         }
@@ -89,7 +91,7 @@ public class GoatsManager extends MouseAdapter {
             if (phases.isBeginning()) {
                 remainingGoat[selectedGoat] = true;
             } else {
-                board.set(draggedPieceX, draggedPieceY, 1);
+                board.set(draggedPieceX, draggedPieceY, GOAT);
             }
         } else {
             int i = (int) ((double) x / 100D + 0.25D);
@@ -102,8 +104,8 @@ public class GoatsManager extends MouseAdapter {
                 j = 0;
             else if (j > 4)
                 j = 4;
-            if (board.get(i, j) == 0 && (phases.isBeginning() || board.validGoatMove(draggedPieceX, draggedPieceY, i, j))) {
-                board.set(i, j, 1);
+            if (board.empty(i, j) && (phases.isBeginning() || board.validGoatMove(draggedPieceX, draggedPieceY, i, j))) {
+                board.set(i, j, GOAT);
                 if (phases.isBeginning() && noRemainingGoats()) {
                     phases.setMiddle();
                 }
@@ -113,7 +115,7 @@ public class GoatsManager extends MouseAdapter {
             } else if (phases.isBeginning()) {
                 remainingGoat[selectedGoat] = true;
             } else {
-                board.set(draggedPieceX, draggedPieceY, 1);
+                board.set(draggedPieceX, draggedPieceY, GOAT);
             }
         }
         boardChanged();
