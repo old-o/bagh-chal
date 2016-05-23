@@ -1,10 +1,15 @@
 package net.doepner.baghchal;
 
-import javax.sound.sampled.*;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.DataLine.Info;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
 import java.net.URL;
 
 import static javax.sound.sampled.AudioSystem.getAudioInputStream;
+import static javax.sound.sampled.AudioSystem.getLine;
 import static javax.sound.sampled.LineEvent.Type.STOP;
 
 /**
@@ -40,8 +45,7 @@ public class Sound {
     public Clip play(URL url) {
         try (AudioInputStream stream = getAudioInputStream(url)) {
 
-            final Clip clip = (Clip) AudioSystem.getLine(
-                    new DataLine.Info(Clip.class, stream.getFormat()));
+            final Clip clip = (Clip) getLine(new Info(Clip.class, stream.getFormat()));
 
             clip.open(stream);
             clip.start();

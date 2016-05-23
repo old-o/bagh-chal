@@ -9,12 +9,10 @@ public class UI extends JPanel {
 
     private final GoatsManager goatsManager;
     private final Board board;
-    private Images images;
-
+    private final Images images;
     private final Phases phases;
 
     private final Image congrats;
-
     private final JButton nextLevelBtn;
 
     private int level;
@@ -78,7 +76,7 @@ public class UI extends JPanel {
             g2.drawImage(congrats, 70, 80, this);
             String s;
             if (level > 7) {
-                s = "You have completed Bagha Chal";
+                s = "You have completed Bagh-Chal";
                 nextLevelBtn.setVisible(false);
             } else {
                 s = "Now try level " + level;
