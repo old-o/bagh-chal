@@ -21,6 +21,8 @@ public class UI extends JPanel {
     private Image tiger;
 
     public UI(Board board, GoatsManager goatsManager, Images images, Phases phases) {
+        super(new BorderLayout());
+
         this.board = board;
         this.goatsManager = goatsManager;
         this.images = images;
@@ -101,27 +103,49 @@ public class UI extends JPanel {
     void drawBoard(Graphics2D g2) {
         g2.setColor(Color.black);
 
-        g2.drawRect(30, 30, 400, 400);
+        // TODO : should be relative to UI width and height
+        final int width = 400;
+        final int height = 400;
 
-        for (int i = 0; i < 3; i++) {
-            int j = 130 + 100 * i;
-            g2.drawLine(30, j, 430, j);
-            g2.drawLine(j, 30, j, 430);
+        final int xStart = 30;
+        final int yStart = 30;
+
+        final int yEnd = yStart + height;
+        final int xEnd = xStart + width;
+
+        final int xStep = width / (board.getXSize() - 1);
+        final int yStep = height / (board.getYSize() - 1);
+
+        for (int x = xStart; x <= xEnd; x+= xStep) {
+            g2.drawLine(x, yStart, x, yEnd);
+        }
+        for (int y = yStart; y <= yEnd; y+= yStep) {
+            g2.drawLine(xStart, y, xEnd, y);
         }
 
-        g2.drawLine(30, 30, 430, 430);
-        g2.drawLine(30, 230, 230, 430);
-        g2.drawLine(230, 30, 430, 230);
-        g2.drawLine(30, 230, 230, 30);
-        g2.drawLine(230, 30, 430, 230);
-        g2.drawLine(230, 430, 430, 230);
-        g2.drawLine(30, 430, 430, 30);
+        final int xMid = xStart + width / 2;
+        final int yMid = yStart + height / 2;
 
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
+        g2.drawLine(xStart, yStart, xEnd, yEnd);
+        g2.drawLine(xStart, yMid, xMid, yEnd);
+        g2.drawLine(xStart, yMid, xMid, yStart);
+        g2.drawLine(xStart, yEnd, xEnd, yStart);
+        g2.drawLine(xMid, yStart, xEnd, yMid);
+        g2.drawLine(xMid, yStart, xEnd, yMid);
+        g2.drawLine(xMid, yEnd, xEnd, yMid);
+
+
+        final int imgWidth = 32;
+        final int imgHeight = 32;
+
+        final int xImgOffset = xStart - (imgWidth /2);
+        final int yImgOffset = yStart - (imgHeight /2);
+
+        for (int i = 0; i < board.getXSize(); i++) {
+            for (int j = 0; j < board.getYSize(); j++) {
                 if (board.get(i, j) != null) {
                     Image im = board.get(i, j) == TIGER ? tiger : images.getGoatImage();
-                    g2.drawImage(im, 14 + i * 100, 14 + j * 100, this);
+                    g2.drawImage(im, xImgOffset + i * xStep, yImgOffset + j * yStep, null);
                 }
             }
         }

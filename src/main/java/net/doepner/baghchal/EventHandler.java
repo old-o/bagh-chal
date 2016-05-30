@@ -9,4 +9,5 @@ public interface EventHandler {
 
     void goatMoveDone();
 
+    void goatDraggingStarted();
 }

@@ -8,7 +8,10 @@ import static net.doepner.baghchal.Piece.TIGER;
  */
 public class Board {
 
-    private final Piece[][] board = new Piece[5][5];
+    private static final int X_SIZE = 5;
+    private static final int Y_SIZE = 5;
+
+    private final Piece[][] board = new Piece[X_SIZE][Y_SIZE];
     private final Sound sound;
 
     public Board(Sound sound) {
@@ -30,7 +33,8 @@ public class Board {
     }
 
     boolean validGoatMove(int x1, int y1, int x2, int y2) {
-        if (x1 < 0 || x1 > 4 || x2 < 0 || x2 > 4 || y1 < 0 || y1 > 4 || y2 < 0 || y2 > 4) {
+        if (x1 < 0 || x1 >= X_SIZE || x2 < 0 || x2 >= X_SIZE
+                || y1 < 0 || y1 >= Y_SIZE || y2 < 0 || y2 >= Y_SIZE) {
             return false;
         }
         int dx = x1 - x2;
@@ -89,9 +93,9 @@ public class Board {
     }
 
     Piece[][] copyBoard() {
-        Piece a[][] = new Piece[5][5];
-        for (int i = 0; i < 5; i++) {
-            System.arraycopy(board[i], 0, a[i], 0, 5);
+        Piece a[][] = new Piece[X_SIZE][Y_SIZE];
+        for (int i = 0; i < X_SIZE; i++) {
+            System.arraycopy(board[i], 0, a[i], 0, Y_SIZE);
 
         }
         return a;
@@ -103,9 +107,6 @@ public class Board {
 
     public void set(int i, int j, Piece piece) {
         board[i][j] = piece;
-        if (piece == GOAT) {
-            sound.playGoat();
-        }
     }
 
     void clear(int i, int j) {
@@ -114,5 +115,13 @@ public class Board {
 
     public boolean empty(int i, int j) {
         return get(i, j) == null;
+    }
+
+    public int getXSize() {
+        return X_SIZE;
+    }
+
+    public int getYSize() {
+        return Y_SIZE;
     }
 }
