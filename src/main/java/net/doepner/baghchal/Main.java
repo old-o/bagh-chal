@@ -42,7 +42,6 @@ public final class Main {
 
         final GoatsManager goatsManager = new GoatsManager(goat, board, phases);
         final UI ui = new UI(board, goatsManager, images, phases);
-        ui.setPreferredSize(new Dimension(550, 550));
 
         goatsManager.setEventHandler(new EventHandler() {
             @Override
@@ -67,6 +66,9 @@ public final class Main {
                 sound.playGoat();
             }
         });
+
+        ui.setPreferredSize(new Dimension(500, 500));
+        ui.start();
 
         final JFrame frame = new JFrame("Bagh-Chal");
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);

@@ -1,7 +1,13 @@
 package net.doepner.baghchal;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
 
 import static net.doepner.baghchal.Piece.TIGER;
 
@@ -41,6 +47,8 @@ public class UI extends JPanel {
 
         congrats = images.getImage("congrats.gif");
 
+        setBackground(bgColor);
+
         addMouseMotionListener(goatsManager);
         addMouseListener(goatsManager);
     }
@@ -71,11 +79,12 @@ public class UI extends JPanel {
     public void paint(Graphics g) {
         super.paint(g);
         final Graphics2D g2 = (Graphics2D) g;
-        g2.setColor(bgColor);
-        g2.fillRect(0, 0, 500, 500);
+
+        final int width = getWidth();
+        final int height = getHeight();
+
         if (phases.isEnd()) {
-            g2.setColor(bgColor);
-            g2.fillRect(0, 0, 500, 500);
+            g2.clearRect(0, 0, width, height);
             g2.setColor(Color.black);
             g2.drawImage(congrats, 70, 80, this);
             String s;
@@ -86,26 +95,19 @@ public class UI extends JPanel {
                 s = "Now try level " + level;
             }
             g2.setFont(new Font("SansSerif", 0, 34));
-            g2.drawString(s, 250 - (g2.getFontMetrics().stringWidth(s) >> 1), 350);
-            return;
+            g2.drawString(s, width / 2 - (g2.getFontMetrics().stringWidth(s) >> 1), height / 2 + 100);
+        }  else {
+            drawBoard(g2, width,height);
+            goatsManager.drawRemainingGoats(g2, width, height);
+            goatsManager.drawDraggedGoat(g2);
         }
-        if (phases.isBeforeGame()) {
-            g2.setColor(bgColor);
-            g2.fillRect(0, 0, 500, 500);
-            g2.drawString("Downloading images...", 50, 50);
-            return;
-        }
-        drawBoard(g2);
-        goatsManager.drawRemainingGoats(g2);
-        goatsManager.drawDraggedGoat(g2);
     }
 
-    void drawBoard(Graphics2D g2) {
+    void drawBoard(Graphics2D g2, int w, int h) {
         g2.setColor(Color.black);
 
-        // TODO : should be relative to UI width and height
-        final int width = 400;
-        final int height = 400;
+        final int width = w - 2 * 50;
+        final int height = h - 2 * 50;
 
         final int xStart = 30;
         final int yStart = 30;
@@ -116,10 +118,10 @@ public class UI extends JPanel {
         final int xStep = width / (board.getXSize() - 1);
         final int yStep = height / (board.getYSize() - 1);
 
-        for (int x = xStart; x <= xEnd; x+= xStep) {
+        for (int x = xStart; x <= xEnd; x += xStep) {
             g2.drawLine(x, yStart, x, yEnd);
         }
-        for (int y = yStart; y <= yEnd; y+= yStep) {
+        for (int y = yStart; y <= yEnd; y += yStep) {
             g2.drawLine(xStart, y, xEnd, y);
         }
 
@@ -138,8 +140,8 @@ public class UI extends JPanel {
         final int imgWidth = 32;
         final int imgHeight = 32;
 
-        final int xImgOffset = xStart - (imgWidth /2);
-        final int yImgOffset = yStart - (imgHeight /2);
+        final int xImgOffset = xStart - (imgWidth / 2);
+        final int yImgOffset = yStart - (imgHeight / 2);
 
         for (int i = 0; i < board.getXSize(); i++) {
             for (int j = 0; j < board.getYSize(); j++) {

@@ -11,10 +11,6 @@ public class Phases {
         phase = 1;
     }
 
-    public boolean isBeforeGame() {
-        return phase == 0;
-    }
-
     public boolean isBeginning() {
         return phase == 1;
     }
@@ -26,7 +22,6 @@ public class Phases {
     public boolean isEnd() {
         return phase > 2;
     }
-
 
     public void setMiddle() {
         phase = 2;

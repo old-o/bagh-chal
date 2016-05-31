@@ -1,5 +1,6 @@
 package net.doepner.baghchal;
 
+import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
@@ -12,9 +13,14 @@ import static net.doepner.baghchal.Piece.GOAT;
  */
 public class GoatsManager extends MouseAdapter {
 
-    private static final int BOARD_END = 450;
-    private static final int BOARD_START = 20;
     private static final int TOTAL_GOATS = 20;
+
+    private final boolean remainingGoat[] = new boolean[20];
+
+    private final Image goat;
+
+    private final Board board;
+    private final Phases phases;
 
     private int selectedGoat;
 
@@ -25,13 +31,6 @@ public class GoatsManager extends MouseAdapter {
 
     private int draggedPieceX;
     private int draggedPieceY;
-
-    private final boolean remainingGoat[] = new boolean[20];
-
-    private final Image goat;
-
-    private final Board board;
-    private final Phases phases;
 
     private EventHandler eventHandler;
 
@@ -49,19 +48,28 @@ public class GoatsManager extends MouseAdapter {
     }
 
     public void mousePressed(MouseEvent e) {
-        System.out.println("Mouse pressed: Source width: " + e.getComponent().getWidth());
+        final int width = e.getComponent().getWidth();
+        final int height = e.getComponent().getHeight();
+
         int x = e.getX();
         int y = e.getY();
-        if (x >= BOARD_END + 10) {
+
+        final int xBoardEnd = width - 50;
+        final int yBoardEnd = height - 50;
+
+        if (x >= xBoardEnd + 10) {
             int i = (y - 10) / 40;
             dragAvailableGoat(i);
-        } else if (y >= BOARD_END + 10) {
-            int i = (x - 10) / 40 + 10;
-            dragAvailableGoat(i);
+        } else {
+
+            if (y >= yBoardEnd + 10) {
+                int i = (x - 10) / 40 + 10;
+                dragAvailableGoat(i);
+            }
         }
-        if (phases.isMiddle() && isPositionOnBoard(x, y)) {
-            int i = getIndex(x);
-            int j = getIndex(y);
+        if (phases.isMiddle() && isPositionOnBoard(e)) {
+            int i = getXIndex(e);
+            int j = getYIndex(e);
             if (board.get(i, j) == GOAT) {
                 draggedPieceX = i;
                 draggedPieceY = j;
@@ -71,8 +79,17 @@ public class GoatsManager extends MouseAdapter {
         }
     }
 
-    private boolean isPositionOnBoard(int x, int y) {
-        return x >= BOARD_START && x <= BOARD_END && y >= BOARD_START && y <= BOARD_END;
+    private boolean isPositionOnBoard(MouseEvent e) {
+        final int xBoardStart = 20;
+        final int yBoardStart = 20;
+
+        final int xBoardEnd = e.getComponent().getWidth() - 50;
+        final int yBoardEnd = e.getComponent().getHeight() - 50;
+
+        int x = e.getX();
+        int y = e.getY();
+
+        return x >= xBoardStart && x <= xBoardEnd && y >= yBoardStart && y <= yBoardEnd;
     }
 
     private void dragAvailableGoat(int i) {
@@ -97,19 +114,15 @@ public class GoatsManager extends MouseAdapter {
             return;
         }
         dragging = false;
-        int x = e.getX();
-        int y = e.getY();
-        if (x < BOARD_START || y < BOARD_START || x > BOARD_END || y > BOARD_END) {
+        if (!isPositionOnBoard(e)) {
             if (phases.isBeginning()) {
                 remainingGoat[selectedGoat] = true;
             } else {
                 board.set(draggedPieceX, draggedPieceY, GOAT);
             }
         } else {
-            int i = getIndex(x);
-            int j = getIndex(y);
-            i = normalize(i);
-            j = normalize(j);
+            final int i = normalize(getXIndex(e), board.getXSize());
+            final int j = normalize(getYIndex(e), board.getYSize());
             if (board.empty(i, j) && (phases.isBeginning() || board.validGoatMove(draggedPieceX, draggedPieceY, i, j))) {
                 board.set(i, j, GOAT);
                 if (phases.isBeginning() && noRemainingGoats()) {
@@ -127,18 +140,18 @@ public class GoatsManager extends MouseAdapter {
         boardChanged();
     }
 
-    private int getIndex(double pos) {
-        return (int) (pos / 100D + 0.25D);
+    private int getXIndex(MouseEvent e) {
+        final double xStep = e.getComponent().getWidth() / board.getXSize();
+        return (int) (e.getX() / xStep + 0.25D);
     }
 
-    private int normalize(int i) {
-        if (i < 0) {
-            return  0;
-        } else if (i > 4) {
-            return 4;
-        } else {
-            return i;
-        }
+    private int getYIndex(MouseEvent e) {
+        final double yStep = e.getComponent().getHeight() / board.getYSize();
+        return (int) (e.getY() / yStep + 0.25D);
+    }
+
+    private int normalize(int i, int max) {
+        return i < 0 ? 0 : i >= max ? max : i;
     }
 
     boolean noRemainingGoats() {
@@ -178,14 +191,14 @@ public class GoatsManager extends MouseAdapter {
         }
     }
 
-    void drawRemainingGoats(Graphics2D g2) {
+    void drawRemainingGoats(Graphics2D g2, int width, int height) {
         for (int i = 0; i < TOTAL_GOATS / 2; i++)
             if (remainingGoat[i])
-                g2.drawImage(goat, BOARD_END + 10, 10 + i * 40, null);
+                g2.drawImage(goat, (width - 50) + 10, 10 + i * 40, null);
 
         for (int i = 0; i < TOTAL_GOATS - (TOTAL_GOATS / 2); i++)
             if (remainingGoat[i + 10])
-                g2.drawImage(goat, 10 + i * 40, BOARD_END + 10, null);
+                g2.drawImage(goat, 10 + i * 40, (height - 50) + 10, null);
 
     }
 }
