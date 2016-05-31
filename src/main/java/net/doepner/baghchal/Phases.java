@@ -5,9 +5,11 @@ package net.doepner.baghchal;
  */
 public class Phases {
 
-    int phase;
+    private int phase;
+    private int level;
 
-    public void reset() {
+    public Phases() {
+        level = 1;
         phase = 1;
     }
 
@@ -31,4 +33,25 @@ public class Phases {
         phase = 3;
     }
 
+
+    public int getLevel() {
+        return level;
+    }
+
+    public int nextLevel() {
+        if (!isOver()) {
+            phase = 1;
+            level++;
+        }
+        return level;
+    }
+
+    public boolean isOver() {
+        return level > 7;
+    }
+
+    public int firstLevel() {
+        level = 1;
+        return level;
+    }
 }

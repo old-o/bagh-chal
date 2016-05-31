@@ -1,8 +1,6 @@
 package net.doepner.baghchal;
 
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import java.awt.BorderLayout;
+import javax.swing.JComponent;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -11,9 +9,7 @@ import java.awt.Image;
 
 import static net.doepner.baghchal.Piece.TIGER;
 
-public class UI extends JPanel {
-
-    private final Color bgColor = Color.white;
+public class UI extends JComponent {
 
     private final GoatsManager goatsManager;
     private final Board board;
@@ -21,78 +17,59 @@ public class UI extends JPanel {
     private final Phases phases;
 
     private final Image congrats;
-    private final JButton nextLevelBtn;
 
-    private int level;
     private Image tiger;
 
     public UI(Board board, GoatsManager goatsManager, Images images, Phases phases) {
-        super(new BorderLayout());
-
         this.board = board;
         this.goatsManager = goatsManager;
         this.images = images;
         this.phases = phases;
 
-        final JButton newGameBtn = new JButton("New Game");
-        newGameBtn.addActionListener(e -> start());
-        newGameBtn.setBounds(410, 460, 80, 30);
-        add(newGameBtn);
-
-        nextLevelBtn = new JButton("Next Level");
-        nextLevelBtn.addActionListener(e -> startLevel(level));
-        nextLevelBtn.setBounds(200, 225, 100, 50);
-        nextLevelBtn.setVisible(false);
-        add(nextLevelBtn);
-
         congrats = images.getImage("congrats.gif");
 
-        setBackground(bgColor);
+        setOpaque(true);
+        setBackground(Color.white);
 
         addMouseMotionListener(goatsManager);
         addMouseListener(goatsManager);
     }
 
     public void start() {
-        startLevel(1);
+        startLevel(phases.firstLevel());
+    }
+
+    public void nextLevel() {
+        startLevel(phases.nextLevel());
     }
 
     private void startLevel(int level) {
-        this.level = level;
-        nextLevelBtn.setVisible(false);
         board.reset();
-        phases.reset();
         goatsManager.reset();
         tiger = images.getTigerImage(level);
         repaint();
     }
 
-    public void offerNextLevel() {
-        level++;
-        nextLevelBtn.setVisible(true);
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public void paint(Graphics g) {
-        super.paint(g);
-        final Graphics2D g2 = (Graphics2D) g;
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
 
         final int width = getWidth();
         final int height = getHeight();
 
+        g.setColor(getBackground());
+        g.fillRect(0, 0, width, height);
+        g.setColor(getForeground());
+
+        final Graphics2D g2 = (Graphics2D) g;
+
         if (phases.isEnd()) {
-            g2.clearRect(0, 0, width, height);
-            g2.setColor(Color.black);
             g2.drawImage(congrats, 70, 80, this);
-            String s;
-            if (level > 7) {
+            final String s;
+            if (phases.isOver()) {
                 s = "You have completed Bagh-Chal";
-                nextLevelBtn.setVisible(false);
             } else {
-                s = "Now try level " + level;
+                s = "Now try level " + phases.getLevel();
             }
             g2.setFont(new Font("SansSerif", 0, 34));
             g2.drawString(s, width / 2 - (g2.getFontMetrics().stringWidth(s) >> 1), height / 2 + 100);

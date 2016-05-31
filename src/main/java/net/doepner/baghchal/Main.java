@@ -19,8 +19,12 @@
 
 package net.doepner.baghchal;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JToolBar;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Image;
 
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
@@ -43,6 +47,25 @@ public final class Main {
         final GoatsManager goatsManager = new GoatsManager(goat, board, phases);
         final UI ui = new UI(board, goatsManager, images, phases);
 
+        ui.setPreferredSize(new Dimension(500, 500));
+        ui.start();
+
+        final JFrame frame = new JFrame("Bagh-Chal");
+        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+
+        final JButton newGameBtn = new JButton("New Game");
+        newGameBtn.addActionListener(e -> ui.start());
+        final JButton nextLevelBtn = new JButton("Next Level");
+        nextLevelBtn.addActionListener(e -> ui.nextLevel());
+
+        final JToolBar toolBar = new JToolBar();
+        toolBar.add(newGameBtn);
+        toolBar.add(nextLevelBtn);
+
+        frame.add(toolBar, BorderLayout.PAGE_START);
+        frame.add(ui, BorderLayout.CENTER);
+
         goatsManager.setEventHandler(new EventHandler() {
             @Override
             public void boardChanged() {
@@ -54,9 +77,9 @@ public final class Main {
                 strategy.updatePossibleMoves();
                 if (strategy.isOver()) {
                     phases.setEnd();
-                    ui.offerNextLevel();
+                    nextLevelBtn.setEnabled(false);
                 } else {
-                    strategy.generateMove(ui.getLevel());
+                    strategy.generateMove(phases.getLevel());
                 }
                 ui.repaint();
             }
@@ -67,13 +90,9 @@ public final class Main {
             }
         });
 
-        ui.setPreferredSize(new Dimension(500, 500));
-        ui.start();
 
-        final JFrame frame = new JFrame("Bagh-Chal");
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        frame.add(ui);
         frame.pack();
         frame.setVisible(true);
     }
+
 }
