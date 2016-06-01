@@ -1,12 +1,26 @@
 package net.doepner.baghchal;
 
 import javax.swing.JComponent;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Paint;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.TexturePaint;
+import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 
+import static java.awt.RenderingHints.KEY_ANTIALIASING;
+import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
+import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
+import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
+import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
+import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
 import static net.doepner.baghchal.Piece.TIGER;
 
 public class UI extends JComponent {
@@ -18,6 +32,10 @@ public class UI extends JComponent {
 
     private final Image congrats;
 
+    private final Paint paint;
+    private final BasicStroke stroke = new BasicStroke(2);
+    private final RenderingHints renderingHints;
+
     private Image tiger;
 
     public UI(Board board, GoatsManager goatsManager, Images images, Phases phases) {
@@ -27,6 +45,14 @@ public class UI extends JComponent {
         this.phases = phases;
 
         congrats = images.getImage("congrats.gif");
+        final BufferedImage bgImage = images.getImage("background.jpg");
+        paint = new TexturePaint(bgImage, new Rectangle(0, 0, bgImage.getWidth(), bgImage.getHeight()));
+
+        final Map<RenderingHints.Key, Object> map = new HashMap<>();
+        map.put(KEY_TEXT_ANTIALIASING, VALUE_TEXT_ANTIALIAS_ON);
+        map.put(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
+        map.put(KEY_STROKE_CONTROL,VALUE_STROKE_NORMALIZE);
+        renderingHints = new RenderingHints(map);
 
         setOpaque(true);
         setBackground(Color.white);
@@ -57,11 +83,13 @@ public class UI extends JComponent {
         final int width = getWidth();
         final int height = getHeight();
 
-        g.setColor(getBackground());
-        g.fillRect(0, 0, width, height);
-        g.setColor(getForeground());
-
         final Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHints(renderingHints);
+
+        g2.setPaint(paint);
+        g.fillRect(0, 0, width, height);
+
+        g.setColor(getForeground());
 
         if (phases.isEnd()) {
             g2.drawImage(congrats, 70, 80, this);
@@ -69,12 +97,12 @@ public class UI extends JComponent {
             if (phases.isOver()) {
                 s = "You have completed Bagh-Chal";
             } else {
-                s = "Now try level " + phases.getLevel();
+                s = "Now try level " + (phases.getLevel() + 1);
             }
             g2.setFont(new Font("SansSerif", 0, 34));
             g2.drawString(s, width / 2 - (g2.getFontMetrics().stringWidth(s) >> 1), height / 2 + 100);
-        }  else {
-            drawBoard(g2, width,height);
+        } else {
+            drawBoard(g2, width, height);
             goatsManager.drawRemainingGoats(g2, width, height);
             goatsManager.drawDraggedGoat(g2);
         }
@@ -82,6 +110,7 @@ public class UI extends JComponent {
 
     void drawBoard(Graphics2D g2, int w, int h) {
         g2.setColor(Color.black);
+        g2.setStroke(stroke);
 
         final int width = w - 2 * 50;
         final int height = h - 2 * 50;

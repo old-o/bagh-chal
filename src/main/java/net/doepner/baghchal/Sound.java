@@ -42,6 +42,10 @@ public class Sound {
         play(tiger);
     }
 
+    public Clip play(String resourceFile) {
+        return play(getClass().getResource(resourceFile));
+    }
+
     public Clip play(URL url) {
         try (AudioInputStream stream = getAudioInputStream(url)) {
 

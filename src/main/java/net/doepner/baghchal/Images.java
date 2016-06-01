@@ -1,7 +1,8 @@
 package net.doepner.baghchal;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 /**
@@ -16,7 +17,7 @@ public class Images {
     };
 
 
-    Image getImage(String s) {
+    BufferedImage getImage(String s) {
         try {
             return ImageIO.read(getClass().getResource(s));
         } catch (IOException e) {

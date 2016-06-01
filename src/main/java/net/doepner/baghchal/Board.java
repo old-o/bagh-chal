@@ -1,6 +1,5 @@
 package net.doepner.baghchal;
 
-import static net.doepner.baghchal.Piece.GOAT;
 import static net.doepner.baghchal.Piece.TIGER;
 
 /**
@@ -106,6 +105,9 @@ public class Board {
     }
 
     public void set(int i, int j, Piece piece) {
+        if (piece == TIGER) {
+            sound.play("step.wav");
+        }
         board[i][j] = piece;
     }
 

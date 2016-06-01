@@ -35,6 +35,8 @@ public final class Main {
 
     public static void main(String... args) {
 
+        System.setProperty("sun.java2d.opengl", "true");
+
         final Sound sound = new Sound();
 
         final Images images = new Images();
