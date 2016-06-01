@@ -18,8 +18,13 @@ public class Board {
     }
 
     void doMove(Move m) {
-        set(m.x2(), m.y2(), get(m.x1(), m.y1()));
+        final Piece piece = get(m.x1(), m.y1());
+        set(m.x2(), m.y2(), piece);
         clear(m.x1(), m.y1());
+
+        if (piece == TIGER) {
+            sound.play("step.wav");
+        }
 
         if (isTakingMove(m)) {
             clear(m.x1() + m.x2() >> 1, m.y1() + m.y2() >> 1);
@@ -105,9 +110,6 @@ public class Board {
     }
 
     public void set(int i, int j, Piece piece) {
-        if (piece == TIGER) {
-            sound.play("step.wav");
-        }
         board[i][j] = piece;
     }
 

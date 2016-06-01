@@ -95,6 +95,8 @@ public final class Main {
 
         frame.pack();
         frame.setVisible(true);
+
+        sound.play("welcome.wav");
     }
 
 }
