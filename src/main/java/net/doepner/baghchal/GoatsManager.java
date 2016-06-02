@@ -113,21 +113,16 @@ public class GoatsManager extends MouseAdapter {
             return;
         }
         dragging = false;
-        if (isPositionOnBoard(e)) {
-            final int i = normalize(getXIndex(e), board.getXSize());
-            final int j = normalize(getYIndex(e), board.getYSize());
-            if (board.empty(i, j) && (phases.isBeginning() || board.validGoatMove(draggedPieceX, draggedPieceY, i, j))) {
-                board.set(i, j, GOAT);
-                if (phases.isBeginning() && noRemainingGoats()) {
-                    phases.setMiddle();
-                }
-                if (i != draggedPieceX || j != draggedPieceY) {
-                    goatMoveDone();
-                }
-            } else if (phases.isBeginning()) {
-                remainingGoat[selectedGoat] = true;
-            } else {
-                board.set(draggedPieceX, draggedPieceY, GOAT);
+        final int i = normalize(getXIndex(e), board.getXSize());
+        final int j = normalize(getYIndex(e), board.getYSize());
+        if (isPositionOnBoard(e) && board.empty(i, j)
+                && (phases.isBeginning() || board.validGoatMove(draggedPieceX, draggedPieceY, i, j))) {
+            board.set(i, j, GOAT);
+            if (phases.isBeginning() && noRemainingGoats()) {
+                phases.setMiddle();
+            }
+            if (i != draggedPieceX || j != draggedPieceY) {
+                goatMoveDone();
             }
         } else {
             if (phases.isBeginning()) {
