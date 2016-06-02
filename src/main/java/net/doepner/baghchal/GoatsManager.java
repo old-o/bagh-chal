@@ -1,12 +1,11 @@
 package net.doepner.baghchal;
 
-import java.awt.Component;
+import static net.doepner.baghchal.Piece.GOAT;
+
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-import static net.doepner.baghchal.Piece.GOAT;
 
 /**
  * Manages the goats
@@ -15,7 +14,7 @@ public class GoatsManager extends MouseAdapter {
 
     private static final int TOTAL_GOATS = 20;
 
-    private final boolean remainingGoat[] = new boolean[20];
+    private final boolean remainingGoat[] = new boolean[TOTAL_GOATS];
 
     private final Image goat;
 
@@ -114,13 +113,7 @@ public class GoatsManager extends MouseAdapter {
             return;
         }
         dragging = false;
-        if (!isPositionOnBoard(e)) {
-            if (phases.isBeginning()) {
-                remainingGoat[selectedGoat] = true;
-            } else {
-                board.set(draggedPieceX, draggedPieceY, GOAT);
-            }
-        } else {
+        if (isPositionOnBoard(e)) {
             final int i = normalize(getXIndex(e), board.getXSize());
             final int j = normalize(getYIndex(e), board.getYSize());
             if (board.empty(i, j) && (phases.isBeginning() || board.validGoatMove(draggedPieceX, draggedPieceY, i, j))) {
@@ -132,6 +125,12 @@ public class GoatsManager extends MouseAdapter {
                     goatMoveDone();
                 }
             } else if (phases.isBeginning()) {
+                remainingGoat[selectedGoat] = true;
+            } else {
+                board.set(draggedPieceX, draggedPieceY, GOAT);
+            }
+        } else {
+            if (phases.isBeginning()) {
                 remainingGoat[selectedGoat] = true;
             } else {
                 board.set(draggedPieceX, draggedPieceY, GOAT);

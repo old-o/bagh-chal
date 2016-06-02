@@ -19,14 +19,15 @@
 
 package net.doepner.baghchal;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JToolBar;
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Image;
 
-import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JToolBar;
 
 /**
  * Entry point of the game
@@ -60,6 +61,7 @@ public final class Main {
         newGameBtn.addActionListener(e -> ui.start());
         final JButton nextLevelBtn = new JButton("Next Level");
         nextLevelBtn.addActionListener(e -> ui.nextLevel());
+        nextLevelBtn.setEnabled(false);
 
         final JToolBar toolBar = new JToolBar();
         toolBar.add(newGameBtn);
@@ -79,10 +81,10 @@ public final class Main {
                 strategy.updatePossibleMoves();
                 if (strategy.isOver()) {
                     phases.setEnd();
-                    nextLevelBtn.setEnabled(false);
                 } else {
                     strategy.generateMove(phases.getLevel());
                 }
+                nextLevelBtn.setEnabled(strategy.isOver());
                 ui.repaint();
             }
 
