@@ -17,78 +17,79 @@ public class Board {
         this.sound = sound;
     }
 
-    void doMove(Move m) {
-        final Piece piece = get(m.x1(), m.y1());
-        set(m.x2(), m.y2(), piece);
-        clear(m.x1(), m.y1());
+    void doMove(Move move) {
+        final Piece piece = get(move.p1());
+        set(move.p2(), piece);
+        clear(move.p1());
 
         if (piece == TIGER) {
             sound.play("step.wav");
         }
-
-        if (isTakingMove(m)) {
-            clear(m.x1() + m.x2() >> 1, m.y1() + m.y2() >> 1);
+        if (move.isTakingMove()) {
+            clear(move.middle());
             sound.playTiger();
         }
     }
 
-    public boolean isTakingMove(Move m) {
-        return m.x1() - m.x2() == 2 || m.x2() - m.x1() == 2 || m.y1() - m.y2() == 2 || m.y2() - m.y1() == 2;
-    }
-
-    boolean validGoatMove(int x1, int y1, int x2, int y2) {
-        if (x1 < 0 || x1 >= X_SIZE || x2 < 0 || x2 >= X_SIZE
-                || y1 < 0 || y1 >= Y_SIZE || y2 < 0 || y2 >= Y_SIZE) {
+    boolean validMove(Move move) {
+        final Position p1 = move.p1();
+        final Position p2 = move.p2();
+        if (!isValidPosition(p1) || !isValidPosition(p2)) {
             return false;
         }
-        int dx = x1 - x2;
-        int dy = y1 - y2;
-        if (dx == 0 && dy == 0) {
-            return false;
+        final int x1 = p1.x();
+        final int y1 = p1.y();
+        final int x2 = p2.x();
+        final int y2 = p2.y();
+
+        if (x1 == x2) {
+            return y1 + 1 == y2 || y1 - 1 == y2;
         }
-        if (dx > 1 || dx < -1 || dy > 1 || dy < -1) {
-            return false;
+        if (y1 == y2) {
+            return x1 + 1 == x2 || x1 - 1 == x2;
         }
-        if (dx == 1) {
-            if (dy == 1) {
-                return canMoveUpLeft(x1, y1);
-            }
-            if (dy == -1) {
-                return canMoveDownLeft(x1, y1);
-            }
-        } else if (dx == -1) {
-            if (dy == 1) {
-                return canMoveUpRight(x1, y1);
-            }
-            if (dy == -1) {
-                return canMoveDownRight(x1, y1);
-            }
+        if (x1 - 1 == x2 && y1 - 1 == y2) {
+            return canMoveLeftUp(x1, y1);
         }
-        return true;
+        if (x1 - 1 == x2 && y1 + 1 == y2) {
+            return canMoveLeftDown(x1, y1);
+        }
+        if (x1 - x2 == -1 && y1 - y2 == 1) {
+            return canMoveRightUp(x1, y1);
+        }
+        if (x1 + 1 == x2 && y1 + 1 == y2) {
+            return canMoveRightDown(x1, y1);
+        }
+        return false;
     }
 
-
-    boolean canMoveDownLeft(int i, int j) {
-        return !(i == 0 || j == 4) && (i + j == 4 || i == 2 && j == 0 || i == 1 && j == 1 || i == 4 && j == 2 || i == 3 && j == 3);
+    boolean isValidPosition(Position pos) {
+        final int x = pos.x();
+        final int y = pos.y();
+        return x >= 0 && y >= 0 && x < X_SIZE && y < Y_SIZE;
     }
 
-    boolean canMoveDownRight(int i, int j) {
-        return !(i == 4 || j == 4) && (i == j || i == 0 && j == 2 || i == 1 && j == 3 || i == 2 && j == 0 || i == 3 && j == 1);
+    boolean canMoveLeftDown(int x, int y) {
+        return !(x == 0 || y == 4) && (x + y == 4 || x == 2 && y == 0 || x == 1 && y == 1 || x == 4 && y == 2 || x == 3 && y == 3);
     }
 
-    boolean canMoveUpRight(int i, int j) {
-        return j != 0 && (i + j == 4 || i == 0 && j == 2 || i == 1 && j == 1 || i == 2 && j == 4 || i == 3 && j == 3);
+    boolean canMoveRightDown(int x, int y) {
+        return !(x == 4 || y == 4) && (x == y || x == 0 && y == 2 || x == 1 && y == 3 || x == 2 && y == 0 || x == 3 && y == 1);
     }
 
-    boolean canMoveUpLeft(int i, int j) {
-        return !(j == 0 || i == 0) && (i == j || i == 1 && j == 3 || i == 2 && j == 4 || i == 3 && j == 1 || i == 4 && j == 2);
+    boolean canMoveRightUp(int x, int y) {
+        return y != 0 && (x + y == 4 || x == 0 && y == 2 || x == 1 && y == 1 || x == 2 && y == 4 || x == 3 && y == 3);
+    }
+
+    boolean canMoveLeftUp(int x, int y) {
+        return !(y == 0 || x == 0) && (x == y || x == 1 && y == 3 || x == 2 && y == 4 || x == 3 && y == 1 || x == 4 && y == 2);
     }
 
     void reset() {
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++)
-                clear(i, j);
-
+        for (int x = 0; x < X_SIZE; x++) {
+            for (int y = 0; y < Y_SIZE; y++) {
+                clear(x, y);
+            }
         }
         set(0, 0, TIGER);
         set(4, 0, TIGER);
@@ -97,28 +98,40 @@ public class Board {
     }
 
     Piece[][] copyBoard() {
-        Piece a[][] = new Piece[X_SIZE][Y_SIZE];
-        for (int i = 0; i < X_SIZE; i++) {
-            System.arraycopy(board[i], 0, a[i], 0, Y_SIZE);
+        final Piece a[][] = new Piece[X_SIZE][Y_SIZE];
+        for (int x = 0; x < X_SIZE; x++) {
+            System.arraycopy(board[x], 0, a[x], 0, Y_SIZE);
 
         }
         return a;
     }
 
-    public Piece get(int i, int j) {
-        return board[i][j];
+    public Piece get(Position p) {
+        return get(p.x(), p.y());
     }
 
-    public void set(int i, int j, Piece piece) {
-        board[i][j] = piece;
+    public void set(Position p, Piece piece) {
+        board[p.x()][p.y()] = piece;
     }
 
-    void clear(int i, int j) {
-        set(i, j, null);
+    void clear(Position p) {
+        set(p, null);
     }
 
-    public boolean empty(int i, int j) {
-        return get(i, j) == null;
+    public boolean isEmpty(Position p) {
+        return get(p) == null;
+    }
+
+    protected Piece get(int x, int y) {
+        return board[x][y];
+    }
+
+    private void set(int x, int y, Piece piece) {
+        board[x][y] = piece;
+    }
+
+    private void clear(int x, int y) {
+        set(x, y, null);
     }
 
     public int getXSize() {
@@ -127,5 +140,15 @@ public class Board {
 
     public int getYSize() {
         return Y_SIZE;
+    }
+
+    public Position normalize(Position p) {
+        final int x = normalize(p.x(), X_SIZE);
+        final int y = normalize(p.y(), Y_SIZE);
+        return new Position(x,y);
+    }
+
+    private int normalize(int n, int max) {
+        return n < 0 ? 0 : n >= max ? max - 1 : n;
     }
 }

@@ -1,11 +1,11 @@
 package net.doepner.baghchal;
 
-import static net.doepner.baghchal.Piece.GOAT;
-
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import static net.doepner.baghchal.Piece.GOAT;
 
 /**
  * Manages the goats
@@ -28,8 +28,7 @@ public class GoatsManager extends MouseAdapter {
     private int mouseX;
     private int mouseY;
 
-    private int draggedPieceX;
-    private int draggedPieceY;
+    private Position draggedPiecePos = null;
 
     private EventHandler eventHandler;
 
@@ -40,7 +39,7 @@ public class GoatsManager extends MouseAdapter {
     }
 
     void reset() {
-        draggedPieceX = draggedPieceY = -1;
+        draggedPiecePos = null;
         for (int i = 0; i < TOTAL_GOATS; i++) {
             remainingGoat[i] = true;
         }
@@ -67,12 +66,10 @@ public class GoatsManager extends MouseAdapter {
             }
         }
         if (phases.isMiddle() && isPositionOnBoard(e)) {
-            int i = getXIndex(e);
-            int j = getYIndex(e);
-            if (board.get(i, j) == GOAT) {
-                draggedPieceX = i;
-                draggedPieceY = j;
-                board.clear(i, j);
+            final Position p = getPosition(e);
+            if (board.get(p) == GOAT) {
+                draggedPiecePos = p;
+                board.clear(p);
                 dragging = true;
             }
         }
@@ -113,25 +110,28 @@ public class GoatsManager extends MouseAdapter {
             return;
         }
         dragging = false;
-        final int i = normalize(getXIndex(e), board.getXSize());
-        final int j = normalize(getYIndex(e), board.getYSize());
-        if (isPositionOnBoard(e) && board.empty(i, j)
-                && (phases.isBeginning() || board.validGoatMove(draggedPieceX, draggedPieceY, i, j))) {
-            board.set(i, j, GOAT);
+        final Position pos = board.normalize(getPosition(e));
+        final Move move = new Move(draggedPiecePos, pos);
+        if (board.isEmpty(pos) && (phases.isBeginning() || board.validMove(move))) {
+            board.set(move.p2(), GOAT);
             if (phases.isBeginning() && noRemainingGoats()) {
                 phases.setMiddle();
             }
-            if (i != draggedPieceX || j != draggedPieceY) {
+            if (!pos.equals(draggedPiecePos)) {
                 goatMoveDone();
             }
         } else {
             if (phases.isBeginning()) {
                 remainingGoat[selectedGoat] = true;
             } else {
-                board.set(draggedPieceX, draggedPieceY, GOAT);
+                board.set(draggedPiecePos, GOAT);
             }
         }
         boardChanged();
+    }
+
+    private Position getPosition(MouseEvent e) {
+        return new Position(getXIndex(e), getYIndex(e));
     }
 
     private int getXIndex(MouseEvent e) {
@@ -142,10 +142,6 @@ public class GoatsManager extends MouseAdapter {
     private int getYIndex(MouseEvent e) {
         final double yStep = e.getComponent().getHeight() / board.getYSize();
         return (int) (e.getY() / yStep + 0.25D);
-    }
-
-    private int normalize(int i, int max) {
-        return i < 0 ? 0 : i >= max ? max : i;
     }
 
     boolean noRemainingGoats() {

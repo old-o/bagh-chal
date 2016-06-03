@@ -50,8 +50,8 @@ public class Strategy {
         List<Move> threatensMany = new ArrayList<>();
         for (Move m : possibleMoves) {
             Piece[][] brd = board.copyBoard();
-            brd[m.x2()][m.y2()] = brd[m.x1()][m.y1()];
-            brd[m.x1()][m.y1()] = null;
+            brd[m.p2().x()][m.p2().y()] = brd[m.p1().x()][m.p1().y()];
+            brd[m.p1().x()][m.p1().y()] = null;
             int t = numberOfPiecesThreatened(brd);
             if (t == 1) {
                 threatensOne.add(m);
@@ -79,25 +79,33 @@ public class Strategy {
             for (int j = 0; j < 5; j++)
                 if (brd[i][j] == TIGER) {
                     if (i > 1) {
-                        if (j > 1 && brd[i - 1][j - 1] == GOAT && brd[i - 2][j - 2] == null)
+                        if (j > 1 && brd[i - 1][j - 1] == GOAT && brd[i - 2][j - 2] == null) {
                             r++;
-                        if (brd[i - 1][j] == GOAT && brd[i - 2][j] == null)
+                        }
+                        if (brd[i - 1][j] == GOAT && brd[i - 2][j] == null) {
                             r++;
-                        if (j < 3 && brd[i - 1][j + 1] == GOAT && brd[i - 2][j + 2] == null)
+                        }
+                        if (j < 3 && brd[i - 1][j + 1] == GOAT && brd[i - 2][j + 2] == null) {
                             r++;
+                        }
                     }
-                    if (j < 3 && brd[i][j + 1] == GOAT && brd[i][j + 2] == null)
+                    if (j < 3 && brd[i][j + 1] == GOAT && brd[i][j + 2] == null) {
                         r++;
+                    }
                     if (i < 3) {
-                        if (j < 3 && brd[i + 1][j + 1] == GOAT && brd[i + 2][j + 2] == null)
+                        if (j < 3 && brd[i + 1][j + 1] == GOAT && brd[i + 2][j + 2] == null) {
                             r++;
-                        if (brd[i + 1][j] == GOAT && brd[i + 2][j] == null)
+                        }
+                        if (brd[i + 1][j] == GOAT && brd[i + 2][j] == null) {
                             r++;
-                        if (j > 1 && brd[i + 1][j - 1] == GOAT && brd[i + 2][j - 2] == null)
+                        }
+                        if (j > 1 && brd[i + 1][j - 1] == GOAT && brd[i + 2][j - 2] == null) {
                             r++;
+                        }
                     }
-                    if (j > 1 && brd[i][j - 1] == GOAT && brd[i][j - 2] == null)
+                    if (j > 1 && brd[i][j - 1] == GOAT && brd[i][j - 2] == null) {
                         r++;
+                    }
                 }
         }
         return r;
@@ -105,7 +113,7 @@ public class Strategy {
 
 
     void doAI_3() {
-        List<Move> takes = possibleMoves.stream().filter(board::isTakingMove).collect(toList());
+        List<Move> takes = possibleMoves.stream().filter(Move::isTakingMove).collect(toList());
 
         int s2 = takes.size();
         if (s2 > 0) {
@@ -115,19 +123,21 @@ public class Strategy {
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
                 if (b(i, j) == TIGER) {
-                    if (board.canMoveUpLeft(i, j) && i > 1 && j > 1 && b(i - 1, j - 1) == GOAT && b(i - 2, j - 2) == null)
+                    // TODO : Use iteration over direction vectors and calls to board.validMove(move)
+                    // vectors can be all combinations of -1,0,1 and -1,0,1 but without 0,0
+                    if (board.canMoveLeftUp(i, j) && i > 1 && j > 1 && b(i - 1, j - 1) == GOAT && b(i - 2, j - 2) == null)
                         takes.add(new Move(i, j, i - 2, j - 2));
                     if (i > 1 && b(i - 1, j) == GOAT && b(i - 2, j) == null)
                         takes.add(new Move(i, j, i - 2, j));
-                    if (board.canMoveDownLeft(i, j) && i > 1 && j < 3 && b(i - 1, j + 1) == GOAT && b(i - 2, j + 2) == null)
+                    if (board.canMoveLeftDown(i, j) && i > 1 && j < 3 && b(i - 1, j + 1) == GOAT && b(i - 2, j + 2) == null)
                         takes.add(new Move(i, j, i - 2, j + 2));
                     if (j < 3 && b(i, j + 1) == GOAT && b(i, j + 2) == null)
                         takes.add(new Move(i, j, i, j + 2));
-                    if (board.canMoveDownRight(i, j) && i < 3 && j < 3 && b(i + 1, j + 1) == GOAT && b(i + 2, j + 2) == null)
+                    if (board.canMoveRightDown(i, j) && i < 3 && j < 3 && b(i + 1, j + 1) == GOAT && b(i + 2, j + 2) == null)
                         takes.add(new Move(i, j, i + 2, j + 2));
                     if (i < 3 && b(i + 1, j) == GOAT && b(i + 2, j) == null)
                         takes.add(new Move(i, j, i + 2, j));
-                    if (board.canMoveUpRight(i, j) && i < 3 && j > 1 && b(i + 1, j - 1) == GOAT && b(i + 2, j - 2) == null)
+                    if (board.canMoveRightUp(i, j) && i < 3 && j > 1 && b(i + 1, j - 1) == GOAT && b(i + 2, j - 2) == null)
                         takes.add(new Move(i, j, i + 2, j - 2));
                     if (j > 1 && b(i, j - 1) == GOAT && b(i, j - 2) == null)
                         takes.add(new Move(i, j, i, j - 2));
@@ -145,20 +155,21 @@ public class Strategy {
     }
 
     private Piece b(int i, int j) {
-        if (i < 0 || i > 4 || j < 0 || j > 4)
+        final Position p = new Position(i, j);
+        if (!board.isValidPosition(p)) {
             return Piece.UNDEFINED;
-        else
-            return board.get(i, j);
+        } else {
+            return board.get(p);
+        }
     }
 
     boolean tryToTake() {
         List<Move> takingMoves = new ArrayList<>();
-        for (Object possibleMove : possibleMoves) {
-            Move m = (Move) possibleMove;
-            if (board.isTakingMove(m))
+        for (Move m : possibleMoves) {
+            if (m.isTakingMove()) {
                 takingMoves.add(m);
+            }
         }
-
         int s2 = takingMoves.size();
         if (s2 > 0) {
             board.doMove(takingMoves.get((int) (Math.random() * (double) s2)));
@@ -193,22 +204,22 @@ public class Strategy {
                             possibleMoves.add(new Move(i, j, i + 1, j));
                         else if (i < 3 && b(i + 1, j) == GOAT && b(i + 2, j) == null)
                             possibleMoves.add(new Move(i, j, i + 2, j));
-                    if (i > 0 && j < 4 && board.canMoveDownLeft(i, j))
+                    if (i > 0 && j < 4 && board.canMoveLeftDown(i, j))
                         if (b(i - 1, j + 1) == null)
                             possibleMoves.add(new Move(i, j, i - 1, j + 1));
                         else if (i > 1 && j < 3 && b(i - 1, j + 1) == GOAT && b(i - 2, j + 2) == null)
                             possibleMoves.add(new Move(i, j, i - 2, j + 2));
-                    if (i < 4 && j < 4 && board.canMoveDownRight(i, j))
+                    if (i < 4 && j < 4 && board.canMoveRightDown(i, j))
                         if (b(i + 1, j + 1) == null)
                             possibleMoves.add(new Move(i, j, i + 1, j + 1));
                         else if (i < 3 && j < 3 && b(i + 1, j + 1) == GOAT && b(i + 2, j + 2) == null)
                             possibleMoves.add(new Move(i, j, i + 2, j + 2));
-                    if (i > 0 && j > 0 && board.canMoveUpLeft(i, j))
+                    if (i > 0 && j > 0 && board.canMoveLeftUp(i, j))
                         if (b(i - 1, j - 1) == null)
                             possibleMoves.add(new Move(i, j, i - 1, j - 1));
                         else if (i > 1 && j > 1 && b(i - 1, j - 1) == GOAT && b(i - 2, j - 2) == null)
                             possibleMoves.add(new Move(i, j, i - 2, j - 2));
-                    if (i < 4 && j > 0 && board.canMoveUpRight(i, j))
+                    if (i < 4 && j > 0 && board.canMoveRightUp(i, j))
                         if (b(i + 1, j - 1) == null)
                             possibleMoves.add(new Move(i, j, i + 1, j - 1));
                         else if (i < 3 && j > 1 && b(i + 1, j - 1) == GOAT && b(i + 2, j - 2) == null)

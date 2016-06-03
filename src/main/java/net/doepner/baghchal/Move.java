@@ -1,37 +1,39 @@
 package net.doepner.baghchal;
 
+import static java.lang.Math.abs;
+
 /**
  * From / to coordinates of a move on the game board
  */
 public class Move {
 
-    private final int x1;
-    private final int y1;
-
-    private final int x2;
-    private final int y2;
+    private final Position p1;
+    private final Position p2;
 
     public Move(int x1, int y1, int x2, int y2) {
-        this.x1 = x1;
-        this.y1 = y1;
-        this.x2 = x2;
-        this.y2 = y2;
+        this(new Position(x1, y1), new Position(x2, y2));
+    }
+
+    public Move(Position p1, Position p2) {
+        this.p1 = p1;
+        this.p2 = p2;
     }
 
 
-    public int x1() {
-        return x1;
+    public Position p1() {
+        return p1;
     }
 
-    public int y1() {
-        return y1;
+    public Position p2() {
+        return p2;
     }
 
-    public int x2() {
-        return x2;
+    public boolean isTakingMove() {
+        return abs(p1.x() - p2.x()) == 2 || abs(p1.y() - p2.y()) == 2 ;
     }
 
-    public int y2() {
-        return y2;
+    public Position middle() {
+        return new Position((p1.x() + p2.x()) / 2, (p1.y() + p2.y()) / 2);
     }
+
 }
