@@ -23,7 +23,7 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Image;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -41,13 +41,12 @@ public final class Main {
         final Sound sound = new Sound();
 
         final Images images = new Images();
-        final Image goat = images.getGoatImage();
 
         final Board board = new Board(sound);
         final Phases phases = new Phases();
         final Strategy strategy = new Strategy(board);
 
-        final GoatsManager goatsManager = new GoatsManager(goat, board, phases);
+        final GoatsManager goatsManager = new GoatsManager(images, board, phases);
         final UI ui = new UI(board, goatsManager, images, phases);
 
         ui.setPreferredSize(new Dimension(500, 500));
@@ -72,7 +71,8 @@ public final class Main {
 
         goatsManager.setEventHandler(new EventHandler() {
             @Override
-            public void boardChanged() {
+            public void boardChanged(MouseEvent e) {
+                //ui.repaint(e.getX() - 20, e.getY() - 20, 40, 40);
                 ui.repaint();
             }
 
