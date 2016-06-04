@@ -36,4 +36,15 @@ public class Move {
         return new Position((p1.x() + p2.x()) / 2, (p1.y() + p2.y()) / 2);
     }
 
+    public Move repeat() {
+        return new Move(p2, new Position(p2.x() + xStep(), p2.y() + yStep()));
+    }
+
+    private int yStep() {
+        return p2.y() - p1.y();
+    }
+
+    private int xStep() {
+        return p2.x() - p1.x();
+    }
 }

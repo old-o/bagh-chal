@@ -17,7 +17,7 @@ public class Board {
         this.sound = sound;
     }
 
-    void doMove(Move move) {
+    boolean doMove(Move move) {
         final Piece piece = get(move.p1());
         set(move.p2(), piece);
         clear(move.p1());
@@ -29,9 +29,10 @@ public class Board {
             clear(move.middle());
             sound.playTiger();
         }
+        return true;
     }
 
-    boolean validMove(Move move) {
+    boolean validStep(Move move) {
         final Position p1 = move.p1();
         final Position p2 = move.p2();
         if (!isValidPosition(p1) || !isValidPosition(p2)) {

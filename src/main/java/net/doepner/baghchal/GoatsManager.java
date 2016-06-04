@@ -1,12 +1,12 @@
 package net.doepner.baghchal;
 
-import static net.doepner.baghchal.Piece.GOAT;
-
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import static net.doepner.baghchal.Piece.GOAT;
 
 /**
  * Manages the goats
@@ -110,7 +110,7 @@ public class GoatsManager extends MouseAdapter {
         dragging = false;
         final Position pos = board.normalize(getPosition(e));
         final Move move = new Move(draggedPiecePos, pos);
-        if (board.isEmpty(pos) && (phases.isBeginning() || board.validMove(move))) {
+        if (board.isEmpty(pos) && (phases.isBeginning() || board.validStep(move))) {
             board.set(move.p2(), GOAT);
             if (phases.isBeginning() && noRemainingGoats()) {
                 phases.setMiddle();

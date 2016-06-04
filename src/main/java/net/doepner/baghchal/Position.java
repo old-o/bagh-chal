@@ -37,4 +37,8 @@ public final class Position {
     public int hashCode() {
         return 31 * x + y;
     }
+
+    public Position add(int xStep, int yStep) {
+        return new Position(x + xStep, y + yStep);
+    }
 }
