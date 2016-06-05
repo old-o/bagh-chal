@@ -7,9 +7,10 @@ import java.awt.event.MouseEvent;
  */
 public interface EventHandler {
 
-    void boardChanged(MouseEvent e);
+    void goatDraggingStarted();
+
+    void goatDragged(MouseEvent e);
 
     void goatMoveDone();
 
-    void goatDraggingStarted();
 }

@@ -160,7 +160,7 @@ public class GoatsManager extends MouseAdapter {
 
     private void goatDragged(MouseEvent e) {
         if (eventHandler != null && e != null) {
-            eventHandler.boardChanged(e);
+            eventHandler.goatDragged(e);
         }
     }
 
