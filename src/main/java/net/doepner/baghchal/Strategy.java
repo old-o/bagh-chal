@@ -57,6 +57,7 @@ public class Strategy {
     }
 
     private int numberOfPiecesThreatened(Move m) {
+        // TODO: don't use a raw array here
         final Piece[][] brd = board.copyBoard();
         brd[m.p2().x()][m.p2().y()] = brd[m.p1().x()][m.p1().y()];
         brd[m.p1().x()][m.p1().y()] = null;
@@ -64,6 +65,7 @@ public class Strategy {
         for (int i = 0; i < board.getXSize(); i++) {
             for (int j = 0; j < board.getYSize(); j++)
                 if (brd[i][j] == TIGER) {
+                    // TODO: DImplify code below by looping over STEPS
                     if (i > 1) {
                         if (j > 1 && brd[i - 1][j - 1] == GOAT && brd[i - 2][j - 2] == null) {
                             r++;
