@@ -36,7 +36,7 @@ public class Sound {
             lastGoat.stop();
             lastGoat = null;
         }
-        play("predator.wav");
+        play("predator-kills.wav");
     }
 
 

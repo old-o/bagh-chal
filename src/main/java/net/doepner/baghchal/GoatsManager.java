@@ -39,6 +39,7 @@ public class GoatsManager extends MouseAdapter {
 
     void reset() {
         draggedPiecePos = null;
+        dragging = false;
         for (int i = 0; i < TOTAL_GOATS; i++) {
             remainingGoat[i] = true;
         }

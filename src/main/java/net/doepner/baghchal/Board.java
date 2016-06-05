@@ -22,12 +22,11 @@ public class Board {
         set(move.p2(), piece);
         clear(move.p1());
 
-        if (piece == PREDATOR) {
-            sound.playPredatorStep();
-        }
         if (move.isTakingMove()) {
             clear(move.middle());
             sound.playPredatorKills();
+        } else if (piece == PREDATOR) {
+            sound.playPredatorStep();
         }
         return true;
     }
@@ -146,7 +145,7 @@ public class Board {
     public Position normalize(Position p) {
         final int x = normalize(p.x(), X_SIZE);
         final int y = normalize(p.y(), Y_SIZE);
-        return new Position(x,y);
+        return new Position(x, y);
     }
 
     private int normalize(int n, int max) {
