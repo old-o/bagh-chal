@@ -72,8 +72,7 @@ public final class Main {
         goatsManager.setEventHandler(new EventHandler() {
             @Override
             public void boardChanged(MouseEvent e) {
-                //ui.repaint(e.getX() - 20, e.getY() - 20, 40, 40);
-                ui.repaint();
+                ui.repaint(e.getX() - 30, e.getY() - 30, 60, 60);
             }
 
             @Override

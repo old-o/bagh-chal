@@ -94,11 +94,15 @@ public class GoatsManager extends MouseAdapter {
         }
     }
 
+    private MouseEvent previousEvent;
+
     public void mouseDragged(MouseEvent e) {
         if (dragging) {
             mouseX = e.getX() - 16; // hard-coded assumption
             mouseY = e.getY() - 16; // that images are 32x32
-            boardChanged(e);
+            goatDragged(previousEvent);
+            goatDragged(e);
+            previousEvent = e;
         }
     }
 
@@ -124,7 +128,7 @@ public class GoatsManager extends MouseAdapter {
                 board.set(draggedPiecePos, PREY);
             }
         }
-        boardChanged(e);
+        goatDragged(e);
     }
 
     private Position getPosition(MouseEvent e) {
@@ -154,8 +158,8 @@ public class GoatsManager extends MouseAdapter {
         this.eventHandler = eventHandler;
     }
 
-    private void boardChanged(MouseEvent e) {
-        if (eventHandler != null) {
+    private void goatDragged(MouseEvent e) {
+        if (eventHandler != null && e != null) {
             eventHandler.boardChanged(e);
         }
     }
