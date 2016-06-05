@@ -17,33 +17,35 @@ import static javax.sound.sampled.LineEvent.Type.STOP;
  */
 public class Sound {
 
-    private final URL[] goats = new URL[]{
-            getClass().getResource("goat1.wav"),
-            getClass().getResource("goat2.wav"),
-            getClass().getResource("goat3.wav"),
-            getClass().getResource("sheep.wav")
-    };
-
-    private final URL tiger = getClass().getResource("tiger.wav");
+    private final Phases phases;
 
     private Clip lastGoat = null;
-    private int goatIndex = 0;
+    private int goatIndex = 1;
 
-    public void playGoat() {
-        lastGoat = play(goats[goatIndex]);
-        goatIndex = (goatIndex + 1) % goats.length;
+    public Sound(Phases phases) {
+        this.phases = phases;
     }
 
-    public void playTiger() {
+    public void playGoat() {
+        lastGoat = play("prey" + goatIndex + ".wav");
+        goatIndex = (goatIndex % 3) + 1;
+    }
+
+    public void playPredatorKills() {
         if (lastGoat != null) {
             lastGoat.stop();
             lastGoat = null;
         }
-        play(tiger);
+        play("predator.wav");
+    }
+
+
+    public void playPredatorStep() {
+        play("predator-step.wav");
     }
 
     public Clip play(String resourceFile) {
-        return play(getClass().getResource(resourceFile));
+        return play(getClass().getResource(phases.getLevel() + "/" + resourceFile));
     }
 
     public Clip play(URL url) {
@@ -68,5 +70,4 @@ public class Sound {
             throw new IllegalStateException(e);
         }
     }
-
 }

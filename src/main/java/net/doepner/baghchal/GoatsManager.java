@@ -1,12 +1,11 @@
 package net.doepner.baghchal;
 
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import static net.doepner.baghchal.Piece.GOAT;
+import static net.doepner.baghchal.Piece.PREY;
 
 /**
  * Manages the goats
@@ -17,8 +16,7 @@ public class GoatsManager extends MouseAdapter {
 
     private final boolean remainingGoat[] = new boolean[TOTAL_GOATS];
 
-    private final Image goat;
-
+    private final Images images;
     private final Board board;
     private final Phases phases;
 
@@ -34,7 +32,7 @@ public class GoatsManager extends MouseAdapter {
     private EventHandler eventHandler;
 
     public GoatsManager(Images images, Board board, Phases phases) {
-        this.goat = images.getGoatImage();
+        this.images = images;
         this.board = board;
         this.phases = phases;
     }
@@ -65,7 +63,7 @@ public class GoatsManager extends MouseAdapter {
         }
         if (phases.isMiddle() && isPositionOnBoard(e)) {
             final Position p = getPosition(e);
-            if (board.get(p) == GOAT) {
+            if (board.get(p) == PREY) {
                 draggedPiecePos = p;
                 board.clear(p);
                 dragging = true;
@@ -111,7 +109,7 @@ public class GoatsManager extends MouseAdapter {
         final Position pos = board.normalize(getPosition(e));
         final Move move = new Move(draggedPiecePos, pos);
         if (board.isEmpty(pos) && (phases.isBeginning() || board.validStep(move))) {
-            board.set(move.p2(), GOAT);
+            board.set(move.p2(), PREY);
             if (phases.isBeginning() && noRemainingGoats()) {
                 phases.setMiddle();
             }
@@ -122,7 +120,7 @@ public class GoatsManager extends MouseAdapter {
             if (phases.isBeginning()) {
                 remainingGoat[selectedGoat] = true;
             } else {
-                board.set(draggedPiecePos, GOAT);
+                board.set(draggedPiecePos, PREY);
             }
         }
         boardChanged(e);
@@ -175,7 +173,7 @@ public class GoatsManager extends MouseAdapter {
 
     public void drawDraggedGoat(Graphics2D g2) {
         if (dragging) {
-            g2.drawImage(goat, mouseX, mouseY, null);
+            g2.drawImage(images.getImage(PREY), mouseX, mouseY, null);
         }
     }
 
@@ -183,7 +181,7 @@ public class GoatsManager extends MouseAdapter {
         for (int i = 0; i < TOTAL_GOATS; i++) {
             if (remainingGoat[i]) {
                 final Point p = getPoint(i, width, height);
-                g2.drawImage(goat, p.x, p.y, null);
+                g2.drawImage(images.getImage(PREY), p.x, p.y, null);
             }
         }
     }

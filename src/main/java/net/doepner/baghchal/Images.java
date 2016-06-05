@@ -4,20 +4,37 @@ import javax.imageio.ImageIO;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import static net.doepner.baghchal.Piece.PREDATOR;
 
 /**
  * Loads images for play pieces from classpath
  */
 public class Images {
 
-    private static final String[] TIGER_IMAGE_NAMES = {
-            "tiger.png",
-            "1_BrownMoth.gif", "2_Bunny.gif", "3_Crab.gif", "4_Snail.gif",
-            "5_FishGold.gif", "6_FishBlue.gif", "7_CoolShark.gif"
-    };
+    private final Phases phases;
 
+    private final ConcurrentMap<String, BufferedImage> cache = new ConcurrentHashMap<>();
 
-    BufferedImage getImage(String s) {
+    public Images(Phases phases) {
+        this.phases = phases;
+    }
+
+    BufferedImage getImage(String resourceFileName) {
+        final String resourceFilePath = phases.getLevel() + "/" + resourceFileName;
+        final BufferedImage cachedImage = cache.get(resourceFilePath);
+        if (cachedImage != null) {
+            return cachedImage;
+        } else {
+            final BufferedImage image = loadImage(resourceFilePath);
+            cache.put(resourceFileName, image);
+            return image;
+        }
+    }
+
+    private BufferedImage loadImage(String s) {
         try {
             return ImageIO.read(getClass().getResource(s));
         } catch (IOException e) {
@@ -25,11 +42,7 @@ public class Images {
         }
     }
 
-    public Image getTigerImage(int level) {
-        return getImage(TIGER_IMAGE_NAMES[level - 1]);
-    }
-
-    public Image getGoatImage() {
-        return getImage("goat.png");
+    public Image getImage(Piece piece) {
+        return getImage(piece == PREDATOR ? "predator.png" : "prey.png");
     }
 }

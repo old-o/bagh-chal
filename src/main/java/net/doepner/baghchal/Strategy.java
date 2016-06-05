@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static java.util.stream.Collectors.toList;
-import static net.doepner.baghchal.Piece.GOAT;
-import static net.doepner.baghchal.Piece.TIGER;
+import static net.doepner.baghchal.Piece.PREDATOR;
+import static net.doepner.baghchal.Piece.PREY;
 
 /**
  * The computer player's strategy (playing the tigers)
@@ -64,34 +64,34 @@ public class Strategy {
         int r = 0;
         for (int i = 0; i < board.getXSize(); i++) {
             for (int j = 0; j < board.getYSize(); j++)
-                if (brd[i][j] == TIGER) {
+                if (brd[i][j] == PREDATOR) {
                     // TODO: DImplify code below by looping over STEPS
                     if (i > 1) {
-                        if (j > 1 && brd[i - 1][j - 1] == GOAT && brd[i - 2][j - 2] == null) {
+                        if (j > 1 && brd[i - 1][j - 1] == PREY && brd[i - 2][j - 2] == null) {
                             r++;
                         }
-                        if (brd[i - 1][j] == GOAT && brd[i - 2][j] == null) {
+                        if (brd[i - 1][j] == PREY && brd[i - 2][j] == null) {
                             r++;
                         }
-                        if (j < 3 && brd[i - 1][j + 1] == GOAT && brd[i - 2][j + 2] == null) {
+                        if (j < 3 && brd[i - 1][j + 1] == PREY && brd[i - 2][j + 2] == null) {
                             r++;
                         }
                     }
-                    if (j < 3 && brd[i][j + 1] == GOAT && brd[i][j + 2] == null) {
+                    if (j < 3 && brd[i][j + 1] == PREY && brd[i][j + 2] == null) {
                         r++;
                     }
                     if (i < 3) {
-                        if (j < 3 && brd[i + 1][j + 1] == GOAT && brd[i + 2][j + 2] == null) {
+                        if (j < 3 && brd[i + 1][j + 1] == PREY && brd[i + 2][j + 2] == null) {
                             r++;
                         }
-                        if (brd[i + 1][j] == GOAT && brd[i + 2][j] == null) {
+                        if (brd[i + 1][j] == PREY && brd[i + 2][j] == null) {
                             r++;
                         }
-                        if (j > 1 && brd[i + 1][j - 1] == GOAT && brd[i + 2][j - 2] == null) {
+                        if (j > 1 && brd[i + 1][j - 1] == PREY && brd[i + 2][j - 2] == null) {
                             r++;
                         }
                     }
-                    if (j > 1 && brd[i][j - 1] == GOAT && brd[i][j - 2] == null) {
+                    if (j > 1 && brd[i][j - 1] == PREY && brd[i][j - 2] == null) {
                         r++;
                     }
                 }
@@ -102,7 +102,7 @@ public class Strategy {
     boolean doAI_3() {
         final List<Move> takes = getPossibleTakes();
         if (takes.isEmpty()) {
-            tryStepsWhere(GOAT, step -> addPossibleJump(takes, step));
+            tryStepsWhere(PREY, step -> addPossibleJump(takes, step));
         }
         return tryMoveFrom(takes) || tryMoveFrom(possibleMoves);
     }
@@ -120,19 +120,19 @@ public class Strategy {
     }
 
     private boolean tryMoveFrom(List<Move> moves) {
-        return moves.isEmpty() || board.doMove(getRandomFrom(moves));
+        return !moves.isEmpty() && board.doMove(getRandomFrom(moves));
     }
 
     void updatePossibleMoves() {
         possibleMoves.clear();
         tryStepsWhere(NONE, possibleMoves::add);
-        tryStepsWhere(GOAT, step -> addPossibleJump(possibleMoves, step));
+        tryStepsWhere(PREY, step -> addPossibleJump(possibleMoves, step));
     }
 
     private void tryStepsWhere(Piece requiredPiece, Consumer<Move> moveProcessor) {
         for (int i = 0; i < board.getXSize(); i++) {
             for (int j = 0; j < board.getYSize(); j++) {
-                if (board(i, j) == TIGER) {
+                if (board(i, j) == PREDATOR) {
                     tryDirections(new Position(i, j), requiredPiece, moveProcessor);
                 }
             }

@@ -21,7 +21,6 @@ import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
 import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
 import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
 import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
-import static net.doepner.baghchal.Piece.TIGER;
 
 public class UI extends JComponent {
 
@@ -32,11 +31,9 @@ public class UI extends JComponent {
 
     private final Image congrats;
 
-    private final Paint paint;
+    private Paint paint;
     private final BasicStroke stroke = new BasicStroke(2);
     private final RenderingHints renderingHints;
-
-    private Image tiger;
 
     public UI(Board board, GoatsManager goatsManager, Images images, Phases phases) {
         this.board = board;
@@ -45,8 +42,6 @@ public class UI extends JComponent {
         this.phases = phases;
 
         congrats = images.getImage("congrats.gif");
-        final BufferedImage bgImage = images.getImage("background.jpg");
-        paint = new TexturePaint(bgImage, new Rectangle(0, 0, bgImage.getWidth(), bgImage.getHeight()));
 
         final Map<RenderingHints.Key, Object> map = new HashMap<>();
         map.put(KEY_TEXT_ANTIALIASING, VALUE_TEXT_ANTIALIAS_ON);
@@ -54,25 +49,25 @@ public class UI extends JComponent {
         map.put(KEY_STROKE_CONTROL,VALUE_STROKE_NORMALIZE);
         renderingHints = new RenderingHints(map);
 
-        setOpaque(true);
-        setBackground(Color.white);
-
         addMouseMotionListener(goatsManager);
         addMouseListener(goatsManager);
     }
 
     public void start() {
-        startLevel(phases.firstLevel());
+        phases.firstLevel();
+        startLevel();
     }
 
     public void nextLevel() {
-        startLevel(phases.nextLevel());
+        phases.nextLevel();
+        startLevel();
     }
 
-    private void startLevel(int level) {
+    public void startLevel() {
         board.reset();
         goatsManager.reset();
-        tiger = images.getTigerImage(level);
+        final BufferedImage bgImage = images.getImage("background.jpg");
+        paint = new TexturePaint(bgImage, new Rectangle(0, 0, bgImage.getWidth(), bgImage.getHeight()));
         repaint();
     }
 
@@ -151,8 +146,9 @@ public class UI extends JComponent {
 
         for (int i = 0; i < board.getXSize(); i++) {
             for (int j = 0; j < board.getYSize(); j++) {
-                if (board.get(i, j) != null) {
-                    Image im = board.get(i, j) == TIGER ? tiger : images.getGoatImage();
+                final Piece piece = board.get(i, j);
+                if (piece != null) {
+                    Image im = images.getImage(piece);
                     g2.drawImage(im, xImgOffset + i * xStep, yImgOffset + j * yStep, null);
                 }
             }

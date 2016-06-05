@@ -19,15 +19,14 @@
 
 package net.doepner.baghchal;
 
-import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
-
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JToolBar;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JToolBar;
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 /**
  * Entry point of the game
@@ -38,19 +37,20 @@ public final class Main {
 
         System.setProperty("sun.java2d.opengl", "true");
 
-        final Sound sound = new Sound();
 
-        final Images images = new Images();
+        final Phases phases = new Phases();
+
+        final Sound sound = new Sound(phases);
+        final Images images = new Images(phases);
 
         final Board board = new Board(sound);
-        final Phases phases = new Phases();
         final Strategy strategy = new Strategy(board);
 
         final GoatsManager goatsManager = new GoatsManager(images, board, phases);
         final UI ui = new UI(board, goatsManager, images, phases);
 
         ui.setPreferredSize(new Dimension(500, 500));
-        ui.start();
+        ui.startLevel();
 
         final JFrame frame = new JFrame("Bagh-Chal");
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);

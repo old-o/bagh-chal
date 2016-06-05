@@ -5,8 +5,8 @@ package net.doepner.baghchal;
  */
 public enum Piece {
 
-    GOAT,
-    TIGER,
+    PREY,
+    PREDATOR,
 
     @Deprecated
     UNDEFINED

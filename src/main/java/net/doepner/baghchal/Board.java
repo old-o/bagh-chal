@@ -1,6 +1,6 @@
 package net.doepner.baghchal;
 
-import static net.doepner.baghchal.Piece.TIGER;
+import static net.doepner.baghchal.Piece.PREDATOR;
 
 /**
  * The game board model
@@ -22,12 +22,12 @@ public class Board {
         set(move.p2(), piece);
         clear(move.p1());
 
-        if (piece == TIGER) {
-            sound.play("step.wav");
+        if (piece == PREDATOR) {
+            sound.playPredatorStep();
         }
         if (move.isTakingMove()) {
             clear(move.middle());
-            sound.playTiger();
+            sound.playPredatorKills();
         }
         return true;
     }
@@ -92,10 +92,10 @@ public class Board {
                 clear(x, y);
             }
         }
-        set(0, 0, TIGER);
-        set(4, 0, TIGER);
-        set(0, 4, TIGER);
-        set(4, 4, TIGER);
+        set(0, 0, PREDATOR);
+        set(X_SIZE - 1, 0, PREDATOR);
+        set(0, Y_SIZE - 1, PREDATOR);
+        set(X_SIZE - 1, Y_SIZE - 1, PREDATOR);
     }
 
     Piece[][] copyBoard() {
