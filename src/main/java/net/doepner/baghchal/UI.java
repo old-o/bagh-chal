@@ -1,6 +1,12 @@
 package net.doepner.baghchal;
 
-import javax.swing.JComponent;
+import static java.awt.RenderingHints.KEY_ANTIALIASING;
+import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
+import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
+import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
+import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
+import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -15,12 +21,7 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.awt.RenderingHints.KEY_ANTIALIASING;
-import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
-import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
-import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
-import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
-import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
+import javax.swing.JComponent;
 
 public class UI extends JComponent {
 
@@ -88,13 +89,8 @@ public class UI extends JComponent {
 
         if (phases.isEnd()) {
             g2.drawImage(congrats, 70, 80, this);
-            final String s;
-            if (phases.isOver()) {
-                s = "You have completed Bagh-Chal";
-            } else {
-                s = "Now try level " + (phases.getLevel() + 1);
-            }
             g2.setFont(new Font("SansSerif", 0, 34));
+            final String s = phases.getLevelEndMessage();
             g2.drawString(s, width / 2 - (g2.getFontMetrics().stringWidth(s) >> 1), height / 2 + 100);
         } else {
             drawBoard(g2, width, height);
@@ -154,5 +150,4 @@ public class UI extends JComponent {
             }
         }
     }
-
 }

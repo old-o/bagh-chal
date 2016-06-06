@@ -39,19 +39,23 @@ public class Phases {
     }
 
     public int nextLevel() {
-        if (!isOver()) {
+        if (!isGameOver()) {
             phase = 1;
             level++;
         }
         return level;
     }
 
-    public boolean isOver() {
+    public boolean isGameOver() {
         return level > 7;
     }
 
     public int firstLevel() {
         level = 1;
         return level;
+    }
+
+    public String getLevelEndMessage() {
+        return isGameOver() ? "You have completed Bagh-Chal" : "Now try level " + (level + 1);
     }
 }

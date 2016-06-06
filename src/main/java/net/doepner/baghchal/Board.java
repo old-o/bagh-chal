@@ -117,10 +117,6 @@ public class Board {
         grid[x][y] = piece;
     }
 
-    private void clear(int x, int y) {
-        set(x, y, null);
-    }
-
     public int getXSize() {
         return X_SIZE;
     }
