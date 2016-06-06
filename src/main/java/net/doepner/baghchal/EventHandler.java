@@ -7,10 +7,10 @@ import java.awt.event.MouseEvent;
  */
 public interface EventHandler {
 
-    void goatDraggingStarted();
+    void draggingStarted();
 
-    void goatDragged(MouseEvent e);
+    void dragged(MouseEvent e);
 
-    void goatMoveDone();
+    void moveDone();
 
 }

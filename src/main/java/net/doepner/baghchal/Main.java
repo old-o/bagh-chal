@@ -19,14 +19,15 @@
 
 package net.doepner.baghchal;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JToolBar;
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 
-import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JToolBar;
 
 /**
  * Entry point of the game
@@ -37,17 +38,27 @@ public final class Main {
 
         System.setProperty("sun.java2d.opengl", "true");
 
-
         final Phases phases = new Phases();
 
         final Sound sound = new Sound(phases);
         final Images images = new Images(phases);
 
-        final Board board = new Board(sound);
+        final Board board = new Board(new BoardListener() {
+            @Override
+            public void onPredatorTake() {
+                sound.playPredatorKills();
+            }
+
+            @Override
+            public void onPredatorStep() {
+                sound.playPredatorStep();
+            }
+        });
+
         final Strategy strategy = new Strategy(board);
 
-        final GoatsManager goatsManager = new GoatsManager(images, board, phases);
-        final UI ui = new UI(board, goatsManager, images, phases);
+        final PreyManager preyManager = new PreyManager(images, board, phases);
+        final UI ui = new UI(board, preyManager, images, phases);
 
         ui.setPreferredSize(new Dimension(500, 500));
         ui.startLevel();
@@ -69,14 +80,14 @@ public final class Main {
         frame.add(toolBar, BorderLayout.PAGE_START);
         frame.add(ui, BorderLayout.CENTER);
 
-        goatsManager.setEventHandler(new EventHandler() {
+        preyManager.setEventHandler(new EventHandler() {
             @Override
-            public void goatDragged(MouseEvent e) {
+            public void dragged(MouseEvent e) {
                 ui.repaint(e.getX() - 30, e.getY() - 30, 60, 60);
             }
 
             @Override
-            public void goatMoveDone() {
+            public void moveDone() {
                 strategy.updatePossibleMoves();
                 if (strategy.isOver()) {
                     phases.setEnd();
@@ -88,7 +99,7 @@ public final class Main {
             }
 
             @Override
-            public void goatDraggingStarted() {
+            public void draggingStarted() {
                 sound.playGoat();
             }
         });

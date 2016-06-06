@@ -1,47 +1,47 @@
 package net.doepner.baghchal;
 
+import static net.doepner.baghchal.Piece.PREY;
+
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import static net.doepner.baghchal.Piece.PREY;
-
 /**
- * Manages the goats
+ * Manages the prey pieces (e.g. goats)
  */
-public class GoatsManager extends MouseAdapter {
+public class PreyManager extends MouseAdapter {
 
-    private static final int TOTAL_GOATS = 20;
+    private static final int TOTAL = 20;
 
-    private final boolean remainingGoat[] = new boolean[TOTAL_GOATS];
+    private final boolean remaining[] = new boolean[TOTAL];
 
     private final Images images;
     private final Board board;
     private final Phases phases;
 
-    private int selectedGoat;
+    private int selected;
 
     private boolean dragging = false;
 
     private int mouseX;
     private int mouseY;
 
-    private Position draggedPiecePos = null;
+    private Position draggedPos = null;
 
     private EventHandler eventHandler;
 
-    public GoatsManager(Images images, Board board, Phases phases) {
+    public PreyManager(Images images, Board board, Phases phases) {
         this.images = images;
         this.board = board;
         this.phases = phases;
     }
 
     void reset() {
-        draggedPiecePos = null;
+        draggedPos = null;
         dragging = false;
-        for (int i = 0; i < TOTAL_GOATS; i++) {
-            remainingGoat[i] = true;
+        for (int i = 0; i < TOTAL; i++) {
+            remaining[i] = true;
         }
     }
 
@@ -57,15 +57,15 @@ public class GoatsManager extends MouseAdapter {
 
         if (x >= xBoardEnd + 10) {
             int i = (y - 10) / 40;
-            dragAvailableGoat(i);
+            dragAvailablePrey(i);
         } else if (y >= yBoardEnd + 10) {
-            int i = (x - 10) / 40 + (TOTAL_GOATS / 2);
-            dragAvailableGoat(i);
+            int i = (x - 10) / 40 + (TOTAL / 2);
+            dragAvailablePrey(i);
         }
         if (phases.isMiddle() && isPositionOnBoard(e)) {
             final Position p = getPosition(e);
             if (board.get(p) == PREY) {
-                draggedPiecePos = p;
+                draggedPos = p;
                 board.clear(p);
                 dragging = true;
             }
@@ -85,12 +85,12 @@ public class GoatsManager extends MouseAdapter {
         return x >= xBoardStart && x <= xBoardEnd && y >= yBoardStart && y <= yBoardEnd;
     }
 
-    private void dragAvailableGoat(int i) {
-        if (remainingGoat[i]) {
-            goatDraggingStarted();
-            selectedGoat = i;
-            remainingGoat[i] = false;
+    private void dragAvailablePrey(int i) {
+        if (remaining[i]) {
+            selected = i;
+            remaining[i] = false;
             dragging = true;
+            draggingStarted();
         }
     }
 
@@ -100,8 +100,8 @@ public class GoatsManager extends MouseAdapter {
         if (dragging) {
             mouseX = e.getX() - 16; // hard-coded assumption
             mouseY = e.getY() - 16; // that images are 32x32
-            goatDragged(previousEvent);
-            goatDragged(e);
+            dragged(previousEvent);
+            dragged(e);
             previousEvent = e;
         }
     }
@@ -112,23 +112,23 @@ public class GoatsManager extends MouseAdapter {
         }
         dragging = false;
         final Position pos = board.normalize(getPosition(e));
-        final Move move = new Move(draggedPiecePos, pos);
+        final Move move = new Move(draggedPos, pos);
         if (board.isEmpty(pos) && (phases.isBeginning() || board.validStep(move))) {
             board.set(move.p2(), PREY);
-            if (phases.isBeginning() && noRemainingGoats()) {
+            if (phases.isBeginning() && noRemaining()) {
                 phases.setMiddle();
             }
-            if (!pos.equals(draggedPiecePos)) {
-                goatMoveDone();
+            if (!pos.equals(draggedPos)) {
+                moveDone();
             }
         } else {
             if (phases.isBeginning()) {
-                remainingGoat[selectedGoat] = true;
+                remaining[selected] = true;
             } else {
-                board.set(draggedPiecePos, PREY);
+                board.set(draggedPos, PREY);
             }
         }
-        goatDragged(e);
+        dragged(e);
     }
 
     private Position getPosition(MouseEvent e) {
@@ -145,9 +145,9 @@ public class GoatsManager extends MouseAdapter {
         return (int) (e.getY() / yStep + 0.25D);
     }
 
-    boolean noRemainingGoats() {
-        for (int i = 0; i < TOTAL_GOATS; i++) {
-            if (remainingGoat[i]) {
+    boolean noRemaining() {
+        for (int i = 0; i < TOTAL; i++) {
+            if (remaining[i]) {
                 return false;
             }
         }
@@ -158,33 +158,33 @@ public class GoatsManager extends MouseAdapter {
         this.eventHandler = eventHandler;
     }
 
-    private void goatDragged(MouseEvent e) {
+    private void dragged(MouseEvent e) {
         if (eventHandler != null && e != null) {
-            eventHandler.goatDragged(e);
+            eventHandler.dragged(e);
         }
     }
 
-    private void goatMoveDone() {
+    private void moveDone() {
         if (eventHandler != null) {
-            eventHandler.goatMoveDone();
+            eventHandler.moveDone();
         }
     }
 
-    private void goatDraggingStarted() {
+    private void draggingStarted() {
         if (eventHandler != null) {
-            eventHandler.goatDraggingStarted();
+            eventHandler.draggingStarted();
         }
     }
 
-    public void drawDraggedGoat(Graphics2D g2) {
+    public void drawDraggedPrey(Graphics2D g2) {
         if (dragging) {
             g2.drawImage(images.getImage(PREY), mouseX, mouseY, null);
         }
     }
 
-    void drawRemainingGoats(Graphics2D g2, int width, int height) {
-        for (int i = 0; i < TOTAL_GOATS; i++) {
-            if (remainingGoat[i]) {
+    void drawRemainingPrey(Graphics2D g2, int width, int height) {
+        for (int i = 0; i < TOTAL; i++) {
+            if (remaining[i]) {
                 final Point p = getPoint(i, width, height);
                 g2.drawImage(images.getImage(PREY), p.x, p.y, null);
             }
@@ -192,13 +192,13 @@ public class GoatsManager extends MouseAdapter {
     }
 
     private Point getPoint(int i, int width, int height) {
-        final int halfOfTheGoats = TOTAL_GOATS / 2;
+        final int half = TOTAL / 2;
         final int x, y;
-        if (i < halfOfTheGoats) {
+        if (i < half) {
             x = (width - 50) + 10;
             y = 10 + i * 40;
         } else {
-            x = 10 + (i - halfOfTheGoats) * 40;
+            x = 10 + (i - half) * 40;
             y = (height - 50) + 10;
         }
         return new Point(x,y);

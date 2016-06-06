@@ -1,12 +1,12 @@
 package net.doepner.baghchal;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
 import static java.util.stream.Collectors.toList;
 import static net.doepner.baghchal.Piece.PREDATOR;
 import static net.doepner.baghchal.Piece.PREY;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * The computer player's strategy (playing the tigers)
@@ -57,41 +57,39 @@ public class Strategy {
     }
 
     private int numberOfPiecesThreatened(Move m) {
-        // TODO: don't use a raw array here
-        final Piece[][] brd = board.copyBoard();
-        brd[m.p2().x()][m.p2().y()] = brd[m.p1().x()][m.p1().y()];
-        brd[m.p1().x()][m.p1().y()] = null;
+        final Board b = board.copyBoard();
+        board.doMove(m);
         int r = 0;
         for (int i = 0; i < board.getXSize(); i++) {
             for (int j = 0; j < board.getYSize(); j++)
-                if (brd[i][j] == PREDATOR) {
+                if (b.get(i,j) == PREDATOR) {
                     // TODO: DImplify code below by looping over STEPS
                     if (i > 1) {
-                        if (j > 1 && brd[i - 1][j - 1] == PREY && brd[i - 2][j - 2] == null) {
+                        if (j > 1 && b.get(i - 1,j - 1) == PREY && b.get(i - 2,j - 2) == null) {
                             r++;
                         }
-                        if (brd[i - 1][j] == PREY && brd[i - 2][j] == null) {
+                        if (b.get(i - 1,j) == PREY && b.get(i - 2,j) == null) {
                             r++;
                         }
-                        if (j < 3 && brd[i - 1][j + 1] == PREY && brd[i - 2][j + 2] == null) {
+                        if (j < 3 && b.get(i - 1,j + 1) == PREY && b.get(i - 2,j + 2) == null) {
                             r++;
                         }
                     }
-                    if (j < 3 && brd[i][j + 1] == PREY && brd[i][j + 2] == null) {
+                    if (j < 3 && b.get(i,j + 1) == PREY && b.get(i,j + 2) == null) {
                         r++;
                     }
                     if (i < 3) {
-                        if (j < 3 && brd[i + 1][j + 1] == PREY && brd[i + 2][j + 2] == null) {
+                        if (j < 3 && b.get(i + 1,j + 1) == PREY && b.get(i + 2,j + 2) == null) {
                             r++;
                         }
-                        if (brd[i + 1][j] == PREY && brd[i + 2][j] == null) {
+                        if (b.get(i + 1,j) == PREY && b.get(i + 2,j) == null) {
                             r++;
                         }
-                        if (j > 1 && brd[i + 1][j - 1] == PREY && brd[i + 2][j - 2] == null) {
+                        if (j > 1 && b.get(i + 1,j - 1) == PREY && b.get(i + 2,j - 2) == null) {
                             r++;
                         }
                     }
-                    if (j > 1 && brd[i][j - 1] == PREY && brd[i][j - 2] == null) {
+                    if (j > 1 && b.get(i,j - 1) == PREY && b.get(i,j - 2) == null) {
                         r++;
                     }
                 }
@@ -108,7 +106,7 @@ public class Strategy {
     }
 
     private List<Move> getPossibleTakes() {
-        return possibleMoves.stream().filter(Move::isTakingMove).collect(toList());
+        return possibleMoves.stream().filter(Move::isJump).collect(toList());
     }
 
     private Piece board(Position p) {

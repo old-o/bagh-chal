@@ -24,7 +24,7 @@ import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
 
 public class UI extends JComponent {
 
-    private final GoatsManager goatsManager;
+    private final PreyManager preyManager;
     private final Board board;
     private final Images images;
     private final Phases phases;
@@ -35,9 +35,9 @@ public class UI extends JComponent {
     private final BasicStroke stroke = new BasicStroke(2);
     private final RenderingHints renderingHints;
 
-    public UI(Board board, GoatsManager goatsManager, Images images, Phases phases) {
+    public UI(Board board, PreyManager preyManager, Images images, Phases phases) {
         this.board = board;
-        this.goatsManager = goatsManager;
+        this.preyManager = preyManager;
         this.images = images;
         this.phases = phases;
 
@@ -49,8 +49,8 @@ public class UI extends JComponent {
         map.put(KEY_STROKE_CONTROL,VALUE_STROKE_NORMALIZE);
         renderingHints = new RenderingHints(map);
 
-        addMouseMotionListener(goatsManager);
-        addMouseListener(goatsManager);
+        addMouseMotionListener(preyManager);
+        addMouseListener(preyManager);
     }
 
     public void start() {
@@ -65,7 +65,7 @@ public class UI extends JComponent {
 
     public void startLevel() {
         board.reset();
-        goatsManager.reset();
+        preyManager.reset();
         final BufferedImage bgImage = images.getImage("background.jpg");
         paint = new TexturePaint(bgImage, new Rectangle(0, 0, bgImage.getWidth(), bgImage.getHeight()));
         repaint();
@@ -98,8 +98,8 @@ public class UI extends JComponent {
             g2.drawString(s, width / 2 - (g2.getFontMetrics().stringWidth(s) >> 1), height / 2 + 100);
         } else {
             drawBoard(g2, width, height);
-            goatsManager.drawRemainingGoats(g2, width, height);
-            goatsManager.drawDraggedGoat(g2);
+            preyManager.drawRemainingPrey(g2, width, height);
+            preyManager.drawDraggedPrey(g2);
         }
     }
 

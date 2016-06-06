@@ -2,6 +2,8 @@ package net.doepner.baghchal;
 
 import static net.doepner.baghchal.Piece.PREDATOR;
 
+import java.util.Arrays;
+
 /**
  * The game board model
  */
@@ -10,23 +12,31 @@ public class Board {
     private static final int X_SIZE = 5;
     private static final int Y_SIZE = 5;
 
-    private final Piece[][] board = new Piece[X_SIZE][Y_SIZE];
-    private final Sound sound;
+    private final Piece[][] grid = new Piece[X_SIZE][Y_SIZE];
 
-    public Board(Sound sound) {
-        this.sound = sound;
+    private final BoardListener listener;
+
+    public Board(BoardListener listener) {
+        this.listener = listener;
+    }
+
+    private Board(Board board) {
+        listener = BoardListener.NONE;
+        for (int x = 0; x < X_SIZE; x++) {
+            System.arraycopy(board.grid[x], 0, grid[x], 0, Y_SIZE);
+        }
     }
 
     boolean doMove(Move move) {
         final Piece piece = get(move.p1());
-        set(move.p2(), piece);
         clear(move.p1());
+        set(move.p2(), piece);
 
-        if (move.isTakingMove()) {
+        if (move.isJump()) {
             clear(move.middle());
-            sound.playPredatorKills();
+            listener.onPredatorTake();
         } else if (piece == PREDATOR) {
-            sound.playPredatorStep();
+            listener.onPredatorStep();
         }
         return true;
     }
@@ -49,16 +59,16 @@ public class Board {
             return x1 + 1 == x2 || x1 - 1 == x2;
         }
         if (x1 - 1 == x2 && y1 - 1 == y2) {
-            return canMoveLeftUp(x1, y1);
+            return !(y1 == 0 || x1 == 0) && (x1 == y1 || x1 == 1 && y1 == 3 || x1 == 2 && y1 == 4 || x1 == 3 && y1 == 1 || x1 == 4 && y1 == 2);
         }
         if (x1 - 1 == x2 && y1 + 1 == y2) {
-            return canMoveLeftDown(x1, y1);
+            return !(x1 == 0 || y1 == 4) && (x1 + y1 == 4 || x1 == 2 && y1 == 0 || x1 == 1 && y1 == 1 || x1 == 4 && y1 == 2 || x1 == 3 && y1 == 3);
         }
         if (x1 - x2 == -1 && y1 - y2 == 1) {
-            return canMoveRightUp(x1, y1);
+            return y1 != 0 && (x1 + y1 == 4 || x1 == 0 && y1 == 2 || x1 == 1 && y1 == 1 || x1 == 2 && y1 == 4 || x1 == 3 && y1 == 3);
         }
         if (x1 + 1 == x2 && y1 + 1 == y2) {
-            return canMoveRightDown(x1, y1);
+            return !(x1 == 4 || y1 == 4) && (x1 == y1 || x1 == 0 && y1 == 2 || x1 == 1 && y1 == 3 || x1 == 2 && y1 == 0 || x1 == 3 && y1 == 1);
         }
         return false;
     }
@@ -69,27 +79,9 @@ public class Board {
         return x >= 0 && y >= 0 && x < X_SIZE && y < Y_SIZE;
     }
 
-    boolean canMoveLeftDown(int x, int y) {
-        return !(x == 0 || y == 4) && (x + y == 4 || x == 2 && y == 0 || x == 1 && y == 1 || x == 4 && y == 2 || x == 3 && y == 3);
-    }
-
-    boolean canMoveRightDown(int x, int y) {
-        return !(x == 4 || y == 4) && (x == y || x == 0 && y == 2 || x == 1 && y == 3 || x == 2 && y == 0 || x == 3 && y == 1);
-    }
-
-    boolean canMoveRightUp(int x, int y) {
-        return y != 0 && (x + y == 4 || x == 0 && y == 2 || x == 1 && y == 1 || x == 2 && y == 4 || x == 3 && y == 3);
-    }
-
-    boolean canMoveLeftUp(int x, int y) {
-        return !(y == 0 || x == 0) && (x == y || x == 1 && y == 3 || x == 2 && y == 4 || x == 3 && y == 1 || x == 4 && y == 2);
-    }
-
     void reset() {
         for (int x = 0; x < X_SIZE; x++) {
-            for (int y = 0; y < Y_SIZE; y++) {
-                clear(x, y);
-            }
+            Arrays.fill(grid[x], null);
         }
         set(0, 0, PREDATOR);
         set(X_SIZE - 1, 0, PREDATOR);
@@ -97,13 +89,8 @@ public class Board {
         set(X_SIZE - 1, Y_SIZE - 1, PREDATOR);
     }
 
-    Piece[][] copyBoard() {
-        final Piece a[][] = new Piece[X_SIZE][Y_SIZE];
-        for (int x = 0; x < X_SIZE; x++) {
-            System.arraycopy(board[x], 0, a[x], 0, Y_SIZE);
-
-        }
-        return a;
+    public Board copyBoard() {
+        return new Board(this);
     }
 
     public Piece get(Position p) {
@@ -111,7 +98,7 @@ public class Board {
     }
 
     public void set(Position p, Piece piece) {
-        board[p.x()][p.y()] = piece;
+        grid[p.x()][p.y()] = piece;
     }
 
     void clear(Position p) {
@@ -123,11 +110,11 @@ public class Board {
     }
 
     protected Piece get(int x, int y) {
-        return board[x][y];
+        return grid[x][y];
     }
 
     private void set(int x, int y, Piece piece) {
-        board[x][y] = piece;
+        grid[x][y] = piece;
     }
 
     private void clear(int x, int y) {
