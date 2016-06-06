@@ -1,8 +1,8 @@
 package net.doepner.baghchal;
 
-import static net.doepner.baghchal.Piece.PREDATOR;
-
 import java.util.Arrays;
+
+import static net.doepner.baghchal.Piece.PREDATOR;
 
 /**
  * The game board model
@@ -28,9 +28,7 @@ public class Board {
     }
 
     boolean doMove(Move move) {
-        final Piece piece = get(move.p1());
-        clear(move.p1());
-        set(move.p2(), piece);
+        final Piece piece = movePiece(move);
 
         if (move.isJump()) {
             clear(move.middle());
@@ -39,6 +37,13 @@ public class Board {
             listener.onPredatorStep();
         }
         return true;
+    }
+
+    public Piece movePiece(Move move) {
+        final Piece piece = get(move.p1());
+        clear(move.p1());
+        set(move.p2(), piece);
+        return piece;
     }
 
     boolean validStep(Move move) {

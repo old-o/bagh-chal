@@ -23,7 +23,7 @@ public class Images {
     }
 
     BufferedImage getImage(String resourceFileName) {
-        final String resourceFilePath = phases.getLevel() + "/" + resourceFileName;
+        final String resourceFilePath = "levels/" + phases.getLevel() + "/" + resourceFileName;
         final BufferedImage cachedImage = cache.get(resourceFilePath);
         if (cachedImage != null) {
             return cachedImage;

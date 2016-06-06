@@ -45,7 +45,7 @@ public class Sound {
     }
 
     public Clip play(String resourceFile) {
-        return play(getClass().getResource(phases.getLevel() + "/" + resourceFile));
+        return play(getClass().getResource("levels/" + phases.getLevel() + "/" + resourceFile));
     }
 
     public Clip play(URL url) {

@@ -1,12 +1,6 @@
 package net.doepner.baghchal;
 
-import static java.awt.RenderingHints.KEY_ANTIALIASING;
-import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
-import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
-import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
-import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
-import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
-
+import javax.swing.JComponent;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -21,7 +15,12 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.JComponent;
+import static java.awt.RenderingHints.KEY_ANTIALIASING;
+import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
+import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
+import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
+import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
+import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
 
 public class UI extends JComponent {
 
@@ -35,6 +34,9 @@ public class UI extends JComponent {
     private Paint paint;
     private final BasicStroke stroke = new BasicStroke(2);
     private final RenderingHints renderingHints;
+
+    private Color gridColor = Color.blue;
+    private Color diagonalColor = Color.darkGray;
 
     public UI(Board board, PreyManager preyManager, Images images, Phases phases) {
         this.board = board;
@@ -100,7 +102,6 @@ public class UI extends JComponent {
     }
 
     void drawBoard(Graphics2D g2, int w, int h) {
-        g2.setColor(Color.black);
         g2.setStroke(stroke);
 
         final int width = w - 2 * 50;
@@ -115,6 +116,8 @@ public class UI extends JComponent {
         final int xStep = width / (board.getXSize() - 1);
         final int yStep = height / (board.getYSize() - 1);
 
+        g2.setColor(gridColor);
+
         for (int x = xStart; x <= xEnd; x += xStep) {
             g2.drawLine(x, yStart, x, yEnd);
         }
@@ -125,26 +128,27 @@ public class UI extends JComponent {
         final int xMid = xStart + width / 2;
         final int yMid = yStart + height / 2;
 
+        g2.setColor(diagonalColor);
+
         g2.drawLine(xStart, yStart, xEnd, yEnd);
+        g2.drawLine(xStart, yEnd, xEnd, yStart);
         g2.drawLine(xStart, yMid, xMid, yEnd);
         g2.drawLine(xStart, yMid, xMid, yStart);
-        g2.drawLine(xStart, yEnd, xEnd, yStart);
-        g2.drawLine(xMid, yStart, xEnd, yMid);
         g2.drawLine(xMid, yStart, xEnd, yMid);
         g2.drawLine(xMid, yEnd, xEnd, yMid);
-
-
-        final int imgWidth = 32;
-        final int imgHeight = 32;
-
-        final int xImgOffset = xStart - (imgWidth / 2);
-        final int yImgOffset = yStart - (imgHeight / 2);
 
         for (int i = 0; i < board.getXSize(); i++) {
             for (int j = 0; j < board.getYSize(); j++) {
                 final Piece piece = board.get(i, j);
                 if (piece != null) {
-                    Image im = images.getImage(piece);
+                    final Image im = images.getImage(piece);
+
+                    final int imgWidth = im.getWidth(null);
+                    final int imgHeight = im.getHeight(null);
+
+                    final int xImgOffset = xStart - (imgWidth / 2);
+                    final int yImgOffset = yStart - (imgHeight / 2);
+
                     g2.drawImage(im, xImgOffset + i * xStep, yImgOffset + j * yStep, null);
                 }
             }
