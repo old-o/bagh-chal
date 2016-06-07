@@ -65,7 +65,7 @@ public final class Main {
         final UI ui = new UI(board, preyManager, images, phases);
 
         ui.setPreferredSize(new Dimension(500, 500));
-        ui.startLevel();
+        ui.start();
 
         final JFrame frame = new JFrame("Bagh-Chal");
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);

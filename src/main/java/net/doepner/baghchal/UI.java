@@ -36,8 +36,8 @@ public class UI extends JComponent {
 
     private Paint paint;
 
-    private Color gridColor = Color.blue;
-    private Color diagonalColor = Color.darkGray;
+    private Color gridColor;
+    private Color diagonalColor;
 
     public UI(Board board, PreyManager preyManager, Images images, Phases phases) {
         this.board = board;
@@ -72,7 +72,13 @@ public class UI extends JComponent {
         preyManager.reset();
         final BufferedImage bgImage = images.getImage("background.jpg");
         paint = new TexturePaint(bgImage, new Rectangle(0, 0, bgImage.getWidth(), bgImage.getHeight()));
+        diagonalColor = getLevelColor("diagonalColor");
+        gridColor = getLevelColor("gridColor");
         repaint();
+    }
+
+    private Color getLevelColor(String name) {
+        return Color.decode(phases.getLevelProperty(name));
     }
 
     @Override

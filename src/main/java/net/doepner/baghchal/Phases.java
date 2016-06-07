@@ -1,5 +1,9 @@
 package net.doepner.baghchal;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 /**
  * Phases of the game (beginning, middle, end)
  */
@@ -58,5 +62,20 @@ public class Phases {
 
     public String getLevelEndMessage() {
         return isGameOver() ? "You have completed Bagh-Chal" : "Now try level " + (level + 1);
+    }
+
+    public Properties getLevelProperties() {
+        final Properties p = new Properties();
+        final InputStream stream = getClass().getResourceAsStream("levels/" + level + "/level.properties");
+        try {
+            p.load(stream);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+        return p;
+    }
+
+    public String getLevelProperty(String name) {
+        return getLevelProperties().get(name).toString();
     }
 }
