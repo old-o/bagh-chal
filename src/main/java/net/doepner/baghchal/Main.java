@@ -55,7 +55,7 @@ public final class Main {
 
             @Override
             public void afterReset() {
-                sound.play("welcome.wav");
+                sound.playResource("welcome.wav");
             }
         });
 
@@ -95,8 +95,7 @@ public final class Main {
                 strategy.doMoveOrEndPhase(phases);
                 final boolean predatorsLostLevel = phases.isEnd();
                 if (predatorsLostLevel) {
-                    // TODO: Find a good triumphant sound effect:
-                    // sound.play("tataa.wav");
+                    sound.playResource("congrats.wav");
                 }
                 nextLevelBtn.setEnabled(predatorsLostLevel);
                 ui.repaint();

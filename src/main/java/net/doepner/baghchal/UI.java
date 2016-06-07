@@ -45,7 +45,7 @@ public class UI extends JComponent {
         this.images = images;
         this.phases = phases;
 
-        congrats = images.getImage("congrats.gif");
+        congrats = images.getImageResource("congrats.gif");
 
         final Map<RenderingHints.Key, Object> map = new HashMap<>();
         map.put(KEY_TEXT_ANTIALIASING, VALUE_TEXT_ANTIALIAS_ON);

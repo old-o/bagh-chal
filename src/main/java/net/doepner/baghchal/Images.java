@@ -24,12 +24,16 @@ public class Images {
 
     BufferedImage getImage(String resourceFileName) {
         final String resourceFilePath = "levels/" + phases.getLevel() + "/" + resourceFileName;
+        return getImageResource(resourceFilePath);
+    }
+
+    BufferedImage getImageResource(String resourceFilePath) {
         final BufferedImage cachedImage = cache.get(resourceFilePath);
         if (cachedImage != null) {
             return cachedImage;
         } else {
             final BufferedImage image = loadImage(resourceFilePath);
-            cache.put(resourceFileName, image);
+            cache.put(resourceFilePath, image);
             return image;
         }
     }

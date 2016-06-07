@@ -47,7 +47,7 @@ public class Phases {
     }
 
     public boolean isGameOver() {
-        return level > 7;
+        return level > 2;
     }
 
     public int firstLevel() {
