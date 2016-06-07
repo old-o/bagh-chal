@@ -19,15 +19,14 @@
 
 package net.doepner.baghchal;
 
-import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
-
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JToolBar;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JToolBar;
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 /**
  * Entry point of the game
@@ -52,6 +51,11 @@ public final class Main {
             @Override
             public void onPredatorStep() {
                 sound.playPredatorStep();
+            }
+
+            @Override
+            public void afterReset() {
+                sound.play("welcome.wav");
             }
         });
 
@@ -88,27 +92,24 @@ public final class Main {
 
             @Override
             public void moveDone() {
-                strategy.updatePossibleMoves();
-                if (strategy.isOver()) {
-                    phases.setEnd();
-                } else {
-                    strategy.generateMove(phases.getLevel());
+                strategy.doMoveOrEndPhase(phases);
+                final boolean predatorsLostLevel = phases.isEnd();
+                if (predatorsLostLevel) {
+                    // TODO: Find a good triumphant sound effect:
+                    // sound.play("tataa.wav");
                 }
-                nextLevelBtn.setEnabled(strategy.isOver());
+                nextLevelBtn.setEnabled(predatorsLostLevel);
                 ui.repaint();
             }
 
             @Override
             public void draggingStarted() {
-                sound.playGoat();
+                sound.playPrey();
             }
         });
 
-
         frame.pack();
         frame.setVisible(true);
-
-        sound.play("welcome.wav");
     }
 
 }

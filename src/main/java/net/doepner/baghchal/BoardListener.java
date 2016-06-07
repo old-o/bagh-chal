@@ -9,6 +9,8 @@ public interface BoardListener {
 
     void onPredatorStep();
 
+    void afterReset();
+
     BoardListener NONE = new BoardListener() {
         @Override
         public void onPredatorTake() {
@@ -17,6 +19,11 @@ public interface BoardListener {
 
         @Override
         public void onPredatorStep() {
+            // ignore
+        }
+
+        @Override
+        public void afterReset() {
             // ignore
         }
     };

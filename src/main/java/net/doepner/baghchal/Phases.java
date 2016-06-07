@@ -52,6 +52,7 @@ public class Phases {
 
     public int firstLevel() {
         level = 1;
+        phase = 1;
         return level;
     }
 

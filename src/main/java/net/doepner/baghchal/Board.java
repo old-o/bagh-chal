@@ -92,6 +92,7 @@ public class Board {
         set(X_SIZE - 1, 0, PREDATOR);
         set(0, Y_SIZE - 1, PREDATOR);
         set(X_SIZE - 1, Y_SIZE - 1, PREDATOR);
+        listener.afterReset();
     }
 
     public Board copyBoard() {

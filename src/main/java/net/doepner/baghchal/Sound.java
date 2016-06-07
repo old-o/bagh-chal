@@ -19,22 +19,22 @@ public class Sound {
 
     private final Phases phases;
 
-    private Clip lastGoat = null;
-    private int goatIndex = 1;
+    private Clip lastPrey = null;
+    private int preyIndex = 1;
 
     public Sound(Phases phases) {
         this.phases = phases;
     }
 
-    public void playGoat() {
-        lastGoat = play("prey" + goatIndex + ".wav");
-        goatIndex = (goatIndex % 3) + 1;
+    public void playPrey() {
+        lastPrey = play("prey" + preyIndex + ".wav");
+        preyIndex = (preyIndex % 3) + 1;
     }
 
     public void playPredatorKills() {
-        if (lastGoat != null) {
-            lastGoat.stop();
-            lastGoat = null;
+        if (lastPrey != null) {
+            lastPrey.stop();
+            lastPrey = null;
         }
         play("predator-kills.wav");
     }

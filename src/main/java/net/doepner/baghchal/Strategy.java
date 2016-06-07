@@ -168,4 +168,13 @@ public class Strategy {
     public boolean isOver() {
         return possibleMoves.size() == 0;
     }
+
+    public void doMoveOrEndPhase(Phases phases) {
+        updatePossibleMoves();
+        if (isOver()) {
+            phases.setEnd();
+        } else {
+            generateMove(phases.getLevel());
+        }
+    }
 }

@@ -31,9 +31,10 @@ public class UI extends JComponent {
 
     private final Image congrats;
 
-    private Paint paint;
     private final BasicStroke stroke = new BasicStroke(2);
     private final RenderingHints renderingHints;
+
+    private Paint paint;
 
     private Color gridColor = Color.blue;
     private Color diagonalColor = Color.darkGray;
