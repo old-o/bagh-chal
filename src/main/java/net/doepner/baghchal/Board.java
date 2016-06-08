@@ -1,8 +1,8 @@
 package net.doepner.baghchal;
 
-import java.util.Arrays;
-
 import static net.doepner.baghchal.Piece.PREDATOR;
+
+import java.util.Arrays;
 
 /**
  * The game board model
@@ -20,6 +20,12 @@ public class Board {
         this.listener = listener;
     }
 
+    /**
+     * Copy constructor that will copy the grid array of the provide board instance.
+     * The resulting board will support no BoardListener functionality.
+     *
+     * @param board An existing board instance
+     */
     private Board(Board board) {
         listener = BoardListener.NONE;
         for (int x = 0; x < X_SIZE; x++) {
@@ -29,12 +35,13 @@ public class Board {
 
     boolean doMove(Move move) {
         final Piece piece = movePiece(move);
-
-        if (move.isJump()) {
-            clear(move.middle());
-            listener.onPredatorTake();
-        } else if (piece == PREDATOR) {
-            listener.onPredatorStep();
+        if (piece == PREDATOR) {
+            if (move.isJump()) {
+                clear(move.middle());
+                listener.onPredatorTake();
+            } else {
+                listener.onPredatorStep();
+            }
         }
         return true;
     }
@@ -56,6 +63,8 @@ public class Board {
         final int y1 = p1.y();
         final int x2 = p2.x();
         final int y2 = p2.y();
+
+        // TODO: Simplify below code using iteration over STEPS array
 
         if (x1 == x2) {
             return y1 + 1 == y2 || y1 - 1 == y2;

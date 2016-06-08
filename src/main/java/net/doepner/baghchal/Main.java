@@ -19,14 +19,15 @@
 
 package net.doepner.baghchal;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JToolBar;
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 
-import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JToolBar;
 
 /**
  * Entry point of the game
@@ -37,7 +38,8 @@ public final class Main {
 
         System.setProperty("sun.java2d.opengl", "true");
 
-        final Phases phases = new Phases();
+        final int maxLevel = 3;
+        final Phases phases = new Phases(maxLevel);
 
         final Sound sound = new Sound(phases);
         final Images images = new Images(phases);

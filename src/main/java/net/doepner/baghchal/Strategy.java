@@ -1,12 +1,12 @@
 package net.doepner.baghchal;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
 import static java.util.stream.Collectors.toList;
 import static net.doepner.baghchal.Piece.PREDATOR;
 import static net.doepner.baghchal.Piece.PREY;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * The computer player's strategy (playing the tigers)
@@ -63,7 +63,7 @@ public class Strategy {
         for (int i = 0; i < board.getXSize(); i++) {
             for (int j = 0; j < board.getYSize(); j++)
                 if (b.get(i,j) == PREDATOR) {
-                    // TODO: DImplify code below by looping over STEPS
+                    // TODO: Simplify code below by looping over STEPS
                     if (i > 1) {
                         if (j > 1 && b.get(i - 1,j - 1) == PREY && b.get(i - 2,j - 2) == null) {
                             r++;
