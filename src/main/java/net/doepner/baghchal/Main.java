@@ -24,7 +24,7 @@ import javax.swing.JFrame;
 import javax.swing.JToolBar;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.MouseEvent;
+import java.awt.Rectangle;
 
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
@@ -86,8 +86,8 @@ public final class Main {
 
         preyManager.setEventHandler(new EventHandler() {
             @Override
-            public void dragged(MouseEvent e) {
-                ui.repaint(e.getX() - 30, e.getY() - 30, 60, 60);
+            public void dragged(Rectangle rectangle) {
+                ui.repaint(rectangle);
             }
 
             @Override

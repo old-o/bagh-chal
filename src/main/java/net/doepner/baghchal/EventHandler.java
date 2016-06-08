@@ -1,6 +1,6 @@
 package net.doepner.baghchal;
 
-import java.awt.event.MouseEvent;
+import java.awt.Rectangle;
 
 /**
  * Handles game events
@@ -9,7 +9,7 @@ public interface EventHandler {
 
     void draggingStarted();
 
-    void dragged(MouseEvent e);
+    void dragged(Rectangle rectangle);
 
     void moveDone();
 

@@ -13,8 +13,7 @@ public class Phases {
     private int level;
 
     public Phases() {
-        level = 1;
-        phase = 1;
+        firstLevel();
     }
 
     public boolean isBeginning() {

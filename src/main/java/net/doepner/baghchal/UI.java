@@ -31,7 +31,7 @@ public class UI extends JComponent {
 
     private final Image congrats;
 
-    private final BasicStroke stroke = new BasicStroke(2);
+    private final BasicStroke stroke = new BasicStroke(1.5f);
     private final RenderingHints renderingHints;
 
     private Paint paint;
@@ -50,7 +50,7 @@ public class UI extends JComponent {
         final Map<RenderingHints.Key, Object> map = new HashMap<>();
         map.put(KEY_TEXT_ANTIALIASING, VALUE_TEXT_ANTIALIAS_ON);
         map.put(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
-        map.put(KEY_STROKE_CONTROL,VALUE_STROKE_NORMALIZE);
+        map.put(KEY_STROKE_CONTROL, VALUE_STROKE_NORMALIZE);
         renderingHints = new RenderingHints(map);
 
         addMouseMotionListener(preyManager);

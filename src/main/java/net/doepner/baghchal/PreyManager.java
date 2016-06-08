@@ -1,11 +1,16 @@
 package net.doepner.baghchal;
 
-import static net.doepner.baghchal.Piece.PREY;
+import net.doepner.BaseUtil;
 
+import java.awt.Component;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import static net.doepner.baghchal.Piece.PREY;
 
 /**
  * Manages the prey pieces (e.g. goats)
@@ -57,10 +62,10 @@ public class PreyManager extends MouseAdapter {
 
         if (x >= xBoardEnd + 10) {
             int i = (y - 10) / 40;
-            dragAvailablePrey(i);
+            dragAvailablePrey(i, e);
         } else if (y >= yBoardEnd + 10) {
             int i = (x - 10) / 40 + (TOTAL / 2);
-            dragAvailablePrey(i);
+            dragAvailablePrey(i, e);
         }
         if (phases.isMiddle() && isPositionOnBoard(e)) {
             final Position p = getPosition(e);
@@ -68,6 +73,7 @@ public class PreyManager extends MouseAdapter {
                 draggedPos = p;
                 board.clear(p);
                 dragging = true;
+                dragged(e.getPoint());
             }
         }
     }
@@ -85,24 +91,21 @@ public class PreyManager extends MouseAdapter {
         return x >= xBoardStart && x <= xBoardEnd && y >= yBoardStart && y <= yBoardEnd;
     }
 
-    private void dragAvailablePrey(int i) {
+    private void dragAvailablePrey(int i, MouseEvent e) {
         if (remaining[i]) {
             selected = i;
-            remaining[i] = false;
             dragging = true;
             draggingStarted();
+            previousDragLocation = getRemainingPreyPoint(selected, e);
+            remaining[i] = false;
         }
     }
-
-    private MouseEvent previousEvent;
 
     public void mouseDragged(MouseEvent e) {
         if (dragging) {
             mouseX = e.getX() - 16; // hard-coded assumption
             mouseY = e.getY() - 16; // that images are 32x32
-            dragged(previousEvent);
-            dragged(e);
-            previousEvent = e;
+            dragged(new Point(mouseX, mouseY));
         }
     }
 
@@ -115,6 +118,7 @@ public class PreyManager extends MouseAdapter {
         final Move move = new Move(draggedPos, pos);
         if (board.isEmpty(pos) && (phases.isBeginning() || board.validStep(move))) {
             board.set(move.p2(), PREY);
+            dragged(e.getPoint());
             if (phases.isBeginning() && noRemaining()) {
                 phases.setMiddle();
             }
@@ -124,11 +128,13 @@ public class PreyManager extends MouseAdapter {
         } else {
             if (phases.isBeginning()) {
                 remaining[selected] = true;
+                dragged(getRemainingPreyPoint(selected, e));
             } else {
                 board.set(draggedPos, PREY);
+                dragged(e.getPoint());
             }
         }
-        dragged(e);
+        previousDragLocation = null;
     }
 
     private Position getPosition(MouseEvent e) {
@@ -158,9 +164,22 @@ public class PreyManager extends MouseAdapter {
         this.eventHandler = eventHandler;
     }
 
-    private void dragged(MouseEvent e) {
-        if (eventHandler != null && e != null) {
-            eventHandler.dragged(e);
+    private Point previousDragLocation;
+
+    private void dragged(Point p) {
+        if (eventHandler != null) {
+            fireDraggedEvent(previousDragLocation);
+            if (!BaseUtil.bothNullOrEqual(p, previousDragLocation)) {
+                fireDraggedEvent(p);
+            }
+            previousDragLocation = p;
+        }
+    }
+
+    private void fireDraggedEvent(Point p) {
+        final Image img = preyImage();
+        if (p != null) {
+            eventHandler.dragged(new Rectangle(p.x, p.y, img.getWidth(null), img.getHeight(null)));
         }
     }
 
@@ -178,20 +197,29 @@ public class PreyManager extends MouseAdapter {
 
     public void drawDraggedPrey(Graphics2D g2) {
         if (dragging) {
-            g2.drawImage(images.getImage(PREY), mouseX, mouseY, null);
+            g2.drawImage(preyImage(), mouseX, mouseY, null);
         }
     }
 
     void drawRemainingPrey(Graphics2D g2, int width, int height) {
         for (int i = 0; i < TOTAL; i++) {
             if (remaining[i]) {
-                final Point p = getPoint(i, width, height);
-                g2.drawImage(images.getImage(PREY), p.x, p.y, null);
+                final Point p = getRemainingPreyPoint(i, width, height);
+                g2.drawImage(preyImage(), p.x, p.y, null);
             }
         }
     }
 
-    private Point getPoint(int i, int width, int height) {
+    private Image preyImage() {
+        return images.getImage(PREY);
+    }
+
+    private Point getRemainingPreyPoint(int i, MouseEvent e) {
+        final Component c = e.getComponent();
+        return getRemainingPreyPoint(i, c.getWidth(), c.getHeight());
+    }
+
+    private Point getRemainingPreyPoint(int i, int width, int height) {
         final int half = TOTAL / 2;
         final int x, y;
         if (i < half) {
