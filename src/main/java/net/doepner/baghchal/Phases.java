@@ -9,31 +9,34 @@ import java.util.Properties;
  */
 public class Phases {
 
-    private int phase;
+    private final int maxLevel;
+
+    private Phase phase;
     private int level;
 
-    public Phases() {
+    public Phases(int maxLevel) {
+        this.maxLevel = maxLevel;
         firstLevel();
     }
 
     public boolean isBeginning() {
-        return phase == 1;
+        return phase == Phase.BEGINNING;
     }
 
     public boolean isMiddle() {
-        return phase == 2;
+        return phase == Phase.MIDDLE;
     }
 
     public boolean isEnd() {
-        return phase > 2;
+        return phase == Phase.END;
     }
 
     public void setMiddle() {
-        phase = 2;
+        phase = Phase.MIDDLE;
     }
 
     public void setEnd() {
-        phase = 3;
+        phase = Phase.END;
     }
 
 
@@ -43,19 +46,19 @@ public class Phases {
 
     public int nextLevel() {
         if (!isGameOver()) {
-            phase = 1;
+            phase = Phase.BEGINNING;
             level++;
         }
         return level;
     }
 
     public boolean isGameOver() {
-        return level > 2;
+        return level >= maxLevel;
     }
 
     public int firstLevel() {
         level = 1;
-        phase = 1;
+        phase = Phase.BEGINNING;
         return level;
     }
 
