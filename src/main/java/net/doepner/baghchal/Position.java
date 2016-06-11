@@ -41,4 +41,21 @@ public final class Position {
     public Position add(int xStep, int yStep) {
         return new Position(x + xStep, y + yStep);
     }
+
+    public boolean isLessThan(Position p) {
+        return x < p.x && y < p.y;
+    }
+
+    public boolean isGreaterOrEqualTo(Position p) {
+        return p.x <= x && p.y <= y;
+    }
+
+    public boolean hasEvenCoordSum() {
+        return (x+y) % 2 == 0;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Position{x=%d, y=%d}", x, y);
+    }
 }

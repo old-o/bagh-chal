@@ -128,13 +128,11 @@ public class Strategy {
     }
 
     private void tryStepsWhere(Piece requiredPiece, Consumer<Move> moveProcessor) {
-        for (int i = 0; i < board.getXSize(); i++) {
-            for (int j = 0; j < board.getYSize(); j++) {
-                if (board(i, j) == PREDATOR) {
-                    tryDirections(new Position(i, j), requiredPiece, moveProcessor);
-                }
+        board.forAllPositions(p -> {
+            if (board.get(p) == PREDATOR) {
+                tryDirections(p, requiredPiece, moveProcessor);
             }
-        }
+        });
     }
 
     private final static int[] STEPS = {-1, 0, +1};

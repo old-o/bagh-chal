@@ -1,6 +1,7 @@
 package net.doepner.baghchal;
 
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 import static net.doepner.baghchal.Piece.PREDATOR;
 
@@ -11,6 +12,9 @@ public class Board {
 
     private static final int X_SIZE = 5;
     private static final int Y_SIZE = 5;
+
+    private final Position p1 = new Position(0, 0);
+    private final Position p2 = new Position(X_SIZE, Y_SIZE);
 
     private final Piece[][] grid = new Piece[X_SIZE][Y_SIZE];
 
@@ -47,41 +51,12 @@ public class Board {
     }
 
     boolean validStep(Move move) {
-        final Position p1 = move.p1();
-        final Position p2 = move.p2();
-        if (!isValidPosition(p1) || !isValidPosition(p2)) {
-            return false;
-        }
-        final int x1 = p1.x();
-        final int y1 = p1.y();
-        final int x2 = p2.x();
-        final int y2 = p2.y();
-
-        if (x1 == x2) {
-            return y1 + 1 == y2 || y1 - 1 == y2;
-        }
-        if (y1 == y2) {
-            return x1 + 1 == x2 || x1 - 1 == x2;
-        }
-        if (x1 - 1 == x2 && y1 - 1 == y2) {
-            return !(y1 == 0 || x1 == 0) && (x1 == y1 || x1 == 1 && y1 == 3 || x1 == 2 && y1 == 4 || x1 == 3 && y1 == 1 || x1 == 4 && y1 == 2);
-        }
-        if (x1 - 1 == x2 && y1 + 1 == y2) {
-            return !(x1 == 0 || y1 == 4) && (x1 + y1 == 4 || x1 == 2 && y1 == 0 || x1 == 1 && y1 == 1 || x1 == 4 && y1 == 2 || x1 == 3 && y1 == 3);
-        }
-        if (x1 - x2 == -1 && y1 - y2 == 1) {
-            return y1 != 0 && (x1 + y1 == 4 || x1 == 0 && y1 == 2 || x1 == 1 && y1 == 1 || x1 == 2 && y1 == 4 || x1 == 3 && y1 == 3);
-        }
-        if (x1 + 1 == x2 && y1 + 1 == y2) {
-            return !(x1 == 4 || y1 == 4) && (x1 == y1 || x1 == 0 && y1 == 2 || x1 == 1 && y1 == 3 || x1 == 2 && y1 == 0 || x1 == 3 && y1 == 1);
-        }
-        return false;
+        return isValidPosition(move.p1()) && isValidPosition(move.p2())
+                && move.isStep() && (move.p1().hasEvenCoordSum() || move.isOneDimensional());
     }
 
     boolean isValidPosition(Position pos) {
-        final int x = pos.x();
-        final int y = pos.y();
-        return x >= 0 && y >= 0 && x < X_SIZE && y < Y_SIZE;
+        return pos.isGreaterOrEqualTo(p1) && pos.isLessThan(p2);
     }
 
     void reset() {
@@ -139,5 +114,13 @@ public class Board {
 
     private int normalize(int n, int max) {
         return n < 0 ? 0 : n >= max ? max - 1 : n;
+    }
+
+    public void forAllPositions(Consumer<Position> positionConsumer) {
+        for (int i = 0; i < X_SIZE; i++) {
+            for (int j = 0; j < Y_SIZE; j++) {
+                positionConsumer.accept(new Position(i,j));
+            }
+        }
     }
 }

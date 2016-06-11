@@ -47,4 +47,19 @@ public class Move {
     private int xStep() {
         return p2.x() - p1.x();
     }
+
+    public boolean isOneDimensional() {
+        return (xStep() == 0) != (yStep() == 0);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Move{p1=%s, p2=%s}", p1, p2);
+    }
+
+    public boolean isStep() {
+        final int xDelta = abs(xStep());
+        final int yDelta = abs(yStep());
+        return xDelta == 0 ? yDelta == 1 : xDelta == 1 && yDelta <= 1;
+    }
 }
