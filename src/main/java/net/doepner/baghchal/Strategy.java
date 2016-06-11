@@ -1,12 +1,12 @@
 package net.doepner.baghchal;
 
-import static java.util.stream.Collectors.toList;
-import static net.doepner.baghchal.Piece.PREDATOR;
-import static net.doepner.baghchal.Piece.PREY;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+
+import static java.util.stream.Collectors.toList;
+import static net.doepner.baghchal.Piece.PREDATOR;
+import static net.doepner.baghchal.Piece.PREY;
 
 /**
  * The computer player's strategy (playing the tigers)
