@@ -113,10 +113,6 @@ public class Strategy {
         return board.isValidPosition(p) ? board.get(p) : Piece.UNDEFINED;
     }
 
-    private Piece board(int i, int j) {
-        return board(new Position(i, j));
-    }
-
     private boolean tryMoveFrom(List<Move> moves) {
         return !moves.isEmpty() && board.doMove(getRandomFrom(moves));
     }
