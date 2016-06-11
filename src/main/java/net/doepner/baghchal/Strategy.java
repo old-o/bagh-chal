@@ -1,7 +1,10 @@
 package net.doepner.baghchal;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 import static java.util.stream.Collectors.toList;
@@ -22,38 +25,102 @@ public class Strategy {
         this.board = board;
     }
 
-    public void generateMove(int level) {
-        switch (level) {
-            case 1:
-                doAI_1();
-                break;
-            case 2:
-                doAI_2();
-                break;
-            case 3:
-            default:
-                doAI_3();
-                break;
+    public boolean doMoveOrEndPhase(Phases phases) {
+        updatePossibleMoves();
+        if (isOver()) {
+            phases.setEnd();
+            return false;
+        } else {
+            return tryMoveFrom(getPossibleTakes())
+                    || tryThreateningMove(phases.getLevel())
+                    || tryMoveFrom(possibleMoves);
         }
     }
 
-    boolean doAI_1() {
-        return tryMoveFrom(getPossibleTakes()) || tryMoveFrom(possibleMoves);
+    private List<Move> getPossibleTakes() {
+        return possibleMoves.stream().filter(Move::isJump).collect(toList());
     }
 
-    boolean doAI_2() {
-        if (tryMoveFrom(getPossibleTakes())) {
-            return true;
-        }
-        final List<Move> threatensOne = new ArrayList<>();
-        final List<Move> threatensMany = new ArrayList<>();
-        for (Move m : possibleMoves) {
-            int t = numberOfPiecesThreatened(m);
-            if (t > 0) {
-                (t == 1 ? threatensOne : threatensMany).add(m);
+    private Piece board(Position p) {
+        return board.isValidPosition(p) ? board.get(p) : Piece.UNDEFINED;
+    }
+
+    private boolean tryMoveFrom(List<Move> moves) {
+        return !moves.isEmpty() && board.doMove(getRandomFrom(moves));
+    }
+
+    private void updatePossibleMoves() {
+        possibleMoves.clear();
+        tryStepsWhere(NONE, possibleMoves::add);
+        tryStepsWhere(PREY, step -> addPossibleJump(possibleMoves, step));
+    }
+
+    private void tryStepsWhere(Piece requiredPiece, Consumer<Move> moveProcessor) {
+        board.forAllPositions(p -> {
+            if (board.get(p) == PREDATOR) {
+                tryDirections(p, requiredPiece, moveProcessor);
+            }
+        });
+    }
+
+    private final static int[] STEPS = {-1, 0, +1};
+
+    private void tryDirections(Position p, Piece requiredPiece, Consumer<Move> moveProcessor) {
+        for (int xStep : STEPS) {
+            for (int yStep : STEPS) {
+                final Position p1 = p.add(xStep, yStep);
+                if (board(p1) == requiredPiece) {
+                    final Move step1 = new Move(p, p1);
+                    if (board.validStep(step1)) {
+                        moveProcessor.accept(step1);
+                    }
+                }
             }
         }
-        return tryMoveFrom(threatensMany) || tryMoveFrom(threatensOne) || tryMoveFrom(possibleMoves);
+    }
+
+    private void addPossibleJump(List<Move> list, Move step1) {
+        final Move step2 = step1.repeat();
+        if (board.validStep(step2) && board.isEmpty(step2.p2())) {
+            final Move jump = new Move(step1.p1(), step2.p2());
+            list.add(jump);
+        }
+    }
+
+    private Move getRandomFrom(List<Move> list) {
+        return list.get(ThreadLocalRandom.current().nextInt(list.size()));
+    }
+
+    private boolean isOver() {
+        return possibleMoves.size() == 0;
+    }
+
+    private boolean tryThreateningMove(int level) {
+        if (level > 2) {
+            final Map<Integer, List<Move>> threateningMoves = getThreateningMoves();
+            final int tryToThreaten = level - 1;
+            for (int i = tryToThreaten; i > 0; i--) {
+                if (tryMoveFrom(threateningMoves.get(tryToThreaten))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private Map<Integer, List<Move>> getThreateningMoves() {
+        final Map<Integer, List<Move>> threateningMoves;
+        threateningMoves = new HashMap<>();
+        for (int i = 1; i < 8; i++) {
+            threateningMoves.put(i, new ArrayList<>());
+        }
+        for (Move m : possibleMoves) {
+            int npt = numberOfPiecesThreatened(m);
+            if (npt > 0) {
+                threateningMoves.get(npt).add(m);
+            }
+        }
+        return threateningMoves;
     }
 
     private int numberOfPiecesThreatened(Move m) {
@@ -95,80 +162,5 @@ public class Strategy {
                 }
         }
         return r;
-    }
-
-    boolean doAI_3() {
-        final List<Move> takes = getPossibleTakes();
-        if (takes.isEmpty()) {
-            tryStepsWhere(PREY, step -> addPossibleJump(takes, step));
-        }
-        return tryMoveFrom(takes) || tryMoveFrom(possibleMoves);
-    }
-
-    private List<Move> getPossibleTakes() {
-        return possibleMoves.stream().filter(Move::isJump).collect(toList());
-    }
-
-    private Piece board(Position p) {
-        return board.isValidPosition(p) ? board.get(p) : Piece.UNDEFINED;
-    }
-
-    private boolean tryMoveFrom(List<Move> moves) {
-        return !moves.isEmpty() && board.doMove(getRandomFrom(moves));
-    }
-
-    void updatePossibleMoves() {
-        possibleMoves.clear();
-        tryStepsWhere(NONE, possibleMoves::add);
-        tryStepsWhere(PREY, step -> addPossibleJump(possibleMoves, step));
-    }
-
-    private void tryStepsWhere(Piece requiredPiece, Consumer<Move> moveProcessor) {
-        board.forAllPositions(p -> {
-            if (board.get(p) == PREDATOR) {
-                tryDirections(p, requiredPiece, moveProcessor);
-            }
-        });
-    }
-
-    private final static int[] STEPS = {-1, 0, +1};
-
-    private void tryDirections(Position p, Piece requiredPiece, Consumer<Move> moveProcessor) {
-        for (int xStep : STEPS) {
-            for (int yStep : STEPS) {
-                final Position p1 = p.add(xStep, yStep);
-                if (board(p1) == requiredPiece) {
-                    final Move step1 = new Move(p, p1);
-                    if (board.validStep(step1)) {
-                        moveProcessor.accept(step1);
-                    }
-                }
-            }
-        }
-    }
-
-    private void addPossibleJump(List<Move> list, Move step1) {
-        final Move step2 = step1.repeat();
-        if (board.validStep(step2) && board.get(step2.p2()) == null) {
-            final Move jump = new Move(step1.p1(), step2.p2());
-            list.add(jump);
-        }
-    }
-
-    private Move getRandomFrom(List<Move> list) {
-        return list.get((int) (Math.random() * (double) list.size()));
-    }
-
-    public boolean isOver() {
-        return possibleMoves.size() == 0;
-    }
-
-    public void doMoveOrEndPhase(Phases phases) {
-        updatePossibleMoves();
-        if (isOver()) {
-            phases.setEnd();
-        } else {
-            generateMove(phases.getLevel());
-        }
     }
 }
