@@ -1,7 +1,5 @@
 package net.doepner.baghchal;
 
-import net.doepner.BaseUtil;
-
 import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -10,6 +8,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import static net.doepner.BaseUtil.bothNullOrEqual;
 import static net.doepner.baghchal.Piece.PREY;
 
 /**
@@ -70,10 +69,10 @@ public class PreyManager extends MouseAdapter {
         if (phases.isMiddle() && isPositionOnBoard(e)) {
             final Position p = getPosition(e);
             if (board.get(p) == PREY) {
+                previousDragLocation = e.getPoint();
                 draggedPos = p;
                 board.clear(p);
                 dragging = true;
-                dragged(e.getPoint());
             }
         }
     }
@@ -168,8 +167,10 @@ public class PreyManager extends MouseAdapter {
 
     private void dragged(Point p) {
         if (eventHandler != null) {
-            fireDraggedEvent(previousDragLocation);
-            if (!BaseUtil.bothNullOrEqual(p, previousDragLocation)) {
+            if (previousDragLocation != null) {
+                fireDraggedEvent(previousDragLocation);
+            }
+            if (!bothNullOrEqual(p, previousDragLocation)) {
                 fireDraggedEvent(p);
             }
             previousDragLocation = p;

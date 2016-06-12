@@ -19,15 +19,14 @@
 
 package net.doepner.baghchal;
 
-import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
-
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JToolBar;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JToolBar;
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 /**
  * Entry point of the game
@@ -38,8 +37,9 @@ public final class Main {
 
         System.setProperty("sun.java2d.opengl", "true");
 
-        final int maxLevel = 3;
+        final int maxLevel = 2;
         final Phases phases = new Phases(maxLevel);
+        final Strategy strategy = new Strategy();
 
         final Sound sound = new Sound(phases);
         final Images images = new Images(phases);
@@ -60,8 +60,6 @@ public final class Main {
                 sound.playResource("welcome.wav");
             }
         });
-
-        final Strategy strategy = new Strategy(board);
 
         final PreyManager preyManager = new PreyManager(images, board, phases);
         final UI ui = new UI(board, preyManager, images, phases);
@@ -94,7 +92,7 @@ public final class Main {
 
             @Override
             public void moveDone() {
-                strategy.doMoveOrEndPhase(phases);
+                strategy.doMoveOrEndPhase(phases, board);
                 final boolean predatorsLostLevel = phases.isEnd();
                 if (predatorsLostLevel) {
                     sound.playResource("congrats.wav");

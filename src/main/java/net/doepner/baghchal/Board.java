@@ -1,11 +1,11 @@
 package net.doepner.baghchal;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 
 import static net.doepner.baghchal.Piece.PREDATOR;
-
-import java.util.Arrays;
+import static net.doepner.baghchal.Piece.PREY;
 
 /**
  * The game board model
@@ -50,6 +50,43 @@ public class Board {
             }
         }
         return true;
+    }
+
+    private final static int[] STEPS = {-1, 0, +1};
+
+    public void tryStepsWhere(Piece requiredPiece, Consumer<Move> moveProcessor) {
+        forAllPositions(p -> {
+            if (get(p) == PREDATOR) {
+                tryDirections(p, requiredPiece, moveProcessor);
+            }
+        });
+    }
+
+    public void tryDirections(Position p, Piece requiredPiece, Consumer<Move> moveProcessor) {
+        for (int xStep : STEPS) {
+            for (int yStep : STEPS) {
+                final Position p1 = p.add(xStep, yStep);
+                final Move step1 = new Move(p, p1);
+                if (validStep(step1) && get(p1) == requiredPiece) {
+                    moveProcessor.accept(step1);
+                }
+            }
+        }
+    }
+
+    public void addPossibleStepsTo(List<Move> moveList) {
+        tryStepsWhere(null, moveList::add);
+    }
+
+    public void addPossibleJumpsTo(List<Move> moveList) {
+        tryStepsWhere(PREY, step -> addPossibleJump(moveList, step));
+    }
+
+    public void addPossibleJump(List<Move> list, Move step1) {
+        final Move step2 = step1.repeat();
+        if (validStep(step2) && isEmpty(step2.p2())) {
+            list.add(new Move(step1.p1(), step2.p2()));
+        }
     }
 
     public Piece movePiece(Move move) {
@@ -128,7 +165,7 @@ public class Board {
     public void forAllPositions(Consumer<Position> positionConsumer) {
         for (int i = 0; i < X_SIZE; i++) {
             for (int j = 0; j < Y_SIZE; j++) {
-                positionConsumer.accept(new Position(i,j));
+                positionConsumer.accept(new Position(i, j));
             }
         }
     }
