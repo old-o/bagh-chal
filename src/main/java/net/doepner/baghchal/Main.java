@@ -57,7 +57,7 @@ public final class Main {
 
             @Override
             public void afterReset() {
-                sound.playResource("welcome.wav");
+                sound.play("welcome.wav");
             }
         });
 
@@ -86,7 +86,8 @@ public final class Main {
 
         preyManager.setEventHandler(new EventHandler() {
             @Override
-            public void dragged(Rectangle rectangle) {
+            public void repaintRectangleAt(Rectangle rectangle) {
+                System.out.println("Repainting rectangle: " + rectangle);
                 ui.repaint(rectangle);
             }
 

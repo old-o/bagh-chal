@@ -9,7 +9,7 @@ public interface EventHandler {
 
     void draggingStarted();
 
-    void dragged(Rectangle rectangle);
+    void repaintRectangleAt(Rectangle rectangle);
 
     void moveDone();
 

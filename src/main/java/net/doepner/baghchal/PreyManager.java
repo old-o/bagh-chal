@@ -8,7 +8,6 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import static net.doepner.BaseUtil.bothNullOrEqual;
 import static net.doepner.baghchal.Piece.PREY;
 
 /**
@@ -26,12 +25,8 @@ public class PreyManager extends MouseAdapter {
 
     private int selected;
 
-    private boolean dragging = false;
-
-    private int mouseX;
-    private int mouseY;
-
-    private Position draggedPos = null;
+    private Point dragStartPoint;
+    private Point lastDragPoint;
 
     private EventHandler eventHandler;
 
@@ -42,8 +37,8 @@ public class PreyManager extends MouseAdapter {
     }
 
     void reset() {
-        draggedPos = null;
-        dragging = false;
+        dragStartPoint = null;
+        lastDragPoint = null;
         for (int i = 0; i < TOTAL; i++) {
             remaining[i] = true;
         }
@@ -66,88 +61,94 @@ public class PreyManager extends MouseAdapter {
             int i = (x - 10) / 40 + (TOTAL / 2);
             dragAvailablePrey(i, e);
         }
-        if (phases.isMiddle() && isPositionOnBoard(e)) {
+        if (phases.isMiddle() && isPointOnBoard(e)) {
             final Position p = getPosition(e);
             if (board.get(p) == PREY) {
-                previousDragLocation = e.getPoint();
-                draggedPos = p;
+                dragStartPoint = getPoint(p, e.getComponent());
+                lastDragPoint = dragStartPoint;
                 board.clear(p);
-                dragging = true;
             }
         }
     }
 
-    private boolean isPositionOnBoard(MouseEvent e) {
+    private boolean isPointOnBoard(MouseEvent e) {
         final int xBoardStart = 20;
         final int yBoardStart = 20;
-
-        final int xBoardEnd = e.getComponent().getWidth() - 50;
-        final int yBoardEnd = e.getComponent().getHeight() - 50;
-
+        final Component c = e.getComponent();
+        final int xBoardEnd = c.getWidth() - 50;
+        final int yBoardEnd = c.getHeight() - 50;
         int x = e.getX();
         int y = e.getY();
-
         return x >= xBoardStart && x <= xBoardEnd && y >= yBoardStart && y <= yBoardEnd;
     }
 
     private void dragAvailablePrey(int i, MouseEvent e) {
         if (remaining[i]) {
             selected = i;
-            dragging = true;
+            dragStartPoint = getRemainingPreyPoint(selected, e);
+            lastDragPoint = dragStartPoint;
             draggingStarted();
-            previousDragLocation = getRemainingPreyPoint(selected, e);
             remaining[i] = false;
         }
     }
 
     public void mouseDragged(MouseEvent e) {
-        if (dragging) {
-            mouseX = e.getX() - 16; // hard-coded assumption
-            mouseY = e.getY() - 16; // that images are 32x32
-            dragged(new Point(mouseX, mouseY));
+        if (dragging()) {
+            repaintRectangleAt(translate(e.getPoint()));
         }
     }
 
     public void mouseReleased(MouseEvent e) {
-        if (!dragging) {
+        if (!dragging()) {
             return;
         }
-        dragging = false;
+        final Position dragStartPos = getPosition(dragStartPoint, e.getComponent());
         final Position pos = board.normalize(getPosition(e));
-        final Move move = new Move(draggedPos, pos);
+        final Move move = new Move(dragStartPos, pos);
         if (board.isEmpty(pos) && (phases.isBeginning() || board.validStep(move))) {
-            board.set(move.p2(), PREY);
-            dragged(e.getPoint());
+            // set the piece
+            board.set(pos, PREY);
+            final Point point = getPoint(pos, e.getComponent());
+            repaintRectangleAt(point);
             if (phases.isBeginning() && noRemaining()) {
                 phases.setMiddle();
             }
-            if (!pos.equals(draggedPos)) {
+            if (!point.equals(dragStartPoint)) {
                 moveDone();
             }
         } else {
             if (phases.isBeginning()) {
                 remaining[selected] = true;
-                dragged(getRemainingPreyPoint(selected, e));
             } else {
-                board.set(draggedPos, PREY);
-                dragged(e.getPoint());
+                board.set(dragStartPos, PREY);
             }
+            repaintRectangleAt(dragStartPoint);
         }
-        previousDragLocation = null;
+        dragStartPoint = null;
+        lastDragPoint = null;
+        selected = -1;
+    }
+
+    private Point getPoint(Position pos, Component c) {
+        final double xStep = c.getWidth() / board.getXSize();
+        final double yStep = c.getHeight() / board.getYSize();
+        return new Point(14 + (int) (pos.x() * xStep), 14 + (int) (pos.y() * yStep));
+    }
+
+    private Point translate(Point point) {
+        final Image image = preyImage();
+        point.translate(-(image.getWidth(null))/2, -(image.getHeight(null))/2);
+        return point;
     }
 
     private Position getPosition(MouseEvent e) {
-        return new Position(getXIndex(e), getYIndex(e));
+        return getPosition(e.getPoint(), e.getComponent());
     }
 
-    private int getXIndex(MouseEvent e) {
-        final double xStep = e.getComponent().getWidth() / board.getXSize();
-        return (int) (e.getX() / xStep + 0.25D);
-    }
-
-    private int getYIndex(MouseEvent e) {
-        final double yStep = e.getComponent().getHeight() / board.getYSize();
-        return (int) (e.getY() / yStep + 0.25D);
+    private Position getPosition(Point p, Component c) {
+        final double xStep = c.getWidth() / board.getXSize();
+        final double yStep = c.getHeight() / board.getYSize();
+        return new Position((int) (p.x / xStep + 0.25D), (int) (p.y / yStep + 0.25D));
     }
 
     boolean noRemaining() {
@@ -163,25 +164,21 @@ public class PreyManager extends MouseAdapter {
         this.eventHandler = eventHandler;
     }
 
-    private Point previousDragLocation;
-
-    private void dragged(Point p) {
+    private void repaintRectangleAt(Point p) {
         if (eventHandler != null) {
-            if (previousDragLocation != null) {
-                fireDraggedEvent(previousDragLocation);
+            final Image img = preyImage();
+            if (lastDragPoint != null) {
+                eventHandler.repaintRectangleAt(getRectangle(lastDragPoint, img));
             }
-            if (!bothNullOrEqual(p, previousDragLocation)) {
-                fireDraggedEvent(p);
+            if (p != null && !p.equals(lastDragPoint)) {
+                eventHandler.repaintRectangleAt(getRectangle(p, img));
             }
-            previousDragLocation = p;
+            lastDragPoint = p;
         }
     }
 
-    private void fireDraggedEvent(Point p) {
-        final Image img = preyImage();
-        if (p != null) {
-            eventHandler.dragged(new Rectangle(p.x, p.y, img.getWidth(null), img.getHeight(null)));
-        }
+    private Rectangle getRectangle(Point p, Image img) {
+        return new Rectangle(p.x, p.y, img.getWidth(null), img.getHeight(null));
     }
 
     private void moveDone() {
@@ -197,9 +194,13 @@ public class PreyManager extends MouseAdapter {
     }
 
     public void drawDraggedPrey(Graphics2D g2) {
-        if (dragging) {
-            g2.drawImage(preyImage(), mouseX, mouseY, null);
+        if (dragging()) {
+            g2.drawImage(preyImage(), lastDragPoint.x, lastDragPoint.y, null);
         }
+    }
+
+    private boolean dragging() {
+        return lastDragPoint != null;
     }
 
     void drawRemainingPrey(Graphics2D g2, int width, int height) {
@@ -224,12 +225,12 @@ public class PreyManager extends MouseAdapter {
         final int half = TOTAL / 2;
         final int x, y;
         if (i < half) {
-            x = (width - 50) + 10;
+            x = 10 + (width - 50);
             y = 10 + i * 40;
         } else {
             x = 10 + (i - half) * 40;
-            y = (height - 50) + 10;
+            y = 10 + (height - 50);
         }
-        return new Point(x,y);
+        return new Point(x, y);
     }
 }
