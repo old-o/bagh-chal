@@ -54,6 +54,11 @@ public class PreyManager extends MouseAdapter {
         final int xBoardEnd = width - 50;
         final int yBoardEnd = height - 50;
 
+        // TODO: Simplify by treating "remaining goats" as pieces with a null Position
+        // and make all Move(null,p) as "valid step" if p is on the board,
+        // make the "remaining" array, an array of Point and generally pick the prey
+        // to be dragged by proximity to the mouse press point
+
         if (x >= xBoardEnd + 10) {
             int i = (y - 10) / 40;
             dragAvailablePrey(i, e);
