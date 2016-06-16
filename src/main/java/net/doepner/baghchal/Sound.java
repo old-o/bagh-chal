@@ -17,13 +17,13 @@ import static javax.sound.sampled.LineEvent.Type.STOP;
  */
 public class Sound {
 
-    private final Phases phases;
+    private final Levels levels;
 
     private Clip lastPrey = null;
     private int preyIndex = 1;
 
-    public Sound(Phases phases) {
-        this.phases = phases;
+    public Sound(Levels levels) {
+        this.levels = levels;
     }
 
     public void playPrey() {
@@ -45,7 +45,7 @@ public class Sound {
     }
 
     public Clip play(String resourceFile) {
-        final String resourcePath = "levels/" + phases.getLevel() + "/" + resourceFile;
+        final String resourcePath = "levels/" + levels.getLevel() + "/" + resourceFile;
         return playResource(resourcePath);
     }
 

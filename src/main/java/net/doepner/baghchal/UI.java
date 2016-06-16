@@ -1,6 +1,6 @@
 package net.doepner.baghchal;
 
-import javax.swing.JComponent;
+import javax.swing.JPanel;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -22,12 +22,12 @@ import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
 import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
 import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
 
-public class UI extends JComponent {
+public class UI extends JPanel {
 
     private final PreyManager preyManager;
     private final Board board;
     private final Images images;
-    private final Phases phases;
+    private final Levels levels;
 
     private final Image congrats;
 
@@ -38,12 +38,14 @@ public class UI extends JComponent {
 
     private Color gridColor;
     private Color diagonalColor;
+    private Color backgroundColor;
+    private Color boardEdgeColor;
 
-    public UI(Board board, PreyManager preyManager, Images images, Phases phases) {
+    public UI(Board board, PreyManager preyManager, Images images, Levels levels) {
         this.board = board;
         this.preyManager = preyManager;
         this.images = images;
-        this.phases = phases;
+        this.levels = levels;
 
         congrats = images.getImageResource("congrats.gif");
 
@@ -58,12 +60,12 @@ public class UI extends JComponent {
     }
 
     public void start() {
-        phases.firstLevel();
+        levels.firstLevel();
         startLevel();
     }
 
     public void nextLevel() {
-        phases.nextLevel();
+        levels.nextLevel();
         startLevel();
     }
 
@@ -72,13 +74,16 @@ public class UI extends JComponent {
         preyManager.reset();
         final BufferedImage bgImage = images.getImage("background.jpg");
         paint = new TexturePaint(bgImage, new Rectangle(0, 0, bgImage.getWidth(), bgImage.getHeight()));
+        backgroundColor = getLevelColor("backgroundColor");
         diagonalColor = getLevelColor("diagonalColor");
         gridColor = getLevelColor("gridColor");
+        boardEdgeColor = getLevelColor("boardEdgeColor");
+
         repaint();
     }
 
     private Color getLevelColor(String name) {
-        return Color.decode(phases.getLevelProperty(name));
+        return Color.decode(levels.getLevelProperty(name));
     }
 
     @Override
@@ -91,37 +96,41 @@ public class UI extends JComponent {
         final Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHints(renderingHints);
 
-        g2.setPaint(paint);
-        g.fillRect(0, 0, width, height);
+        g2.setColor(getForeground());
 
-        g.setColor(getForeground());
-
-        if (phases.isEnd()) {
-            g2.drawImage(congrats, 70, 80, this);
+        if (levels.isLevelDone()) {
+            g2.drawImage(congrats, 70, 80, null);
             g2.setFont(new Font("SansSerif", 0, 34));
-            final String s = phases.getLevelEndMessage();
+            final String s = levels.getLevelEndMessage();
             g2.drawString(s, width / 2 - (g2.getFontMetrics().stringWidth(s) >> 1), height / 2 + 100);
         } else {
             drawBoard(g2, width, height);
-            preyManager.drawRemainingPrey(g2, width, height);
             preyManager.drawDraggedPrey(g2);
         }
     }
 
-    void drawBoard(Graphics2D g2, int w, int h) {
+    void drawBoard(Graphics2D g2, int width, int height) {
+
+        final int xStep = width / board.getXSize();
+        final int yStep = height / board.getYSize();
+
+        setBackground(backgroundColor);
+        setOpaque(true);
+
+        g2.translate(xStep / 2, yStep / 2);
+
+        final int xStart = xStep;
+        final int xEnd = xStep * board.getCentreXSize();
+
+        final int yStart = yStep;
+        final int yEnd = yStep * board.getCentreYSize();
+
+        g2.setPaint(paint);
+        g2.fillRect(xStart - xStep /2, yStart - yStep/2, xEnd - xStart + xStep, yEnd - yStart + yStep);
+
         g2.setStroke(stroke);
-
-        final int width = w - 2 * 50;
-        final int height = h - 2 * 50;
-
-        final int xStart = 30;
-        final int yStart = 30;
-
-        final int yEnd = yStart + height;
-        final int xEnd = xStart + width;
-
-        final int xStep = width / (board.getXSize() - 1);
-        final int yStep = height / (board.getYSize() - 1);
+        g2.setColor(boardEdgeColor);
+        g2.drawRect(xStart - xStep /2, yStart - yStep/2, xEnd - xStart + xStep, yEnd - yStart + yStep);
 
         g2.setColor(gridColor);
 
@@ -132,8 +141,8 @@ public class UI extends JComponent {
             g2.drawLine(xStart, y, xEnd, y);
         }
 
-        final int xMid = xStart + width / 2;
-        final int yMid = yStart + height / 2;
+        final int xMid = (xStart + xEnd) / 2;
+        final int yMid = (yStart + yEnd) / 2;
 
         g2.setColor(diagonalColor);
 
@@ -153,12 +162,14 @@ public class UI extends JComponent {
                     final int imgWidth = im.getWidth(null);
                     final int imgHeight = im.getHeight(null);
 
-                    final int xImgOffset = xStart - (imgWidth / 2);
-                    final int yImgOffset = yStart - (imgHeight / 2);
+                    final int xImgOffset = -(imgWidth / 2);
+                    final int yImgOffset = -(imgHeight / 2);
 
                     g2.drawImage(im, xImgOffset + i * xStep, yImgOffset + j * yStep, null);
                 }
             }
         }
+
+        g2.translate(-xStep / 2, -yStep / 2);
     }
 }

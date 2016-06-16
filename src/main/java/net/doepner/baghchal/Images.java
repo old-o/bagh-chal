@@ -14,16 +14,16 @@ import static net.doepner.baghchal.Piece.PREDATOR;
  */
 public class Images {
 
-    private final Phases phases;
+    private final Levels levels;
 
     private final ConcurrentMap<String, BufferedImage> cache = new ConcurrentHashMap<>();
 
-    public Images(Phases phases) {
-        this.phases = phases;
+    public Images(Levels levels) {
+        this.levels = levels;
     }
 
     BufferedImage getImage(String resourceFileName) {
-        final String resourceFilePath = "levels/" + phases.getLevel() + "/" + resourceFileName;
+        final String resourceFilePath = "levels/" + levels.getLevel() + "/" + resourceFileName;
         return getImageResource(resourceFilePath);
     }
 

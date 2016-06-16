@@ -38,11 +38,11 @@ public final class Main {
         System.setProperty("sun.java2d.opengl", "true");
 
         final int maxLevel = 2;
-        final Phases phases = new Phases(maxLevel);
+        final Levels levels = new Levels(maxLevel);
         final Strategy strategy = new Strategy();
 
-        final Sound sound = new Sound(phases);
-        final Images images = new Images(phases);
+        final Sound sound = new Sound(levels);
+        final Images images = new Images(levels);
 
         final Board board = new Board(new BoardListener() {
             @Override
@@ -61,11 +61,8 @@ public final class Main {
             }
         });
 
-        final PreyManager preyManager = new PreyManager(images, board, phases);
-        final UI ui = new UI(board, preyManager, images, phases);
-
-        ui.setPreferredSize(new Dimension(500, 500));
-        ui.start();
+        final PreyManager preyManager = new PreyManager(images, board);
+        final UI ui = new UI(board, preyManager, images, levels);
 
         final JFrame frame = new JFrame("Bagh-Chal");
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -87,17 +84,16 @@ public final class Main {
         preyManager.setEventHandler(new EventHandler() {
             @Override
             public void repaintRectangleAt(Rectangle rectangle) {
-                System.out.println("Repainting rectangle: " + rectangle);
                 ui.repaint(rectangle);
             }
 
             @Override
             public void moveDone() {
-                strategy.doMoveOrEndPhase(phases, board);
-                final boolean predatorsLostLevel = phases.isEnd();
+                final boolean predatorsLostLevel = !strategy.doMoveOrEndPhase(board, levels.getLevel());
                 if (predatorsLostLevel) {
                     sound.playResource("congrats.wav");
                 }
+                levels.setLevelDone(predatorsLostLevel);
                 nextLevelBtn.setEnabled(predatorsLostLevel);
                 ui.repaint();
             }
@@ -107,6 +103,9 @@ public final class Main {
                 sound.playPrey();
             }
         });
+
+        ui.setPreferredSize(new Dimension(500, 500));
+        ui.start();
 
         frame.pack();
         frame.setVisible(true);

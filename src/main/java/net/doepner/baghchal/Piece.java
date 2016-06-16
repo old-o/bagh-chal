@@ -9,6 +9,6 @@ public enum Piece {
     PREDATOR,
 
     @Deprecated
-    UNDEFINED
+    INVALID
 
 }

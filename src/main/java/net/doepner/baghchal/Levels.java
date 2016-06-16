@@ -7,38 +7,21 @@ import java.util.Properties;
 /**
  * Phases of the game (beginning, middle, end)
  */
-public class Phases {
+public class Levels {
 
     private final int maxLevel;
 
-    private Phase phase;
     private int level;
+    private boolean levelDone;
 
-    public Phases(int maxLevel) {
+    public Levels(int maxLevel) {
         this.maxLevel = maxLevel;
         firstLevel();
     }
 
-    public boolean isBeginning() {
-        return phase == Phase.BEGINNING;
+    public boolean isLevelDone() {
+        return levelDone;
     }
-
-    public boolean isMiddle() {
-        return phase == Phase.MIDDLE;
-    }
-
-    public boolean isEnd() {
-        return phase == Phase.END;
-    }
-
-    public void setMiddle() {
-        phase = Phase.MIDDLE;
-    }
-
-    public void setEnd() {
-        phase = Phase.END;
-    }
-
 
     public int getLevel() {
         return level;
@@ -46,7 +29,7 @@ public class Phases {
 
     public int nextLevel() {
         if (!isGameOver()) {
-            phase = Phase.BEGINNING;
+            levelDone = false;
             level++;
         }
         return level;
@@ -58,7 +41,7 @@ public class Phases {
 
     public int firstLevel() {
         level = 1;
-        phase = Phase.BEGINNING;
+        levelDone = false;
         return level;
     }
 
@@ -79,5 +62,9 @@ public class Phases {
 
     public String getLevelProperty(String name) {
         return getLevelProperties().get(name).toString();
+    }
+
+    public void setLevelDone(boolean levelDone) {
+        this.levelDone = levelDone;
     }
 }

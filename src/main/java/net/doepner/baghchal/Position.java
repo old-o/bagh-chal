@@ -42,8 +42,8 @@ public final class Position {
         return new Position(x + xStep, y + yStep);
     }
 
-    public boolean isLessThan(Position p) {
-        return x < p.x && y < p.y;
+    public boolean isLessOrEqualTo(Position p) {
+        return x <= p.x && y <= p.y;
     }
 
     public boolean isGreaterOrEqualTo(Position p) {

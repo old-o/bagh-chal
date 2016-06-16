@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static net.doepner.baghchal.Piece.INVALID;
 import static net.doepner.baghchal.Piece.PREDATOR;
 import static net.doepner.baghchal.Piece.PREY;
 
@@ -12,13 +13,19 @@ import static net.doepner.baghchal.Piece.PREY;
  */
 public class Board {
 
-    private static final int X_SIZE = 5;
-    private static final int Y_SIZE = 5;
+    private static final int CENTER_X_SIZE = 5;
+    private static final int CENTER_Y_SIZE = 5;
 
-    private final Position p1 = new Position(0, 0);
-    private final Position p2 = new Position(X_SIZE, Y_SIZE);
+    private static final int X_SIZE = 1 + CENTER_X_SIZE + 1;
+    private static final int Y_SIZE = 1 + CENTER_Y_SIZE + 1;
 
-    private final Piece[][] grid = new Piece[X_SIZE][Y_SIZE];
+    private static final Position m1 = new Position(0, 0);
+    private static final Position m2 = new Position(X_SIZE - 1, Y_SIZE - 1);
+
+    private final Position p1 = new Position(1, 1);
+    private final Position p2 = new Position(CENTER_X_SIZE, CENTER_Y_SIZE);
+
+    private final Piece[][] b = new Piece[X_SIZE][Y_SIZE];
 
     private final BoardListener listener;
 
@@ -34,8 +41,8 @@ public class Board {
      */
     private Board(Board board) {
         listener = BoardListener.NONE;
-        for (int x = 0; x < X_SIZE; x++) {
-            System.arraycopy(board.grid[x], 0, grid[x], 0, Y_SIZE);
+        for (int x = 0; x < b.length; x++) {
+            System.arraycopy(board.b[x], 0, b[x], 0, b[x].length);
         }
     }
 
@@ -67,7 +74,7 @@ public class Board {
             for (int yStep : STEPS) {
                 final Position p1 = p.add(xStep, yStep);
                 final Move step1 = new Move(p, p1);
-                if (validStep(step1) && get(p1) == requiredPiece) {
+                if (isStepAlongLine(step1) && get(p1) == requiredPiece) {
                     moveProcessor.accept(step1);
                 }
             }
@@ -84,7 +91,7 @@ public class Board {
 
     public void addPossibleJump(List<Move> list, Move step1) {
         final Move step2 = step1.repeat();
-        if (validStep(step2) && isEmpty(step2.p2())) {
+        if (isStepAlongLine(step2) && isEmpty(step2.p2())) {
             list.add(new Move(step1.p1(), step2.p2()));
         }
     }
@@ -96,23 +103,23 @@ public class Board {
         return piece;
     }
 
-    boolean validStep(Move move) {
+    boolean isStepAlongLine(Move move) {
         return isValidPosition(move.p1()) && isValidPosition(move.p2())
                 && move.isStep() && (move.p1().hasEvenCoordSum() || move.isOneDimensional());
     }
 
     boolean isValidPosition(Position pos) {
-        return pos.isGreaterOrEqualTo(p1) && pos.isLessThan(p2);
+        return pos.isGreaterOrEqualTo(p1) && pos.isLessOrEqualTo(p2);
     }
 
     void reset() {
-        for (int x = 0; x < X_SIZE; x++) {
-            Arrays.fill(grid[x], null);
+        for (Piece[] pieces : b) {
+            Arrays.fill(pieces, null);
         }
-        set(0, 0, PREDATOR);
-        set(X_SIZE - 1, 0, PREDATOR);
-        set(0, Y_SIZE - 1, PREDATOR);
-        set(X_SIZE - 1, Y_SIZE - 1, PREDATOR);
+        set(p1, PREDATOR);
+        set(p1.x(), p2.y(), PREDATOR);
+        set(p2.x(), p1.y(), PREDATOR);
+        set(p2, PREDATOR);
         listener.afterReset();
     }
 
@@ -125,7 +132,7 @@ public class Board {
     }
 
     public void set(Position p, Piece piece) {
-        grid[p.x()][p.y()] = piece;
+        b[p.x()][p.y()] = piece;
     }
 
     void clear(Position p) {
@@ -137,11 +144,31 @@ public class Board {
     }
 
     protected Piece get(int x, int y) {
-        return grid[x][y];
+        try {
+            return b[x][y];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return INVALID;
+        }
     }
 
-    private void set(int x, int y, Piece piece) {
-        grid[x][y] = piece;
+    public void set(int x, int y, Piece piece) {
+        b[x][y] = piece;
+    }
+
+    public int getCentreXSize() {
+        return CENTER_X_SIZE;
+    }
+
+    public int getCentreYSize() {
+        return CENTER_Y_SIZE;
+    }
+
+    public void forAllPositions(Consumer<Position> positionConsumer) {
+        for (int i = 1; i <= CENTER_X_SIZE; i++) {
+            for (int j = 1; j <= CENTER_Y_SIZE; j++) {
+                positionConsumer.accept(new Position(i, j));
+            }
+        }
     }
 
     public int getXSize() {
@@ -152,21 +179,13 @@ public class Board {
         return Y_SIZE;
     }
 
-    public Position normalize(Position p) {
-        final int x = normalize(p.x(), X_SIZE);
-        final int y = normalize(p.y(), Y_SIZE);
-        return new Position(x, y);
+    public boolean isValid(Move move) {
+        return move.isNotStationary() && isEmpty(move.p2())
+                && (isStepAlongLine(move) || (isBorderPosition(move.p1()) && !isBorderPosition(move.p2())));
     }
 
-    private int normalize(int n, int max) {
-        return n < 0 ? 0 : n >= max ? max - 1 : n;
-    }
-
-    public void forAllPositions(Consumer<Position> positionConsumer) {
-        for (int i = 0; i < X_SIZE; i++) {
-            for (int j = 0; j < Y_SIZE; j++) {
-                positionConsumer.accept(new Position(i, j));
-            }
-        }
+    private boolean isBorderPosition(Position p) {
+        return p.x() == 0 || p.x() == CENTER_X_SIZE + 1
+                || p.y() == 0 || p.y() == CENTER_Y_SIZE + 1;
     }
 }
