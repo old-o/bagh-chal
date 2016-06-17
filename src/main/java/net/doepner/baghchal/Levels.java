@@ -46,7 +46,7 @@ public class Levels {
     }
 
     public String getLevelEndMessage() {
-        return isGameOver() ? "You have completed Bagh-Chal" : "Now try level " + (level + 1);
+        return isGameOver() ? "You won Bagh-Chal!" : "Now try level " + (level + 1);
     }
 
     public Properties getLevelProperties() {

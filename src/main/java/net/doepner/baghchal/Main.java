@@ -94,7 +94,7 @@ public final class Main {
                     sound.playResource("congrats.wav");
                 }
                 levels.setLevelDone(predatorsLostLevel);
-                nextLevelBtn.setEnabled(predatorsLostLevel);
+                nextLevelBtn.setEnabled(predatorsLostLevel && !levels.isGameOver());
                 ui.repaint();
             }
 
