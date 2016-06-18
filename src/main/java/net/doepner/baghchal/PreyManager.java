@@ -13,7 +13,7 @@ import static net.doepner.baghchal.Piece.PREY;
 /**
  * Manages the prey pieces (e.g. goats)
  */
-public class PreyManager extends MouseAdapter {
+class PreyManager extends MouseAdapter {
 
     private final Images images;
     private final Board board;

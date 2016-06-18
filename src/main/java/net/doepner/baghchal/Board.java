@@ -10,16 +10,13 @@ import static net.doepner.baghchal.Piece.PREDATOR;
 /**
  * The game board model
  */
-public class Board {
+class Board {
 
     private static final int CENTER_X_SIZE = 5;
     private static final int CENTER_Y_SIZE = 5;
 
     private static final int X_SIZE = 1 + CENTER_X_SIZE + 1;
     private static final int Y_SIZE = 1 + CENTER_Y_SIZE + 1;
-
-    private static final Position m1 = new Position(0, 0);
-    private static final Position m2 = new Position(X_SIZE - 1, Y_SIZE - 1);
 
     private final Position p1 = new Position(1, 1);
     private final Position p2 = new Position(CENTER_X_SIZE, CENTER_Y_SIZE);
@@ -45,7 +42,7 @@ public class Board {
         }
     }
 
-    boolean doMove(Move move) {
+    void doMove(Move move) {
         final Piece piece = movePiece(move);
         if (piece == PREDATOR) {
             if (move.isJump()) {
@@ -55,7 +52,6 @@ public class Board {
                 listener.onPredatorStep();
             }
         }
-        return true;
     }
 
     private final static int[] STEPS = {-1, 0, +1};
@@ -68,7 +64,7 @@ public class Board {
         });
     }
 
-    void tryDirections(Position p, Piece requiredPiece, Consumer<Move> moveProcessor) {
+    private void tryDirections(Position p, Piece requiredPiece, Consumer<Move> moveProcessor) {
         for (int xStep : STEPS) {
             for (int yStep : STEPS) {
                 final Position p1 = p.add(xStep, yStep);
@@ -104,12 +100,12 @@ public class Board {
         return piece;
     }
 
-    boolean isStepAlongLine(Move move) {
+    private boolean isStepAlongLine(Move move) {
         return isValidPosition(move.p1()) && isValidPosition(move.p2())
                 && move.isStep() && (move.p1().hasEvenCoordSum() || move.isOneDimensional());
     }
 
-    boolean isValidPosition(Position pos) {
+    private boolean isValidPosition(Position pos) {
         return pos.isGreaterOrEqualTo(p1) && pos.isLessOrEqualTo(p2);
     }
 
@@ -140,7 +136,7 @@ public class Board {
         set(p, null);
     }
 
-    boolean isEmpty(Position p) {
+    private boolean isEmpty(Position p) {
         return get(p) == null;
     }
 
@@ -164,7 +160,7 @@ public class Board {
         return CENTER_Y_SIZE;
     }
 
-    void forAllPositions(Consumer<Position> positionConsumer) {
+    private void forAllPositions(Consumer<Position> positionConsumer) {
         for (int i = 1; i <= CENTER_X_SIZE; i++) {
             for (int j = 1; j <= CENTER_Y_SIZE; j++) {
                 positionConsumer.accept(new Position(i, j));

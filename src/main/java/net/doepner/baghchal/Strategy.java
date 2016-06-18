@@ -12,7 +12,7 @@ import static net.doepner.baghchal.Piece.PREY;
 /**
  * The computer player's strategy (playing the tigers)
  */
-public class Strategy {
+class Strategy {
 
     boolean doMoveOrEndPhase(Board board, int level) {
         final List<Move> possibleMoves = new ArrayList<>();
@@ -25,7 +25,12 @@ public class Strategy {
     }
 
     private static boolean tryMoveFrom(List<Move> moves, Board board) {
-        return !moves.isEmpty() && board.doMove(getRandomFrom(moves));
+        if (moves.isEmpty()) {
+            return false;
+        } else {
+            board.doMove(getRandomFrom(moves));
+            return true;
+        }
     }
 
     private static Move getRandomFrom(List<Move> list) {

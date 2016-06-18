@@ -15,7 +15,7 @@ import static javax.sound.sampled.LineEvent.Type.STOP;
 /**
  *
  */
-public class Sound {
+class Sound {
 
     private final Levels levels;
 
@@ -53,7 +53,7 @@ public class Sound {
         return  play(getClass().getResource(resourcePath));
     }
 
-    Clip play(URL url) {
+    private Clip play(URL url) {
         try (AudioInputStream stream = getAudioInputStream(url)) {
 
             final Clip clip = (Clip) getLine(new Info(Clip.class, stream.getFormat()));

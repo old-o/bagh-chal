@@ -10,7 +10,7 @@ import java.util.Properties;
 /**
  * Phases of the game (beginning, middle, end)
  */
-public class Levels {
+class Levels {
 
     private static final Class<?> myClass = MethodHandles.lookup().lookupClass();
 
@@ -34,12 +34,11 @@ public class Levels {
         return level;
     }
 
-    int nextLevel() {
+    void nextLevel() {
         if (!isGameOver()) {
             levelDone = false;
             level++;
         }
-        return level;
     }
 
     boolean isGameOver() {
@@ -55,7 +54,7 @@ public class Levels {
         return isGameOver() ? "You won Bagh-Chal!" : "Now try level " + (level + 1);
     }
 
-    Properties getProperties(int level) {
+    private Properties getProperties(int level) {
         final Properties properties = propertiesMap.get(level);
         if (properties == null) {
             final Properties loadedProperties = loadProperties(level);

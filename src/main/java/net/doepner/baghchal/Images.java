@@ -12,7 +12,7 @@ import static net.doepner.baghchal.Piece.PREDATOR;
 /**
  * Loads images for play pieces from classpath
  */
-public class Images {
+class Images {
 
     private final ConcurrentMap<String, BufferedImage> cache = new ConcurrentHashMap<>();
     private final Levels levels;

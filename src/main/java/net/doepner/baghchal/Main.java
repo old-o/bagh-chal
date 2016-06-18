@@ -31,7 +31,7 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 /**
  * Entry point of the game
  */
-public final class Main {
+final class Main {
 
     public static void main(String... args) {
 

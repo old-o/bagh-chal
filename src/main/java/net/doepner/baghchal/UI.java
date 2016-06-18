@@ -22,7 +22,7 @@ import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
 import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
 import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
 
-public class UI extends JPanel {
+class UI extends JPanel {
 
     private final PreyManager preyManager;
     private final Board board;
@@ -69,7 +69,7 @@ public class UI extends JPanel {
         startLevel();
     }
 
-    void startLevel() {
+    private void startLevel() {
         board.reset();
         preyManager.reset();
         final BufferedImage bgImage = images.getImage("background.jpg");
@@ -108,7 +108,7 @@ public class UI extends JPanel {
         }
     }
 
-    void drawBoard(Graphics2D g2, int width, int height) {
+    private void drawBoard(Graphics2D g2, int width, int height) {
         setBackground(backgroundColor);
         setOpaque(true);
 

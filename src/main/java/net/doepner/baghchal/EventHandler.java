@@ -5,7 +5,7 @@ import java.awt.Rectangle;
 /**
  * Handles game events
  */
-public interface EventHandler {
+interface EventHandler {
 
     void draggingStarted();
 

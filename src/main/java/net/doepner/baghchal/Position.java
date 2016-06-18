@@ -3,7 +3,7 @@ package net.doepner.baghchal;
 /**
  * Position on a 2-dimensional plane
  */
-public final class Position {
+final class Position {
 
     private final int x;
     private final int y;
