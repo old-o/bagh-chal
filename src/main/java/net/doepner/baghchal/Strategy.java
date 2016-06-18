@@ -18,17 +18,10 @@ public class Strategy {
         final List<Move> possibleMoves = new ArrayList<>();
         board.addPossibleStepsTo(possibleMoves);
         board.addPossibleJumpsTo(possibleMoves);
-        if (possibleMoves.isEmpty()) {
-            return false;
-        } else {
-            return tryMoveFrom(allTakesIn(possibleMoves), board)
-                    || tryThreateningMove(level, possibleMoves, board)
-                    || tryMoveFrom(possibleMoves, board);
-        }
-    }
-
-    private static List<Move> allTakesIn(List<Move> moveList) {
-        return moveList.stream().filter(Move::isJump).collect(toList());
+        return possibleMoves.isEmpty() || !(
+                tryMoveFrom(allTakesIn(possibleMoves), board)
+                        || tryThreateningMove(level, possibleMoves, board)
+                        || tryMoveFrom(possibleMoves, board));
     }
 
     private static boolean tryMoveFrom(List<Move> moves, Board board) {
@@ -39,14 +32,17 @@ public class Strategy {
         return list.get(ThreadLocalRandom.current().nextInt(list.size()));
     }
 
+    private static List<Move> allTakesIn(List<Move> moveList) {
+        return moveList.stream().filter(Move::isJump).collect(toList());
+    }
+
     private static boolean tryThreateningMove(int level, Iterable<Move> possibleMoves, Board board) {
         if (level > 1) {
-            final Map<Integer, List<Move>> threateningMoves = getThreateningMoves(possibleMoves, board);
             final int tryToThreaten = level - 1;
+            final Map<Integer, List<Move>> threateningMoves = getThreateningMoves(possibleMoves, board);
             for (int i = tryToThreaten; i > 0; i--) {
                 if (tryMoveFrom(threateningMoves.get(tryToThreaten), board)) {
                     return true;
-
                 }
             }
         }

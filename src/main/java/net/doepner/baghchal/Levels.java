@@ -2,6 +2,9 @@ package net.doepner.baghchal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -9,10 +12,14 @@ import java.util.Properties;
  */
 public class Levels {
 
+    private static final Class<?> myClass = MethodHandles.lookup().lookupClass();
+
     private final int maxLevel;
 
     private int level;
     private boolean levelDone;
+
+    private final Map<Integer, Properties> propertiesMap = new HashMap<>();
 
     public Levels(int maxLevel) {
         this.maxLevel = maxLevel;
@@ -39,19 +46,29 @@ public class Levels {
         return level >= maxLevel;
     }
 
-    public int firstLevel() {
+    public void firstLevel() {
         level = 1;
         levelDone = false;
-        return level;
     }
 
     public String getLevelEndMessage() {
         return isGameOver() ? "You won Bagh-Chal!" : "Now try level " + (level + 1);
     }
 
-    public Properties getLevelProperties() {
+    public Properties getProperties(int level) {
+        final Properties properties = propertiesMap.get(level);
+        if (properties == null) {
+            final Properties loadedProperties = loadProperties(level);
+            propertiesMap.put(level, loadedProperties);
+            return loadedProperties;
+        } else {
+            return properties;
+        }
+    }
+
+    private static Properties loadProperties(int level) {
         final Properties p = new Properties();
-        final InputStream stream = getClass().getResourceAsStream("levels/" + level + "/level.properties");
+        final InputStream stream = myClass.getResourceAsStream("levels/" + level + "/level.properties");
         try {
             p.load(stream);
         } catch (IOException e) {
@@ -61,7 +78,7 @@ public class Levels {
     }
 
     public String getLevelProperty(String name) {
-        return getLevelProperties().get(name).toString();
+        return getProperties(level).get(name).toString();
     }
 
     public void setLevelDone(boolean levelDone) {

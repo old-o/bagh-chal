@@ -58,7 +58,7 @@ public class PreyManager extends MouseAdapter {
         if (dragStart != null) {
             final Point point = e.getPoint();
             final Image image = preyImage();
-            point.translate(- image.getWidth(null) /2, - image.getHeight(null) / 2);
+            point.translate(-image.getWidth(null) / 2, -image.getHeight(null) / 2);
             repaintRectangleAt(point);
         }
     }
@@ -84,7 +84,7 @@ public class PreyManager extends MouseAdapter {
         final Component c = e.getComponent();
         final double xStep = c.getWidth() / board.getXSize();
         final double yStep = c.getHeight() / board.getYSize();
-        return new Position((int) (p.x / xStep), (int)(p.y / yStep));
+        return new Position((int) (p.x / xStep), (int) (p.y / yStep));
     }
 
     private void repaintRectangleAt(Point p) {

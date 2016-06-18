@@ -89,7 +89,7 @@ public final class Main {
 
             @Override
             public void moveDone() {
-                final boolean predatorsLostLevel = !strategy.doMoveOrEndPhase(board, levels.getLevel());
+                final boolean predatorsLostLevel = strategy.doMoveOrEndPhase(board, levels.getLevel());
                 if (predatorsLostLevel) {
                     sound.playResource("congrats.wav");
                 }

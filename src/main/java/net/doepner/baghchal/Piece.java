@@ -7,8 +7,6 @@ public enum Piece {
 
     PREY,
     PREDATOR,
-
-    @Deprecated
     INVALID
 
 }
