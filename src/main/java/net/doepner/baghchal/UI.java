@@ -1,12 +1,6 @@
 package net.doepner.baghchal;
 
-import static java.awt.RenderingHints.KEY_ANTIALIASING;
-import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
-import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
-import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
-import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
-import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
-
+import javax.swing.JPanel;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -21,7 +15,12 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.JPanel;
+import static java.awt.RenderingHints.KEY_ANTIALIASING;
+import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
+import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
+import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
+import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
+import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
 
 public class UI extends JPanel {
 
@@ -42,7 +41,7 @@ public class UI extends JPanel {
     private Color backgroundColor;
     private Color boardEdgeColor;
 
-    public UI(Board board, PreyManager preyManager, Images images, Levels levels) {
+    UI(Board board, PreyManager preyManager, Images images, Levels levels) {
         this.board = board;
         this.preyManager = preyManager;
         this.images = images;
@@ -60,17 +59,17 @@ public class UI extends JPanel {
         addMouseListener(preyManager);
     }
 
-    public void start() {
+    void start() {
         levels.firstLevel();
         startLevel();
     }
 
-    public void nextLevel() {
+    void nextLevel() {
         levels.nextLevel();
         startLevel();
     }
 
-    public void startLevel() {
+    void startLevel() {
         board.reset();
         preyManager.reset();
         final BufferedImage bgImage = images.getImage("background.jpg");
@@ -143,12 +142,16 @@ public class UI extends JPanel {
     }
 
     private void drawBoardCentreArea(Graphics2D g2, int xStep, int yStep, int xStart, int xEnd, int yStart, int yEnd) {
-        g2.setPaint(paint);
-        g2.fillRect(xStart - xStep /2, yStart - yStep/2, xEnd - xStart + xStep, yEnd - yStart + yStep);
+        final int boardStartX = xStart - xStep / 2;
+        final int boardStartY = yStart - yStep / 2;
+        final int boardWidth = xEnd - xStart + xStep;
+        final int boardHeight = yEnd - yStart + yStep;
 
+        g2.setPaint(paint);
+        g2.fillRect(boardStartX, boardStartY, boardWidth, boardHeight);
         g2.setStroke(stroke);
         g2.setColor(boardEdgeColor);
-        g2.drawRect(xStart - xStep /2, yStart - yStep/2, xEnd - xStart + xStep, yEnd - yStart + yStep);
+        g2.drawRect(boardStartX, boardStartY, boardWidth, boardHeight);
     }
 
     private void drawDiagonalLines(Graphics2D g2, int xStart, int xEnd, int yStart, int yEnd) {
@@ -157,12 +160,12 @@ public class UI extends JPanel {
 
         g2.setColor(diagonalColor);
 
-        g2.drawLine(xStart, yStart, xEnd, yEnd);
-        g2.drawLine(xStart, yEnd, xEnd, yStart);
         g2.drawLine(xStart, yMid, xMid, yEnd);
         g2.drawLine(xStart, yMid, xMid, yStart);
         g2.drawLine(xMid, yStart, xEnd, yMid);
         g2.drawLine(xMid, yEnd, xEnd, yMid);
+        g2.drawLine(xEnd, yEnd, xStart, yStart);
+        g2.drawLine(xEnd, yStart, xStart, yEnd);
     }
 
     private void drawPieces(Graphics2D g2, int xStep, int yStep) {
@@ -170,15 +173,15 @@ public class UI extends JPanel {
             for (int j = 0; j < board.getYSize(); j++) {
                 final Piece piece = board.get(i, j);
                 if (piece != null) {
-                    final Image im = images.getImage(piece);
+                    final Image img = images.getImage(piece);
 
-                    final int imgWidth = im.getWidth(null);
-                    final int imgHeight = im.getHeight(null);
+                    final int imgWidth = img.getWidth(null);
+                    final int imgHeight = img.getHeight(null);
 
-                    final int xImgOffset = -(imgWidth / 2);
-                    final int yImgOffset = -(imgHeight / 2);
+                    final int xOffset = imgWidth / 2;
+                    final int yOffset = imgHeight / 2;
 
-                    g2.drawImage(im, xImgOffset + i * xStep, yImgOffset + j * yStep, null);
+                    g2.drawImage(img, i * xStep - xOffset, j * yStep - yOffset, null);
                 }
             }
         }

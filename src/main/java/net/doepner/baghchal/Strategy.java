@@ -14,10 +14,10 @@ import static net.doepner.baghchal.Piece.PREY;
  */
 public class Strategy {
 
-    public boolean doMoveOrEndPhase(Board board, int level) {
+    boolean doMoveOrEndPhase(Board board, int level) {
         final List<Move> possibleMoves = new ArrayList<>();
         board.addPossibleStepsTo(possibleMoves);
-        board.addPossibleJumpsTo(possibleMoves);
+        board.addPossibleJumpsTo(possibleMoves, PREY);
         return possibleMoves.isEmpty() || !(
                 tryMoveFrom(allTakesIn(possibleMoves), board)
                         || tryThreateningMove(level, possibleMoves, board)

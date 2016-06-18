@@ -14,17 +14,20 @@ import static net.doepner.baghchal.Piece.PREDATOR;
  */
 public class Images {
 
+    private final ConcurrentMap<String, BufferedImage> cache = new ConcurrentHashMap<>();
     private final Levels levels;
 
-    private final ConcurrentMap<String, BufferedImage> cache = new ConcurrentHashMap<>();
-
-    public Images(Levels levels) {
+    Images(Levels levels) {
         this.levels = levels;
     }
 
     BufferedImage getImage(String resourceFileName) {
         final String resourceFilePath = "levels/" + levels.getLevel() + "/" + resourceFileName;
         return getImageResource(resourceFilePath);
+    }
+
+    Image getImage(Piece piece) {
+        return getImage(piece == PREDATOR ? "predator.png" : "prey.png");
     }
 
     BufferedImage getImageResource(String resourceFilePath) {
@@ -44,9 +47,5 @@ public class Images {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    public Image getImage(Piece piece) {
-        return getImage(piece == PREDATOR ? "predator.png" : "prey.png");
     }
 }

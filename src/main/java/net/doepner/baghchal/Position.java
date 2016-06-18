@@ -13,11 +13,11 @@ public final class Position {
         this.y = y;
     }
 
-    public int x() {
+    int x() {
         return x;
     }
 
-    public int y() {
+    int y() {
         return y;
     }
 
@@ -38,19 +38,19 @@ public final class Position {
         return 31 * x + y;
     }
 
-    public Position add(int xStep, int yStep) {
+    Position add(int xStep, int yStep) {
         return new Position(x + xStep, y + yStep);
     }
 
-    public boolean isLessOrEqualTo(Position p) {
+    boolean isLessOrEqualTo(Position p) {
         return x <= p.x && y <= p.y;
     }
 
-    public boolean isGreaterOrEqualTo(Position p) {
+    boolean isGreaterOrEqualTo(Position p) {
         return p.x <= x && p.y <= y;
     }
 
-    public boolean hasEvenCoordSum() {
+    boolean hasEvenCoordSum() {
         return (x+y) % 2 == 0;
     }
 

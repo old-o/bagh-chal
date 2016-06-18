@@ -21,20 +21,20 @@ public class Levels {
 
     private final Map<Integer, Properties> propertiesMap = new HashMap<>();
 
-    public Levels(int maxLevel) {
+    Levels(int maxLevel) {
         this.maxLevel = maxLevel;
         firstLevel();
     }
 
-    public boolean isLevelDone() {
+    boolean isLevelDone() {
         return levelDone;
     }
 
-    public int getLevel() {
+    int getLevel() {
         return level;
     }
 
-    public int nextLevel() {
+    int nextLevel() {
         if (!isGameOver()) {
             levelDone = false;
             level++;
@@ -42,20 +42,20 @@ public class Levels {
         return level;
     }
 
-    public boolean isGameOver() {
+    boolean isGameOver() {
         return level >= maxLevel;
     }
 
-    public void firstLevel() {
+    void firstLevel() {
         level = 1;
         levelDone = false;
     }
 
-    public String getLevelEndMessage() {
+    String getLevelEndMessage() {
         return isGameOver() ? "You won Bagh-Chal!" : "Now try level " + (level + 1);
     }
 
-    public Properties getProperties(int level) {
+    Properties getProperties(int level) {
         final Properties properties = propertiesMap.get(level);
         if (properties == null) {
             final Properties loadedProperties = loadProperties(level);
@@ -77,11 +77,11 @@ public class Levels {
         return p;
     }
 
-    public String getLevelProperty(String name) {
+    String getLevelProperty(String name) {
         return getProperties(level).get(name).toString();
     }
 
-    public void setLevelDone(boolean levelDone) {
+    void setLevelDone(boolean levelDone) {
         this.levelDone = levelDone;
     }
 }

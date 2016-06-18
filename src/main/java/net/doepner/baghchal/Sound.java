@@ -22,16 +22,16 @@ public class Sound {
     private Clip lastPrey = null;
     private int preyIndex = 1;
 
-    public Sound(Levels levels) {
+    Sound(Levels levels) {
         this.levels = levels;
     }
 
-    public void playPrey() {
+    void playPrey() {
         lastPrey = play("prey" + preyIndex + ".wav");
         preyIndex = (preyIndex % 3) + 1;
     }
 
-    public void playPredatorKills() {
+    void playPredatorKills() {
         if (lastPrey != null) {
             lastPrey.stop();
             lastPrey = null;
@@ -40,20 +40,20 @@ public class Sound {
     }
 
 
-    public void playPredatorStep() {
+    void playPredatorStep() {
         play("predator-step.wav");
     }
 
-    public Clip play(String resourceFile) {
+    Clip play(String resourceFile) {
         final String resourcePath = "levels/" + levels.getLevel() + "/" + resourceFile;
         return playResource(resourcePath);
     }
 
-    public Clip playResource(String resourcePath) {
+    Clip playResource(String resourcePath) {
         return  play(getClass().getResource(resourcePath));
     }
 
-    public Clip play(URL url) {
+    Clip play(URL url) {
         try (AudioInputStream stream = getAudioInputStream(url)) {
 
             final Clip clip = (Clip) getLine(new Info(Clip.class, stream.getFormat()));

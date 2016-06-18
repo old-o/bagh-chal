@@ -15,31 +15,31 @@ public class Move {
         this.p2 = p2;
     }
 
-    public Position p1() {
+    Position p1() {
         return p1;
     }
 
-    public Position p2() {
+    Position p2() {
         return p2;
     }
 
-    public boolean isJump() {
+    boolean isJump() {
         return xDiff() == 2 || yDiff() == 2 ;
     }
 
-    public Position middle() {
+    Position middle() {
         return new Position((p1.x() + p2.x()) / 2, (p1.y() + p2.y()) / 2);
     }
 
-    public Move repeat() {
+    Move repeat() {
         return new Move(p2, new Position(p2.x() + xStep(), p2.y() + yStep()));
     }
 
-    public boolean isOneDimensional() {
+    boolean isOneDimensional() {
         return (xStep() == 0) != (yStep() == 0);
     }
 
-    public boolean isStep() {
+    boolean isStep() {
         final int xd = xDiff();
         final int yd = yDiff();
         return xd == 0 ? yd == 1 : xd == 1 && yd <= 1;
@@ -66,7 +66,7 @@ public class Move {
         return String.format("Move{p1=%s, p2=%s}", p1, p2);
     }
 
-    public boolean isNotStationary() {
+    boolean isNotStationary() {
         return !p1.equals(p2);
     }
 }

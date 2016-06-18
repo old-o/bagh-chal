@@ -6,7 +6,6 @@ import java.util.function.Consumer;
 
 import static net.doepner.baghchal.Piece.INVALID;
 import static net.doepner.baghchal.Piece.PREDATOR;
-import static net.doepner.baghchal.Piece.PREY;
 
 /**
  * The game board model
@@ -29,7 +28,7 @@ public class Board {
 
     private final BoardListener listener;
 
-    public Board(BoardListener listener) {
+    Board(BoardListener listener) {
         this.listener = listener;
     }
 
@@ -61,7 +60,7 @@ public class Board {
 
     private final static int[] STEPS = {-1, 0, +1};
 
-    public void tryStepsWhere(Piece requiredPiece, Consumer<Move> moveProcessor) {
+    void tryStepsWhere(Piece requiredPiece, Consumer<Move> moveProcessor) {
         forAllPositions(p -> {
             if (get(p) == PREDATOR) {
                 tryDirections(p, requiredPiece, moveProcessor);
@@ -69,34 +68,36 @@ public class Board {
         });
     }
 
-    public void tryDirections(Position p, Piece requiredPiece, Consumer<Move> moveProcessor) {
+    void tryDirections(Position p, Piece requiredPiece, Consumer<Move> moveProcessor) {
         for (int xStep : STEPS) {
             for (int yStep : STEPS) {
                 final Position p1 = p.add(xStep, yStep);
-                final Move step1 = new Move(p, p1);
-                if (isStepAlongLine(step1) && get(p1) == requiredPiece) {
-                    moveProcessor.accept(step1);
+                if (get(p1) == requiredPiece) {
+                    final Move step = new Move(p, p1);
+                    if (isStepAlongLine(step)) {
+                        moveProcessor.accept(step);
+                    }
                 }
             }
         }
     }
 
-    public void addPossibleStepsTo(List<Move> moveList) {
+    void addPossibleStepsTo(List<Move> moveList) {
         tryStepsWhere(null, moveList::add);
     }
 
-    public void addPossibleJumpsTo(List<Move> moveList) {
-        tryStepsWhere(PREY, step -> addPossibleJump(moveList, step));
+    void addPossibleJumpsTo(List<Move> moveList, Piece piece) {
+        tryStepsWhere(piece, step -> addPossibleJump(moveList, step));
     }
 
-    public void addPossibleJump(List<Move> list, Move step1) {
+    void addPossibleJump(List<Move> list, Move step1) {
         final Move step2 = step1.repeat();
         if (isStepAlongLine(step2) && isEmpty(step2.p2())) {
             list.add(new Move(step1.p1(), step2.p2()));
         }
     }
 
-    public Piece movePiece(Move move) {
+    Piece movePiece(Move move) {
         final Piece piece = get(move.p1());
         clear(move.p1());
         set(move.p2(), piece);
@@ -123,15 +124,15 @@ public class Board {
         listener.afterReset();
     }
 
-    public Board copyBoard() {
+    Board copyBoard() {
         return new Board(this);
     }
 
-    public Piece get(Position p) {
+    Piece get(Position p) {
         return get(p.x(), p.y());
     }
 
-    public void set(Position p, Piece piece) {
+    void set(Position p, Piece piece) {
         b[p.x()][p.y()] = piece;
     }
 
@@ -139,11 +140,11 @@ public class Board {
         set(p, null);
     }
 
-    public boolean isEmpty(Position p) {
+    boolean isEmpty(Position p) {
         return get(p) == null;
     }
 
-    protected Piece get(int x, int y) {
+    Piece get(int x, int y) {
         try {
             return b[x][y];
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -151,19 +152,19 @@ public class Board {
         }
     }
 
-    public void set(int x, int y, Piece piece) {
+    void set(int x, int y, Piece piece) {
         b[x][y] = piece;
     }
 
-    public int getCentreXSize() {
+    int getCentreXSize() {
         return CENTER_X_SIZE;
     }
 
-    public int getCentreYSize() {
+    int getCentreYSize() {
         return CENTER_Y_SIZE;
     }
 
-    public void forAllPositions(Consumer<Position> positionConsumer) {
+    void forAllPositions(Consumer<Position> positionConsumer) {
         for (int i = 1; i <= CENTER_X_SIZE; i++) {
             for (int j = 1; j <= CENTER_Y_SIZE; j++) {
                 positionConsumer.accept(new Position(i, j));
@@ -171,15 +172,15 @@ public class Board {
         }
     }
 
-    public int getXSize() {
+    int getXSize() {
         return X_SIZE;
     }
 
-    public int getYSize() {
+    int getYSize() {
         return Y_SIZE;
     }
 
-    public boolean isValid(Move move) {
+    boolean isValid(Move move) {
         return move.isNotStationary() && isEmpty(move.p2())
                 && (isStepAlongLine(move) || (isBorderPosition(move.p1()) && !isBorderPosition(move.p2())));
     }

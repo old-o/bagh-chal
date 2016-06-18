@@ -23,13 +23,13 @@ public class PreyManager extends MouseAdapter {
 
     private EventHandler eventHandler;
 
-    public PreyManager(Images images, Board board) {
+    PreyManager(Images images, Board board) {
         this.images = images;
         this.board = board;
         reset();
     }
 
-    public void setEventHandler(EventHandler eventHandler) {
+    void setEventHandler(EventHandler eventHandler) {
         this.eventHandler = eventHandler;
     }
 
@@ -44,6 +44,7 @@ public class PreyManager extends MouseAdapter {
         }
     }
 
+    @Override
     public void mousePressed(MouseEvent e) {
         final Position p = getPosition(e);
         if (board.get(p) == PREY) {
@@ -54,6 +55,7 @@ public class PreyManager extends MouseAdapter {
         }
     }
 
+    @Override
     public void mouseDragged(MouseEvent e) {
         if (dragStart != null) {
             final Point point = e.getPoint();
@@ -63,6 +65,7 @@ public class PreyManager extends MouseAdapter {
         }
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
         final Position p = getPosition(e);
         if (dragStart != null) {
@@ -76,6 +79,12 @@ public class PreyManager extends MouseAdapter {
             if (validMove) {
                 eventHandler.moveDone();
             }
+        }
+    }
+
+    void drawDraggedPrey(Graphics2D g2) {
+        if (lastDragPoint != null) {
+            g2.drawImage(preyImage(), lastDragPoint.x, lastDragPoint.y, null);
         }
     }
 
@@ -102,12 +111,6 @@ public class PreyManager extends MouseAdapter {
         int imgWidth = img.getWidth(null);
         int imgHeight = img.getHeight(null);
         return new Rectangle(p.x - imgWidth, p.y - imgHeight, 2 * imgWidth, 2 * imgHeight);
-    }
-
-    public void drawDraggedPrey(Graphics2D g2) {
-        if (lastDragPoint != null) {
-            g2.drawImage(preyImage(), lastDragPoint.x, lastDragPoint.y, null);
-        }
     }
 
     private Image preyImage() {
