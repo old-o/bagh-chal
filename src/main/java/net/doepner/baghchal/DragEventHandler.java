@@ -3,9 +3,9 @@ package net.doepner.baghchal;
 import java.awt.Point;
 
 /**
- * Handles game events
+ * Handles drag events
  */
-interface EventHandler {
+interface DragEventHandler {
 
     void draggingStarted(Point point);
 
@@ -13,5 +13,4 @@ interface EventHandler {
 
     void releasedAt(Point point);
 
-    void moveDone(Move move);
 }

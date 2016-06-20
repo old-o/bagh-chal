@@ -1,16 +1,16 @@
 package net.doepner.baghchal;
 
+import static net.doepner.baghchal.Piece.INVALID;
+import static net.doepner.baghchal.Piece.PREDATOR;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static net.doepner.baghchal.Piece.INVALID;
-import static net.doepner.baghchal.Piece.PREDATOR;
-
 /**
  * The game board model
  */
-class Board {
+public class Board {
 
     private static final int CENTER_X_SIZE = 5;
     private static final int CENTER_Y_SIZE = 5;
@@ -33,7 +33,8 @@ class Board {
      * Copy constructor that will copy the grid array of the provide board instance.
      * The resulting board will support no BoardListener functionality.
      *
-     * @param board An existing board instance
+     * @param board
+     *         An existing board instance
      */
     private Board(Board board) {
         listener = BoardListener.NONE;
@@ -44,13 +45,11 @@ class Board {
 
     void doMove(Move move) {
         final Piece piece = movePiece(move);
-        if (piece == PREDATOR) {
-            if (move.isJump()) {
-                clear(move.middle());
-                listener.onPredatorTake();
-            } else {
-                listener.onPredatorStep();
-            }
+        if (move.isJump()) {
+            clear(move.middle());
+            listener.afterJump(piece);
+        } else {
+            listener.afterStep(piece);
         }
     }
 
@@ -173,10 +172,15 @@ class Board {
     }
 
     boolean isValid(Move move) {
-        return move.isNotStationary() && isEmpty(move.p2())
-                && (
-                (isBorderEmpty() && isStepAlongLine(move))
-                        || (isBorderPosition(move.p1()) && !isBorderPosition(move.p2())));
+        return move.isNotStationary() && isEmpty(move.p2()) && (isBorderToBoard(move) || isOnBoard(move));
+    }
+
+    private boolean isOnBoard(Move move) {
+        return isBorderEmpty() && isStepAlongLine(move);
+    }
+
+    private boolean isBorderToBoard(Move move) {
+        return isBorderPosition(move.p1()) && !isBorderPosition(move.p2());
     }
 
     private boolean isBorderEmpty() {
@@ -204,5 +208,15 @@ class Board {
 
     public Position getBottomRight() {
         return bottomRight;
+    }
+
+    public Position pick(Position p, Piece piece) {
+        if (get(p) == piece) {
+            clear(p);
+            listener.afterPicked(piece);
+            return p;
+        } else {
+            return null;
+        }
     }
 }

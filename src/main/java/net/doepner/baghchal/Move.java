@@ -5,7 +5,7 @@ import static java.lang.Math.abs;
 /**
  * From / to coordinates of a move on the game board
  */
-class Move {
+public class Move {
 
     private final Position p1;
     private final Position p2;

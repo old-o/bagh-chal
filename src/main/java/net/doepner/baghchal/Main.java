@@ -19,18 +19,20 @@
 
 package net.doepner.baghchal;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JToolBar;
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+import static net.doepner.baghchal.Piece.PREDATOR;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 
-import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JToolBar;
 
 /**
  * Entry point of the game
  */
-final class Main {
+final public class Main {
 
     public static void main(String... args) {
 
@@ -45,13 +47,24 @@ final class Main {
 
         final Board board = new Board(new BoardListener() {
             @Override
-            public void onPredatorTake() {
-                sound.playPredatorKills();
+            public void afterJump(Piece piece) {
+                if (piece == PREDATOR) {
+                    sound.playPredatorKills();
+                }
             }
 
             @Override
-            public void onPredatorStep() {
-                sound.playPredatorStep();
+            public void afterStep(Piece piece) {
+                if (piece == PREDATOR) {
+                    sound.playPredatorStep();
+                }
+            }
+
+            @Override
+            public void afterPicked(Piece piece) {
+                if (piece == Piece.PREY) {
+                    sound.playPrey();
+                }
             }
 
             @Override
@@ -61,7 +74,9 @@ final class Main {
         });
 
         final UI ui = new UI(board, new BoardSetup(), images, levels);
-        final Player preyPlayer = new UserPreyPlayer(images, ui, sound);
+        final DragImageSupport dragImageSupport = new DragImageSupport(ui, images.getImage("prey.png"));
+        ui.setDraggedImagePainter(dragImageSupport);
+        final Player preyPlayer = new UserPreyPlayer(dragImageSupport, ui);
 
         final JFrame frame = new JFrame("Bagh-Chal");
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);

@@ -1,67 +1,33 @@
 package net.doepner.baghchal;
 
-import java.awt.Point;
-import java.awt.image.BufferedImage;
+import java.awt.Component;
 
 /**
  * Lets the user play the prey pieces
  */
 public final class UserPreyPlayer implements Player {
 
-    private final Images images;
-    private final UI ui;
-    private final Sound sound;
+    private final DragImageSupport dragImageSupport;
+    private final Component ui;
 
-    public UserPreyPlayer(Images images, UI ui, Sound sound) {
-        this.images = images;
+    public UserPreyPlayer(DragImageSupport dragImageSupport, Component ui) {
+        this.dragImageSupport = dragImageSupport;
         this.ui = ui;
-        this.sound = sound;
     }
 
     @Override
     public Move play(Board board) {
         final Move[] result = new Move[1];
 
-        final PreyManager preyManager = new PreyManager(board);
-        preyManager.setEventHandler(
-                new EventHandler() {
-
-                    private Point dragStartPoint;
-
-                    @Override
-                    public void draggingStarted(Point point) {
-                        dragStartPoint = point;
-                        sound.playPrey();
-                        ui.setLastDragPoint(point);
-                    }
-
-                    @Override
-                    public void draggedAt(Point p) {
-                        final BufferedImage img = getPreyImage();
-                        p.translate(-img.getWidth(null) / 2, -img.getHeight(null) / 2);
-                        ui.draggedAt(p, img);
-                    }
-
-                    @Override
-                    public void moveDone(Move move) {
-                        synchronized (result) {
-                            result[0] = move;
-                            result.notify();
-                        }
-                    }
-
-                    @Override
-                    public void releasedAt(Point point) {
-                        final BufferedImage img = getPreyImage();
-                        ui.draggedAt(point, img);
-                        ui.draggedAt(dragStartPoint, img);
-                        ui.clearLastDragPoint();
-                        dragStartPoint = null;
-                    }
-                }
-        );
-        ui.addMouseMotionListener(preyManager);
-        ui.addMouseListener(preyManager);
+        final PreyDragAndDrop preyDragAndDrop = new PreyDragAndDrop(board, move -> {
+            synchronized (result) {
+                result[0] = move;
+                result.notify();
+            }
+        });
+        preyDragAndDrop.setDragEventHandler(dragImageSupport);
+        ui.addMouseMotionListener(preyDragAndDrop);
+        ui.addMouseListener(preyDragAndDrop);
         try {
             synchronized (result) {
                 while (result[0] == null) {
@@ -71,13 +37,8 @@ public final class UserPreyPlayer implements Player {
         } catch (InterruptedException e) {
             throw new IllegalStateException(e);
         }
-        ui.removeMouseListener(preyManager);
-        ui.removeMouseMotionListener(preyManager);
+        ui.removeMouseListener(preyDragAndDrop);
+        ui.removeMouseMotionListener(preyDragAndDrop);
         return result[0];
     }
-
-    private BufferedImage getPreyImage() {
-        return images.getImage("prey.png");
-    }
-
 }

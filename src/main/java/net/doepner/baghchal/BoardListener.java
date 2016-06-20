@@ -5,20 +5,28 @@ package net.doepner.baghchal;
  */
 public interface BoardListener {
 
-    void onPredatorTake();
+    void afterJump(Piece piece);
 
-    void onPredatorStep();
+    void afterStep(Piece piece);
+
+    void afterPicked(Piece piece);
 
     void afterReset();
 
     BoardListener NONE = new BoardListener() {
+
         @Override
-        public void onPredatorTake() {
+        public void afterJump(Piece piece) {
             // ignore
         }
 
         @Override
-        public void onPredatorStep() {
+        public void afterStep(Piece piece) {
+            // ignore
+        }
+
+        @Override
+        public void afterPicked(Piece piece) {
             // ignore
         }
 

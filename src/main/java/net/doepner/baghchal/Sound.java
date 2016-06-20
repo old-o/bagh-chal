@@ -1,21 +1,22 @@
 package net.doepner.baghchal;
 
+import static javax.sound.sampled.AudioSystem.getAudioInputStream;
+import static javax.sound.sampled.AudioSystem.getLine;
+import static javax.sound.sampled.LineEvent.Type.STOP;
+
+import java.io.IOException;
+import java.net.URL;
+
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine.Info;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.IOException;
-import java.net.URL;
-
-import static javax.sound.sampled.AudioSystem.getAudioInputStream;
-import static javax.sound.sampled.AudioSystem.getLine;
-import static javax.sound.sampled.LineEvent.Type.STOP;
 
 /**
  *
  */
-class Sound {
+public class Sound {
 
     private final Levels levels;
 

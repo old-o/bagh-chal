@@ -1,18 +1,18 @@
 package net.doepner.baghchal;
 
+import static java.util.stream.Collectors.toList;
+import static net.doepner.baghchal.Piece.PREY;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static java.util.stream.Collectors.toList;
-import static net.doepner.baghchal.Piece.PREY;
-
 /**
  * The computer player's strategy (playing the tigers)
  */
-class PredatorStrategy implements Player {
+public class PredatorStrategy implements Player {
 
     private final Levels levels;
 

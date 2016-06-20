@@ -1,18 +1,19 @@
 package net.doepner.baghchal;
 
-import javax.imageio.ImageIO;
+import static net.doepner.baghchal.Piece.PREDATOR;
+
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static net.doepner.baghchal.Piece.PREDATOR;
+import javax.imageio.ImageIO;
 
 /**
  * Loads images for play pieces from classpath
  */
-class Images {
+public class Images {
 
     private final ConcurrentMap<String, BufferedImage> cache = new ConcurrentHashMap<>();
     private final Levels levels;

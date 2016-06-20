@@ -1,21 +1,5 @@
 package net.doepner.baghchal;
 
-import javax.swing.JPanel;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Paint;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.TexturePaint;
-import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
-
 import static java.awt.RenderingHints.KEY_ANTIALIASING;
 import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
 import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
@@ -23,7 +7,23 @@ import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
 import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
 import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
 
-class UI extends JPanel {
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.TexturePaint;
+import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.JPanel;
+
+public class UI extends JPanel {
 
     private final Board board;
     private final BoardSetup boardSetup;
@@ -34,31 +34,34 @@ class UI extends JPanel {
     private final Image congrats;
 
     private final BasicStroke stroke = new BasicStroke(1.5f);
-    private final RenderingHints renderingHints;
+    private final RenderingHints renderingHints = createRenderingHints();
 
-    private Paint paint;
+    private static RenderingHints createRenderingHints() {
+        final Map<RenderingHints.Key, Object> map = new HashMap<>();
+        map.put(KEY_TEXT_ANTIALIASING, VALUE_TEXT_ANTIALIAS_ON);
+        map.put(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
+        map.put(KEY_STROKE_CONTROL, VALUE_STROKE_NORMALIZE);
+        return new RenderingHints(map);
+    }
+
+    private Painter draggedImagePainter;
+    private Paint boardPaint;
 
     private Color gridColor;
     private Color diagonalColor;
     private Color backgroundColor;
     private Color boardEdgeColor;
 
-    private Image draggedImage;
-
     UI(Board board, BoardSetup boardSetup, Images images, Levels levels) {
         this.board = board;
         this.boardSetup = boardSetup;
-
         this.images = images;
         this.levels = levels;
-
         congrats = images.getImageResource("congrats.gif");
+    }
 
-        final Map<RenderingHints.Key, Object> map = new HashMap<>();
-        map.put(KEY_TEXT_ANTIALIASING, VALUE_TEXT_ANTIALIAS_ON);
-        map.put(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
-        map.put(KEY_STROKE_CONTROL, VALUE_STROKE_NORMALIZE);
-        renderingHints = new RenderingHints(map);
+    void setDraggedImagePainter(Painter draggedImagePainter) {
+        this.draggedImagePainter = draggedImagePainter;
     }
 
     void start() {
@@ -75,7 +78,7 @@ class UI extends JPanel {
         board.reset();
         boardSetup.setup(board);
         final BufferedImage bgImage = images.getImage("background.jpg");
-        paint = new TexturePaint(bgImage, new Rectangle(0, 0, bgImage.getWidth(), bgImage.getHeight()));
+        boardPaint = new TexturePaint(bgImage, new Rectangle(0, 0, bgImage.getWidth(), bgImage.getHeight()));
         backgroundColor = getLevelColor("backgroundColor");
         diagonalColor = getLevelColor("diagonalColor");
         gridColor = getLevelColor("gridColor");
@@ -106,7 +109,7 @@ class UI extends JPanel {
             g2.drawString(s, width / 2 - (g2.getFontMetrics().stringWidth(s) / 2), height / 2 + 20);
         } else {
             drawBoard(g2, width, height);
-            drawDraggedPrey(g2);
+            draggedImagePainter.paint(g2);
         }
     }
 
@@ -149,7 +152,7 @@ class UI extends JPanel {
         final int boardWidth = xEnd - xStart + xStep;
         final int boardHeight = yEnd - yStart + yStep;
 
-        g2.setPaint(paint);
+        g2.setPaint(boardPaint);
         g2.fillRect(boardStartX, boardStartY, boardWidth, boardHeight);
         g2.setStroke(stroke);
         g2.setColor(boardEdgeColor);
@@ -187,38 +190,5 @@ class UI extends JPanel {
                 }
             }
         }
-    }
-
-    private Point lastDragPoint;
-
-    private void drawDraggedPrey(Graphics2D g2) {
-        if (lastDragPoint != null) {
-            g2.drawImage(draggedImage, lastDragPoint.x, lastDragPoint.y, null);
-        }
-    }
-
-    public void draggedAt(Point p, Image img) {
-        draggedImage = img;
-        if (lastDragPoint != null) {
-            repaint(getRectangle(lastDragPoint, img));
-        }
-        if (p != null && !p.equals(lastDragPoint)) {
-            repaint(getRectangle(p, img));
-        }
-        setLastDragPoint(p);
-    }
-
-    private static Rectangle getRectangle(Point p, Image img) {
-        int imgWidth = img.getWidth(null);
-        int imgHeight = img.getHeight(null);
-        return new Rectangle(p.x - imgWidth, p.y - imgHeight, 2 * imgWidth, 2 * imgHeight);
-    }
-
-    public void clearLastDragPoint() {
-        setLastDragPoint(null);
-    }
-
-    public void setLastDragPoint(Point lastDragPoint) {
-        this.lastDragPoint = lastDragPoint;
     }
 }

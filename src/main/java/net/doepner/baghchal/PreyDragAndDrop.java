@@ -1,46 +1,47 @@
 package net.doepner.baghchal;
 
+import static net.doepner.baghchal.Piece.PREY;
+
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import static net.doepner.baghchal.Piece.PREY;
-
 /**
  * Manages the prey pieces (e.g. goats)
  */
-class PreyManager extends MouseAdapter {
+public class PreyDragAndDrop extends MouseAdapter {
 
     private final Board board;
+    private final PlayFlow playFlow;
 
-    private EventHandler eventHandler;
+    private DragEventHandler dragEventHandler;
 
     private Position dragStart;
 
-    PreyManager(Board board) {
+    PreyDragAndDrop(Board board, PlayFlow playFlow) {
         this.board = board;
+        this.playFlow = playFlow;
     }
 
-    void setEventHandler(EventHandler eventHandler) {
-        this.eventHandler = eventHandler;
+    void setDragEventHandler(DragEventHandler dragEventHandler) {
+        this.dragEventHandler = dragEventHandler;
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         final Position p = getPosition(e);
-        if (board.get(p) == PREY) {
-            board.clear(p);
-            dragStart = p;
-            eventHandler.draggingStarted(e.getPoint());
-        }
+            dragStart = board.pick(p, PREY);
+            if (dragStart != null) {
+                dragEventHandler.draggingStarted(e.getPoint());
+            }
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
         if (dragStart != null) {
             final Point point = e.getPoint();
-            eventHandler.draggedAt(point);
+            dragEventHandler.draggedAt(point);
         }
     }
 
@@ -52,10 +53,10 @@ class PreyManager extends MouseAdapter {
             final boolean validMove = board.isValid(move);
             final Position resultingPosition = validMove ? move.p2() : dragStart;
             board.set(resultingPosition, PREY);
-            eventHandler.releasedAt(e.getPoint());
+            dragEventHandler.releasedAt(e.getPoint());
             dragStart = null;
             if (validMove) {
-                eventHandler.moveDone(move);
+                playFlow.moveDone(move);
             }
         }
     }

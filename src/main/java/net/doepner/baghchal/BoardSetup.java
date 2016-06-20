@@ -6,7 +6,7 @@ import static net.doepner.baghchal.Piece.PREY;
 /**
  * Sets up the pieces on the board
  */
-final class BoardSetup {
+public final class BoardSetup {
 
     void setup(Board board) {
         final Position p1 = board.getTopLeft();

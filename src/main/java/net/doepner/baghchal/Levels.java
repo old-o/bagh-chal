@@ -10,7 +10,7 @@ import java.util.Properties;
 /**
  * Phases of the game (beginning, middle, end)
  */
-class Levels {
+public class Levels {
 
     private static final Class<?> myClass = MethodHandles.lookup().lookupClass();
 
