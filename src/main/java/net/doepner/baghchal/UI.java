@@ -8,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Paint;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.TexturePaint;
@@ -24,8 +25,9 @@ import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
 
 class UI extends JPanel {
 
-    private final PreyManager preyManager;
     private final Board board;
+    private final BoardSetup boardSetup;
+
     private final Images images;
     private final Levels levels;
 
@@ -41,9 +43,12 @@ class UI extends JPanel {
     private Color backgroundColor;
     private Color boardEdgeColor;
 
-    UI(Board board, PreyManager preyManager, Images images, Levels levels) {
+    private Image draggedImage;
+
+    UI(Board board, BoardSetup boardSetup, Images images, Levels levels) {
         this.board = board;
-        this.preyManager = preyManager;
+        this.boardSetup = boardSetup;
+
         this.images = images;
         this.levels = levels;
 
@@ -54,9 +59,6 @@ class UI extends JPanel {
         map.put(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
         map.put(KEY_STROKE_CONTROL, VALUE_STROKE_NORMALIZE);
         renderingHints = new RenderingHints(map);
-
-        addMouseMotionListener(preyManager);
-        addMouseListener(preyManager);
     }
 
     void start() {
@@ -71,7 +73,7 @@ class UI extends JPanel {
 
     private void startLevel() {
         board.reset();
-        preyManager.reset();
+        boardSetup.setup(board);
         final BufferedImage bgImage = images.getImage("background.jpg");
         paint = new TexturePaint(bgImage, new Rectangle(0, 0, bgImage.getWidth(), bgImage.getHeight()));
         backgroundColor = getLevelColor("backgroundColor");
@@ -98,13 +100,13 @@ class UI extends JPanel {
         g2.setColor(getForeground());
 
         if (levels.isLevelDone()) {
-            g2.drawImage(congrats, width / 2 - congrats.getWidth(null) / 2, height / 2- congrats.getHeight(null), null);
+            g2.drawImage(congrats, width / 2 - congrats.getWidth(null) / 2, height / 2 - congrats.getHeight(null), null);
             g2.setFont(new Font("SansSerif", 0, 34));
             final String s = levels.getLevelEndMessage();
             g2.drawString(s, width / 2 - (g2.getFontMetrics().stringWidth(s) / 2), height / 2 + 20);
         } else {
             drawBoard(g2, width, height);
-            preyManager.drawDraggedPrey(g2);
+            drawDraggedPrey(g2);
         }
     }
 
@@ -185,5 +187,38 @@ class UI extends JPanel {
                 }
             }
         }
+    }
+
+    private Point lastDragPoint;
+
+    private void drawDraggedPrey(Graphics2D g2) {
+        if (lastDragPoint != null) {
+            g2.drawImage(draggedImage, lastDragPoint.x, lastDragPoint.y, null);
+        }
+    }
+
+    public void draggedAt(Point p, Image img) {
+        draggedImage = img;
+        if (lastDragPoint != null) {
+            repaint(getRectangle(lastDragPoint, img));
+        }
+        if (p != null && !p.equals(lastDragPoint)) {
+            repaint(getRectangle(p, img));
+        }
+        setLastDragPoint(p);
+    }
+
+    private static Rectangle getRectangle(Point p, Image img) {
+        int imgWidth = img.getWidth(null);
+        int imgHeight = img.getHeight(null);
+        return new Rectangle(p.x - imgWidth, p.y - imgHeight, 2 * imgWidth, 2 * imgHeight);
+    }
+
+    public void clearLastDragPoint() {
+        setLastDragPoint(null);
+    }
+
+    public void setLastDragPoint(Point lastDragPoint) {
+        this.lastDragPoint = lastDragPoint;
     }
 }

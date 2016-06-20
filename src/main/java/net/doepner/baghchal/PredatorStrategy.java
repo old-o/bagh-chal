@@ -12,24 +12,41 @@ import static net.doepner.baghchal.Piece.PREY;
 /**
  * The computer player's strategy (playing the tigers)
  */
-class Strategy {
+class PredatorStrategy implements Player {
 
-    boolean doMoveOrEndPhase(Board board, int level) {
+    private final Levels levels;
+
+    public PredatorStrategy(Levels levels) {
+        this.levels = levels;
+    }
+
+    @Override
+    public Move play(Board board) {
+        final int level = levels.getLevel();
         final List<Move> possibleMoves = new ArrayList<>();
         board.addPossibleStepsTo(possibleMoves);
         board.addPossibleJumpsTo(possibleMoves, PREY);
-        return possibleMoves.isEmpty() || !(
-                tryMoveFrom(allTakesIn(possibleMoves), board)
-                        || tryThreateningMove(level, possibleMoves, board)
-                        || tryMoveFrom(possibleMoves, board));
+        if (possibleMoves.isEmpty()) {
+            return null;
+        }
+        final Move take = tryMoveFrom(allTakesIn(possibleMoves), board);
+        if (take != null) {
+            return take;
+        }
+        final Move threateningMove = tryThreateningMove(level, possibleMoves, board);
+        if (threateningMove != null) {
+            return threateningMove;
+        }
+        return tryMoveFrom(possibleMoves, board);
     }
 
-    private static boolean tryMoveFrom(List<Move> moves, Board board) {
+    private static Move tryMoveFrom(List<Move> moves, Board board) {
         if (moves.isEmpty()) {
-            return false;
+            return null;
         } else {
-            board.doMove(getRandomFrom(moves));
-            return true;
+            final Move move = getRandomFrom(moves);
+            board.doMove(move);
+            return move;
         }
     }
 
@@ -41,17 +58,18 @@ class Strategy {
         return moveList.stream().filter(Move::isJump).collect(toList());
     }
 
-    private static boolean tryThreateningMove(int level, Iterable<Move> possibleMoves, Board board) {
+    private static Move tryThreateningMove(int level, Iterable<Move> possibleMoves, Board board) {
         if (level > 1) {
             final int tryToThreaten = level - 1;
             final Map<Integer, List<Move>> threateningMoves = getThreateningMoves(possibleMoves, board);
             for (int i = tryToThreaten; i > 0; i--) {
-                if (tryMoveFrom(threateningMoves.get(tryToThreaten), board)) {
-                    return true;
+                final Move move = tryMoveFrom(threateningMoves.get(tryToThreaten), board);
+                if (move != null) {
+                    return move;
                 }
             }
         }
-        return false;
+        return null;
     }
 
     private static Map<Integer, List<Move>> getThreateningMoves(Iterable<Move> possibleMoves, Board board) {

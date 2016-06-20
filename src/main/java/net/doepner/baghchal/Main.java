@@ -24,7 +24,6 @@ import javax.swing.JFrame;
 import javax.swing.JToolBar;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Rectangle;
 
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
@@ -39,7 +38,7 @@ final class Main {
 
         final int maxLevel = 2;
         final Levels levels = new Levels(maxLevel);
-        final Strategy strategy = new Strategy();
+        final Player predatorStrategy = new PredatorStrategy(levels);
 
         final Sound sound = new Sound(levels);
         final Images images = new Images(levels);
@@ -61,8 +60,8 @@ final class Main {
             }
         });
 
-        final PreyManager preyManager = new PreyManager(images, board);
-        final UI ui = new UI(board, preyManager, images, levels);
+        final UI ui = new UI(board, new BoardSetup(), images, levels);
+        final Player preyPlayer = new UserPreyPlayer(images, ui, sound);
 
         final JFrame frame = new JFrame("Bagh-Chal");
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -81,34 +80,23 @@ final class Main {
         frame.add(toolBar, BorderLayout.PAGE_START);
         frame.add(ui, BorderLayout.CENTER);
 
-        preyManager.setEventHandler(new EventHandler() {
-            @Override
-            public void repaintRectangleAt(Rectangle rectangle) {
-                ui.repaint(rectangle);
-            }
-
-            @Override
-            public void moveDone() {
-                final boolean predatorsLostLevel = strategy.doMoveOrEndPhase(board, levels.getLevel());
-                if (predatorsLostLevel) {
-                    sound.playResource("congrats.wav");
-                }
-                levels.setLevelDone(predatorsLostLevel);
-                nextLevelBtn.setEnabled(predatorsLostLevel && !levels.isGameOver());
-                ui.repaint();
-            }
-
-            @Override
-            public void draggingStarted() {
-                sound.playPrey();
-            }
-        });
-
         ui.setPreferredSize(new Dimension(500, 500));
         ui.start();
 
         frame.pack();
         frame.setVisible(true);
+
+        while (!levels.isGameOver()) {
+            preyPlayer.play(board);
+            final Move predatorMove = predatorStrategy.play(board);
+            final boolean predatorsLostLevel = predatorMove == null;
+            if (predatorsLostLevel) {
+                sound.playResource("congrats.wav");
+            }
+            levels.setLevelDone(predatorsLostLevel);
+            nextLevelBtn.setEnabled(predatorsLostLevel && !levels.isGameOver());
+            ui.repaint();
+        }
     }
 
 }

@@ -1,16 +1,17 @@
 package net.doepner.baghchal;
 
-import java.awt.Rectangle;
+import java.awt.Point;
 
 /**
  * Handles game events
  */
 interface EventHandler {
 
-    void draggingStarted();
+    void draggingStarted(Point point);
 
-    void repaintRectangleAt(Rectangle rectangle);
+    void draggedAt(Point point);
 
-    void moveDone();
+    void releasedAt(Point point);
 
+    void moveDone(Move move);
 }

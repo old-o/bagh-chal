@@ -18,8 +18,8 @@ class Board {
     private static final int X_SIZE = 1 + CENTER_X_SIZE + 1;
     private static final int Y_SIZE = 1 + CENTER_Y_SIZE + 1;
 
-    private final Position p1 = new Position(1, 1);
-    private final Position p2 = new Position(CENTER_X_SIZE, CENTER_Y_SIZE);
+    private final Position topLeft = new Position(1, 1);
+    private final Position bottomRight = new Position(CENTER_X_SIZE, CENTER_Y_SIZE);
 
     private final Piece[][] b = new Piece[X_SIZE][Y_SIZE];
 
@@ -106,17 +106,13 @@ class Board {
     }
 
     private boolean isValidPosition(Position pos) {
-        return pos.isGreaterOrEqualTo(p1) && pos.isLessOrEqualTo(p2);
+        return pos.isGreaterOrEqualTo(topLeft) && pos.isLessOrEqualTo(bottomRight);
     }
 
     void reset() {
         for (Piece[] pieces : b) {
             Arrays.fill(pieces, null);
         }
-        set(p1, PREDATOR);
-        set(p1.x(), p2.y(), PREDATOR);
-        set(p2.x(), p1.y(), PREDATOR);
-        set(p2, PREDATOR);
         listener.afterReset();
     }
 
@@ -178,11 +174,35 @@ class Board {
 
     boolean isValid(Move move) {
         return move.isNotStationary() && isEmpty(move.p2())
-                && (isStepAlongLine(move) || (isBorderPosition(move.p1()) && !isBorderPosition(move.p2())));
+                && (
+                (isBorderEmpty() && isStepAlongLine(move))
+                        || (isBorderPosition(move.p1()) && !isBorderPosition(move.p2())));
+    }
+
+    private boolean isBorderEmpty() {
+        final Position p1 = topLeft;
+        final Position p2 = bottomRight;
+        for (int n = 0; n <= 6; n++) {
+            if (get(p1.x() - 1, n) != null
+                    || get(p2.x() + 1, n) != null
+                    || get(n, p1.y() - 1) != null
+                    || get(n, p2.y() + 1) != null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean isBorderPosition(Position p) {
         return p.x() == 0 || p.x() == CENTER_X_SIZE + 1
                 || p.y() == 0 || p.y() == CENTER_Y_SIZE + 1;
+    }
+
+    public Position getTopLeft() {
+        return topLeft;
+    }
+
+    public Position getBottomRight() {
+        return bottomRight;
     }
 }
