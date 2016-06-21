@@ -1,7 +1,6 @@
 package net.doepner.baghchal;
 
 import static net.doepner.baghchal.Piece.INVALID;
-import static net.doepner.baghchal.Piece.PREDATOR;
 
 import java.util.Arrays;
 import java.util.List;
@@ -55,9 +54,9 @@ public class Board {
 
     private final static int[] STEPS = {-1, 0, +1};
 
-    void tryStepsWhere(Piece requiredPiece, Consumer<Move> moveProcessor) {
+    void tryStepsWhere(Piece movingPiece, Piece requiredPiece, Consumer<Move> moveProcessor) {
         forAllPositions(p -> {
-            if (get(p) == PREDATOR) {
+            if (get(p) == movingPiece) {
                 tryDirections(p, requiredPiece, moveProcessor);
             }
         });
@@ -77,12 +76,12 @@ public class Board {
         }
     }
 
-    void addPossibleStepsTo(List<Move> moveList) {
-        tryStepsWhere(null, moveList::add);
+    void addPossibleStepsTo(List<Move> moveList, Piece movingPiece) {
+        tryStepsWhere(movingPiece, null, moveList::add);
     }
 
-    void addPossibleJumpsTo(List<Move> moveList, Piece piece) {
-        tryStepsWhere(piece, step -> addPossibleJump(moveList, step));
+    void addPossibleJumpsTo(List<Move> moveList, Piece movingPiece, Piece requiredPiece) {
+        tryStepsWhere(movingPiece, requiredPiece, step -> addPossibleJump(moveList, step));
     }
 
     void addPossibleJump(List<Move> list, Move step1) {

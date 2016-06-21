@@ -1,6 +1,7 @@
 package net.doepner.baghchal;
 
 import static java.util.stream.Collectors.toList;
+import static net.doepner.baghchal.Piece.PREDATOR;
 import static net.doepner.baghchal.Piece.PREY;
 
 import java.util.ArrayList;
@@ -24,8 +25,8 @@ public class PredatorStrategy implements Player {
     public Move play(Board board) {
         final int level = levels.getLevel();
         final List<Move> possibleMoves = new ArrayList<>();
-        board.addPossibleStepsTo(possibleMoves);
-        board.addPossibleJumpsTo(possibleMoves, PREY);
+        board.addPossibleStepsTo(possibleMoves, PREDATOR);
+        board.addPossibleJumpsTo(possibleMoves, PREDATOR, PREY);
         if (possibleMoves.isEmpty()) {
             return null;
         }
@@ -90,7 +91,7 @@ public class PredatorStrategy implements Player {
         final Board b = board.copyBoard();
         b.movePiece(m);
         final List<Move> jumps = new ArrayList<>();
-        b.tryStepsWhere(PREY, step -> b.addPossibleJump(jumps, step));
+        b.tryStepsWhere(PREDATOR, PREY, step -> b.addPossibleJump(jumps, step));
         return jumps.size();
     }
 }

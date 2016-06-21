@@ -19,15 +19,7 @@
 
 package net.doepner.baghchal;
 
-import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
-import static net.doepner.baghchal.Piece.PREDATOR;
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JToolBar;
+import java.awt.*;
 
 /**
  * Entry point of the game
@@ -39,78 +31,33 @@ final public class Main {
         System.setProperty("sun.java2d.opengl", "true");
 
         final int maxLevel = 2;
-        final Levels levels = new Levels(maxLevel);
-        final Player predatorStrategy = new PredatorStrategy(levels);
+        final Dimension preferredSize = new Dimension(500, 500);
+
+        final LevelProperties levelProperties = new LevelProperties("levels/%d/level.properties");
+        final Levels levels = new Levels(levelProperties, maxLevel);
 
         final Sound sound = new Sound(levels);
         final Images images = new Images(levels);
 
-        final Board board = new Board(new BoardListener() {
-            @Override
-            public void afterJump(Piece piece) {
-                if (piece == PREDATOR) {
-                    sound.playPredatorKills();
-                }
-            }
+        final Board board = new Board(new BoardSound(sound));
+        final BoardPanel boardPanel = new BoardPanel(board, new BoardSetup(), images, levels);
 
-            @Override
-            public void afterStep(Piece piece) {
-                if (piece == PREDATOR) {
-                    sound.playPredatorStep();
-                }
-            }
+        final Player preyPlayer = new UserPreyPlayer(boardPanel, images);
+        final Player predatorPlayer = new PredatorStrategy(levels);
 
-            @Override
-            public void afterPicked(Piece piece) {
-                if (piece == Piece.PREY) {
-                    sound.playPrey();
-                }
-            }
-
-            @Override
-            public void afterReset() {
-                sound.play("welcome.wav");
-            }
-        });
-
-        final UI ui = new UI(board, new BoardSetup(), images, levels);
-        final DragImageSupport dragImageSupport = new DragImageSupport(ui, images.getImage("prey.png"));
-        ui.setDraggedImagePainter(dragImageSupport);
-        final Player preyPlayer = new UserPreyPlayer(dragImageSupport, ui);
-
-        final JFrame frame = new JFrame("Bagh-Chal");
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        frame.setLayout(new BorderLayout());
-
-        final JButton newGameBtn = new JButton("New Game");
-        newGameBtn.addActionListener(e -> ui.start());
-        final JButton nextLevelBtn = new JButton("Next Level");
-        nextLevelBtn.addActionListener(e -> ui.nextLevel());
-        nextLevelBtn.setEnabled(false);
-
-        final JToolBar toolBar = new JToolBar();
-        toolBar.add(newGameBtn);
-        toolBar.add(nextLevelBtn);
-
-        frame.add(toolBar, BorderLayout.PAGE_START);
-        frame.add(ui, BorderLayout.CENTER);
-
-        ui.setPreferredSize(new Dimension(500, 500));
-        ui.start();
-
-        frame.pack();
-        frame.setVisible(true);
+        final MainFrame mainFrame = new MainFrame(boardPanel);
+        mainFrame.show(preferredSize);
 
         while (!levels.isGameOver()) {
             preyPlayer.play(board);
-            final Move predatorMove = predatorStrategy.play(board);
+            final Move predatorMove = predatorPlayer.play(board);
             final boolean predatorsLostLevel = predatorMove == null;
             if (predatorsLostLevel) {
                 sound.playResource("congrats.wav");
             }
             levels.setLevelDone(predatorsLostLevel);
-            nextLevelBtn.setEnabled(predatorsLostLevel && !levels.isGameOver());
-            ui.repaint();
+            mainFrame.enableNextLevel(predatorsLostLevel && !levels.isGameOver());
+            boardPanel.repaint();
         }
     }
 

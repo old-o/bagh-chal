@@ -7,23 +7,14 @@ import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
 import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
 import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Paint;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.TexturePaint;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JPanel;
 
-public class UI extends JPanel {
+public class BoardPanel extends JPanel {
 
     private final Board board;
     private final BoardSetup boardSetup;
@@ -44,7 +35,6 @@ public class UI extends JPanel {
         return new RenderingHints(map);
     }
 
-    private Painter draggedImagePainter;
     private Paint boardPaint;
 
     private Color gridColor;
@@ -52,16 +42,12 @@ public class UI extends JPanel {
     private Color backgroundColor;
     private Color boardEdgeColor;
 
-    UI(Board board, BoardSetup boardSetup, Images images, Levels levels) {
+    BoardPanel(Board board, BoardSetup boardSetup, Images images, Levels levels) {
         this.board = board;
         this.boardSetup = boardSetup;
         this.images = images;
         this.levels = levels;
         congrats = images.getImageResource("congrats.gif");
-    }
-
-    void setDraggedImagePainter(Painter draggedImagePainter) {
-        this.draggedImagePainter = draggedImagePainter;
     }
 
     void start() {
@@ -99,7 +85,6 @@ public class UI extends JPanel {
 
         final Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHints(renderingHints);
-
         g2.setColor(getForeground());
 
         if (levels.isLevelDone()) {
@@ -109,7 +94,7 @@ public class UI extends JPanel {
             g2.drawString(s, width / 2 - (g2.getFontMetrics().stringWidth(s) / 2), height / 2 + 20);
         } else {
             drawBoard(g2, width, height);
-            draggedImagePainter.paint(g2);
+            drawDraggedImage(g2);
         }
     }
 
@@ -190,5 +175,30 @@ public class UI extends JPanel {
                 }
             }
         }
+    }
+
+    private Point lastDragPoint;
+    private Image draggedImage;
+
+    void repaintForDrag(Rectangle rectangle) {
+        repaint(rectangle);
+    }
+
+    private void drawDraggedImage(Graphics2D g2) {
+        if (lastDragPoint != null) {
+            g2.drawImage(draggedImage, lastDragPoint.x, lastDragPoint.y, null);
+        }
+    }
+
+    public void setLastDragPoint(Point lastDragPoint) {
+        this.lastDragPoint = lastDragPoint;
+    }
+
+    public void setDraggedImage(Image draggedImage) {
+        this.draggedImage = draggedImage;
+    }
+
+    public Point getLastDragPoint() {
+        return lastDragPoint;
     }
 }

@@ -1,44 +1,49 @@
 package net.doepner.baghchal;
 
-import java.awt.Component;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
 /**
  * Lets the user play the prey pieces
  */
 public final class UserPreyPlayer implements Player {
 
-    private final DragImageSupport dragImageSupport;
-    private final Component ui;
+    private final BoardPanel boardPanel;
+    private final Images images;
 
-    public UserPreyPlayer(DragImageSupport dragImageSupport, Component ui) {
-        this.dragImageSupport = dragImageSupport;
-        this.ui = ui;
+    public UserPreyPlayer(BoardPanel boardPanel, Images images) {
+        this.boardPanel = boardPanel;
+        this.images = images;
+    }
+
+    private static class Result {
+        public Move move;
     }
 
     @Override
     public Move play(Board board) {
-        final Move[] result = new Move[1];
-
-        final PreyDragAndDrop preyDragAndDrop = new PreyDragAndDrop(board, move -> {
-            synchronized (result) {
-                result[0] = move;
-                result.notify();
-            }
-        });
-        preyDragAndDrop.setDragEventHandler(dragImageSupport);
-        ui.addMouseMotionListener(preyDragAndDrop);
-        ui.addMouseListener(preyDragAndDrop);
+        final Result result = new Result();
+        final BufferedImage preyImage = images.getImage("prey.png");
+        final PreyDragAndDrop preyDragAndDrop = new PreyDragAndDrop(board, boardPanel, preyImage,
+                move -> {
+                    synchronized (result) {
+                        result.move = move;
+                        result.notify();
+                    }
+                });
+        boardPanel.addMouseMotionListener(preyDragAndDrop);
+        boardPanel.addMouseListener(preyDragAndDrop);
         try {
             synchronized (result) {
-                while (result[0] == null) {
+                while (result.move == null) {
                     result.wait();
                 }
             }
         } catch (InterruptedException e) {
             throw new IllegalStateException(e);
         }
-        ui.removeMouseListener(preyDragAndDrop);
-        ui.removeMouseMotionListener(preyDragAndDrop);
-        return result[0];
+        boardPanel.removeMouseListener(preyDragAndDrop);
+        boardPanel.removeMouseMotionListener(preyDragAndDrop);
+        return result.move;
     }
 }
