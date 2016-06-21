@@ -3,6 +3,8 @@ package net.doepner.baghchal;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+import static net.doepner.baghchal.Piece.PREY;
+
 /**
  * Lets the user play the prey pieces
  */
@@ -23,8 +25,7 @@ public final class UserPreyPlayer implements Player {
     @Override
     public Move play(Board board) {
         final Result result = new Result();
-        final BufferedImage preyImage = images.getImage("prey.png");
-        final PreyDragAndDrop preyDragAndDrop = new PreyDragAndDrop(board, boardPanel, preyImage,
+        final PreyDragAndDrop preyDragAndDrop = new PreyDragAndDrop(board, boardPanel, images.getImage(PREY),
                 move -> {
                     synchronized (result) {
                         result.move = move;

@@ -51,7 +51,7 @@ final public class Main {
         while (!levels.isGameOver()) {
             preyPlayer.play(board);
             final Move predatorMove = predatorPlayer.play(board);
-            final boolean predatorsLostLevel = predatorMove == null;
+            final boolean predatorsLostLevel = (predatorMove == null);
             if (predatorsLostLevel) {
                 sound.playResource("congrats.wav");
             }
