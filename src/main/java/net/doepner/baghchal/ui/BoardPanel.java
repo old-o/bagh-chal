@@ -1,4 +1,26 @@
-package net.doepner.baghchal;
+package net.doepner.baghchal.ui;
+
+import net.doepner.baghchal.BoardSetup;
+import net.doepner.baghchal.model.Board;
+import net.doepner.baghchal.model.Levels;
+import net.doepner.baghchal.model.Piece;
+import net.doepner.baghchal.resources.Images;
+
+import javax.swing.JPanel;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.TexturePaint;
+import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.awt.RenderingHints.KEY_ANTIALIASING;
 import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
@@ -6,13 +28,6 @@ import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
 import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
 import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
 import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.JPanel;
 
 public class BoardPanel extends JPanel {
 
@@ -42,12 +57,12 @@ public class BoardPanel extends JPanel {
     private Color backgroundColor;
     private Color boardEdgeColor;
 
-    BoardPanel(Board board, BoardSetup boardSetup, Images images, Levels levels) {
+    public BoardPanel(Board board, BoardSetup boardSetup, Images images, Levels levels) {
         this.board = board;
         this.boardSetup = boardSetup;
         this.images = images;
         this.levels = levels;
-        congrats = images.getImageResource("congrats.gif");
+        congrats = images.getImageResource(getClass().getResource("/net/doepner/baghchal/congrats.gif"));
     }
 
     void start() {
@@ -164,14 +179,9 @@ public class BoardPanel extends JPanel {
                 final Piece piece = board.get(i, j);
                 if (piece != null) {
                     final Image img = images.getImage(piece);
-
-                    final int imgWidth = img.getWidth(null);
-                    final int imgHeight = img.getHeight(null);
-
-                    final int xOffset = imgWidth / 2;
-                    final int yOffset = imgHeight / 2;
-
-                    g2.drawImage(img, i * xStep - xOffset, j * yStep - yOffset, null);
+                    final int halfImgWidth = img.getWidth(null) / 2;
+                    final int halfImgHeight = img.getHeight(null) / 2;
+                    g2.drawImage(img, i * xStep - halfImgWidth, j * yStep - halfImgHeight, null);
                 }
             }
         }

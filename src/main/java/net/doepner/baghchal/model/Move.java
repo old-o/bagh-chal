@@ -1,4 +1,4 @@
-package net.doepner.baghchal;
+package net.doepner.baghchal.model;
 
 import static java.lang.Math.abs;
 
@@ -15,15 +15,15 @@ public class Move {
         this.p2 = p2;
     }
 
-    Position p1() {
+    public Position p1() {
         return p1;
     }
 
-    Position p2() {
+    public Position p2() {
         return p2;
     }
 
-    boolean isJump() {
+    public boolean isJump() {
         return xDiff() == 2 || yDiff() == 2 ;
     }
 

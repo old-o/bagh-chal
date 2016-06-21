@@ -1,6 +1,9 @@
 package net.doepner.baghchal;
 
-import static net.doepner.baghchal.Piece.PREDATOR;
+import net.doepner.baghchal.model.Piece;
+import net.doepner.baghchal.resources.Sound;
+
+import static net.doepner.baghchal.model.Piece.PREDATOR;
 
 /**
  * Plays sounds as board events occur

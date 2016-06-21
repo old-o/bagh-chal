@@ -1,8 +1,7 @@
-package net.doepner.baghchal;
+package net.doepner.baghchal.resources;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.invoke.MethodHandles;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -12,13 +11,14 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class LevelProperties {
 
-    private static final Class<?> myClass = MethodHandles.lookup().lookupClass();
-    private final String resourcePathFormat;
-
     private final ConcurrentMap<Integer, Properties> propertiesMap = new ConcurrentHashMap<>();
 
-    public LevelProperties(String resourcePathFormat) {
-        this.resourcePathFormat = resourcePathFormat;
+    private final LevelResources resources;
+    private final String fileName;
+
+    public LevelProperties(LevelResources resources, String fileName) {
+        this.resources = resources;
+        this.fileName = fileName;
     }
 
     public Properties getProperties(int level) {
@@ -34,8 +34,7 @@ public class LevelProperties {
 
     private Properties loadProperties(int level) {
         final Properties p = new Properties();
-        final InputStream stream = myClass.getResourceAsStream(String.format(resourcePathFormat, level));
-        try {
+        try (final InputStream stream = resources.getResource(level, fileName).openStream()) {
             p.load(stream);
         } catch (IOException e) {
             throw new IllegalStateException(e);

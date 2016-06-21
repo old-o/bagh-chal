@@ -1,14 +1,17 @@
 package net.doepner.baghchal;
 
-import static net.doepner.baghchal.Piece.PREDATOR;
-import static net.doepner.baghchal.Piece.PREY;
+import net.doepner.baghchal.model.Board;
+import net.doepner.baghchal.model.Position;
+
+import static net.doepner.baghchal.model.Piece.PREDATOR;
+import static net.doepner.baghchal.model.Piece.PREY;
 
 /**
  * Sets up the pieces on the board
  */
 public final class BoardSetup {
 
-    void setup(Board board) {
+    public void setup(Board board) {
         final Position p1 = board.getTopLeft();
         final Position p2 = board.getBottomRight();
         board.set(p1, PREDATOR);

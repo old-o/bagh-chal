@@ -1,10 +1,18 @@
-package net.doepner.baghchal;
+package net.doepner.baghchal.ui;
 
-import static net.doepner.baghchal.Piece.PREY;
+import net.doepner.baghchal.model.Board;
+import net.doepner.baghchal.model.Move;
+import net.doepner.baghchal.model.Position;
+import net.doepner.baghchal.play.PlayFlow;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import static net.doepner.baghchal.model.Piece.PREY;
 
 /**
  * Manages the prey pieces (e.g. goats)
@@ -20,7 +28,7 @@ public class PreyDragAndDrop extends MouseAdapter {
     private Position dragStart;
     private Point dragStartPoint;
 
-    PreyDragAndDrop(Board board, BoardPanel boardPanel, Image image, PlayFlow playFlow) {
+    public PreyDragAndDrop(Board board, BoardPanel boardPanel, Image image, PlayFlow playFlow) {
         this.board = board;
         this.playFlow = playFlow;
         this.boardPanel = boardPanel;
@@ -74,7 +82,7 @@ public class PreyDragAndDrop extends MouseAdapter {
         return new Position((int) (p.x / xStep), (int) (p.y / yStep));
     }
 
-    public void repaintDraggedAt(Point p) {
+    private void repaintDraggedAt(Point p) {
         if (lastDragPoint() != null) {
             repaintRectangle(lastDragPoint());
         }

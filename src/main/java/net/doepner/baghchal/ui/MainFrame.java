@@ -1,4 +1,4 @@
-package net.doepner.baghchal;
+package net.doepner.baghchal.ui;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -16,7 +16,7 @@ public class MainFrame {
     private final BoardPanel boardPanel;
     private final JButton nextLevelBtn;
 
-    MainFrame(BoardPanel boardPanel) {
+    public MainFrame(BoardPanel boardPanel) {
         frame = new JFrame("Bagh-Chal");
         this.boardPanel = boardPanel;
 
@@ -38,7 +38,7 @@ public class MainFrame {
         frame.add(boardPanel, BorderLayout.CENTER);
     }
 
-    void show(Dimension preferredSize) {
+    public void show(Dimension preferredSize) {
         boardPanel.setPreferredSize(preferredSize);
         boardPanel.start();
         frame.pack();

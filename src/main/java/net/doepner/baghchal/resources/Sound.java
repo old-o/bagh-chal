@@ -1,17 +1,18 @@
-package net.doepner.baghchal;
+package net.doepner.baghchal.resources;
 
-import static javax.sound.sampled.AudioSystem.getAudioInputStream;
-import static javax.sound.sampled.AudioSystem.getLine;
-import static javax.sound.sampled.LineEvent.Type.STOP;
-
-import java.io.IOException;
-import java.net.URL;
+import net.doepner.baghchal.model.Levels;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine.Info;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.IOException;
+import java.net.URL;
+
+import static javax.sound.sampled.AudioSystem.getAudioInputStream;
+import static javax.sound.sampled.AudioSystem.getLine;
+import static javax.sound.sampled.LineEvent.Type.STOP;
 
 /**
  *
@@ -19,20 +20,22 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 public class Sound {
 
     private final Levels levels;
+    private final LevelResources resources;
 
     private Clip lastPrey = null;
     private int preyIndex = 1;
 
-    Sound(Levels levels) {
+    public Sound(Levels levels, LevelResources resources) {
         this.levels = levels;
+        this.resources = resources;
     }
 
-    void playPrey() {
+    public void playPrey() {
         lastPrey = play("prey" + preyIndex + ".wav");
         preyIndex = (preyIndex % 3) + 1;
     }
 
-    void playPredatorKills() {
+    public void playPredatorKills() {
         if (lastPrey != null) {
             lastPrey.stop();
             lastPrey = null;
@@ -41,17 +44,16 @@ public class Sound {
     }
 
 
-    void playPredatorStep() {
+    public void playPredatorStep() {
         play("predator-step.wav");
     }
 
-    Clip play(String resourceFile) {
-        final String resourcePath = "levels/" + levels.getLevel() + "/" + resourceFile;
-        return playResource(resourcePath);
+    public Clip play(String resourceFile) {
+        return play(resources.getResource(levels.getLevel(), resourceFile));
     }
 
-    Clip playResource(String resourcePath) {
-        return  play(getClass().getResource(resourcePath));
+    public void playResource(String resourcePath) {
+        play(getClass().getResource(resourcePath));
     }
 
     private Clip play(URL url) {

@@ -1,5 +1,7 @@
 package net.doepner.baghchal;
 
+import net.doepner.baghchal.model.Piece;
+
 /**
  * Listens to board events
  */

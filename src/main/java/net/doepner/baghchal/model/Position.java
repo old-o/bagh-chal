@@ -1,4 +1,4 @@
-package net.doepner.baghchal;
+package net.doepner.baghchal.model;
 
 /**
  * Position on a 2-dimensional plane
@@ -13,11 +13,11 @@ public final class Position {
         this.y = y;
     }
 
-    int x() {
+    public int x() {
         return x;
     }
 
-    int y() {
+    public int y() {
         return y;
     }
 

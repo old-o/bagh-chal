@@ -1,9 +1,12 @@
-package net.doepner.baghchal;
+package net.doepner.baghchal.play;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
+import net.doepner.baghchal.model.Board;
+import net.doepner.baghchal.model.Move;
+import net.doepner.baghchal.resources.Images;
+import net.doepner.baghchal.ui.BoardPanel;
+import net.doepner.baghchal.ui.PreyDragAndDrop;
 
-import static net.doepner.baghchal.Piece.PREY;
+import static net.doepner.baghchal.model.Piece.PREY;
 
 /**
  * Lets the user play the prey pieces

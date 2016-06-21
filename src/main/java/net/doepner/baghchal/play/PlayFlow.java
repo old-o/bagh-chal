@@ -1,4 +1,6 @@
-package net.doepner.baghchal;
+package net.doepner.baghchal.play;
+
+import net.doepner.baghchal.model.Move;
 
 /**
  * Turn-taking when player is done

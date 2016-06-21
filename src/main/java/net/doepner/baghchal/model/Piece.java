@@ -1,4 +1,4 @@
-package net.doepner.baghchal;
+package net.doepner.baghchal.model;
 
 /**
  * Possible play pieces

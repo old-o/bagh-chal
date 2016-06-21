@@ -19,12 +19,25 @@
 
 package net.doepner.baghchal;
 
-import java.awt.*;
+import net.doepner.baghchal.model.Board;
+import net.doepner.baghchal.model.Levels;
+import net.doepner.baghchal.model.Move;
+import net.doepner.baghchal.play.Player;
+import net.doepner.baghchal.play.PredatorStrategy;
+import net.doepner.baghchal.play.UserPreyPlayer;
+import net.doepner.baghchal.resources.Images;
+import net.doepner.baghchal.resources.LevelProperties;
+import net.doepner.baghchal.resources.LevelResources;
+import net.doepner.baghchal.resources.Sound;
+import net.doepner.baghchal.ui.BoardPanel;
+import net.doepner.baghchal.ui.MainFrame;
+
+import java.awt.Dimension;
 
 /**
  * Entry point of the game
  */
-final public class Main {
+public final class Main {
 
     public static void main(String... args) {
 
@@ -33,11 +46,12 @@ final public class Main {
         final int maxLevel = 2;
         final Dimension preferredSize = new Dimension(500, 500);
 
-        final LevelProperties levelProperties = new LevelProperties("levels/%d/level.properties");
+        final LevelResources levelResources = new LevelResources("/net/doepner/baghchal/levels/%d/%s");
+        final LevelProperties levelProperties = new LevelProperties(levelResources, "level.properties");
         final Levels levels = new Levels(levelProperties, maxLevel);
 
-        final Sound sound = new Sound(levels);
-        final Images images = new Images(levels);
+        final Sound sound = new Sound(levels, levelResources);
+        final Images images = new Images(levels, levelResources);
 
         final Board board = new Board(new BoardSound(sound));
         final BoardPanel boardPanel = new BoardPanel(board, new BoardSetup(), images, levels);
@@ -53,7 +67,7 @@ final public class Main {
             final Move predatorMove = predatorPlayer.play(board);
             final boolean predatorsLostLevel = (predatorMove == null);
             if (predatorsLostLevel) {
-                sound.playResource("congrats.wav");
+                sound.playResource("/net/doepner/baghchal/congrats.wav");
             }
             levels.setLevelDone(predatorsLostLevel);
             mainFrame.enableNextLevel(predatorsLostLevel && !levels.isGameOver());

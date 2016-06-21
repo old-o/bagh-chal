@@ -1,14 +1,18 @@
-package net.doepner.baghchal;
+package net.doepner.baghchal.play;
 
-import static java.util.stream.Collectors.toList;
-import static net.doepner.baghchal.Piece.PREDATOR;
-import static net.doepner.baghchal.Piece.PREY;
+import net.doepner.baghchal.model.Board;
+import net.doepner.baghchal.model.Levels;
+import net.doepner.baghchal.model.Move;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static java.util.stream.Collectors.toList;
+import static net.doepner.baghchal.model.Piece.PREDATOR;
+import static net.doepner.baghchal.model.Piece.PREY;
 
 /**
  * The computer player's strategy (playing the tigers)
