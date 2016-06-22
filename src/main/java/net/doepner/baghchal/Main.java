@@ -24,7 +24,7 @@ import net.doepner.baghchal.model.Levels;
 import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.play.Player;
 import net.doepner.baghchal.play.PredatorStrategy;
-import net.doepner.baghchal.play.UserPreyPlayer;
+import net.doepner.baghchal.play.UserPlayer;
 import net.doepner.baghchal.resources.Images;
 import net.doepner.baghchal.resources.LevelProperties;
 import net.doepner.baghchal.resources.LevelResources;
@@ -33,6 +33,8 @@ import net.doepner.baghchal.ui.BoardPanel;
 import net.doepner.baghchal.ui.GameFrame;
 
 import java.awt.Dimension;
+
+import static net.doepner.baghchal.model.Piece.PREY;
 
 /**
  * Entry point of the game
@@ -57,7 +59,7 @@ public final class Main {
         final BoardSetup boardSetup = new BoardSetup();
         final BoardPanel boardPanel = new BoardPanel(board, boardSetup, images, levels);
 
-        final Player preyPlayer = new UserPreyPlayer(boardPanel, images);
+        final Player preyPlayer = new UserPlayer(PREY, boardPanel, images);
         final Player predatorPlayer = new PredatorStrategy(levels);
 
         final GameFrame gameFrame = new GameFrame(boardPanel);

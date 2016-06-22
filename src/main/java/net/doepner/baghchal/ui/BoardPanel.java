@@ -18,6 +18,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.TexturePaint;
+import java.awt.event.MouseAdapter;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
@@ -197,5 +198,17 @@ public class BoardPanel extends JPanel {
         if (lastDragPoint != null) {
             g2.drawImage(draggedImage, lastDragPoint.x, lastDragPoint.y, null);
         }
+    }
+
+    public void addMouseAdapter(MouseAdapter mouseAdapter) {
+        addMouseListener(mouseAdapter);
+        addMouseMotionListener(mouseAdapter);
+        addMouseWheelListener(mouseAdapter);
+    }
+
+    public void removeMouseAdapter(MouseAdapter mouseAdapter) {
+        removeMouseListener(mouseAdapter);
+        removeMouseMotionListener(mouseAdapter);
+        removeMouseWheelListener(mouseAdapter);
     }
 }

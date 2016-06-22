@@ -187,7 +187,9 @@ public class Board {
         return b[0].length;
     }
 
-    public boolean isValid(Move move) {
+    public boolean isValid(Move move, Piece piece) {
+        // TODO: Factor in the rules of the game (in a flexible way that also work for other games like Alquerque)
+        // currently this is written for bagh-chal prey movements:
         return move.isNotStationary() && isEmpty(move.p2()) && (isBorderToBoard(move) || isValidOnBoardMove(move));
     }
 

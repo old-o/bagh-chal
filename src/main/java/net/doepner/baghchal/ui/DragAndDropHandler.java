@@ -2,6 +2,7 @@ package net.doepner.baghchal.ui;
 
 import net.doepner.baghchal.model.Board;
 import net.doepner.baghchal.model.Move;
+import net.doepner.baghchal.model.Piece;
 import net.doepner.baghchal.model.Position;
 import net.doepner.baghchal.play.PlayFlow;
 import net.doepner.baghchal.resources.Images;
@@ -13,23 +14,23 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
-import static net.doepner.baghchal.model.Piece.PREY;
-
 /**
- * Manages the prey pieces (e.g. goats)
+ * Manages the moving of pieces via drag and drop
  */
-public class PreyDragAndDrop extends MouseAdapter {
+public class DragAndDropHandler extends MouseAdapter {
 
     private final Board board;
     private final BoardPanel boardPanel;
     private final Images images;
 
     private final PlayFlow playFlow;
+    private final Piece piece;
 
     private Position dragStart;
     private Point dragStartPoint;
 
-    public PreyDragAndDrop(Board board, BoardPanel boardPanel, Images images, PlayFlow playFlow) {
+    public DragAndDropHandler(Piece piece, Board board, BoardPanel boardPanel, Images images, PlayFlow playFlow) {
+        this.piece = piece;
         this.board = board;
         this.playFlow = playFlow;
         this.boardPanel = boardPanel;
@@ -39,7 +40,7 @@ public class PreyDragAndDrop extends MouseAdapter {
     @Override
     public void mousePressed(MouseEvent e) {
         final Position p = getPosition(e);
-            dragStart = board.pick(p, PREY);
+            dragStart = board.pick(p, piece);
             if (dragStart != null) {
                 dragStartPoint = e.getPoint();
                 lastDragPoint(dragStartPoint);
@@ -50,7 +51,7 @@ public class PreyDragAndDrop extends MouseAdapter {
     public void mouseDragged(MouseEvent e) {
         if (dragStart != null) {
             final Point point = e.getPoint();
-            final BufferedImage image = images.getImage(PREY);
+            final BufferedImage image = images.getImage(piece);
             point.translate(-image.getWidth(null) / 2, -image.getHeight(null) / 2);
             repaintDraggedAt(point);
         }
@@ -61,9 +62,9 @@ public class PreyDragAndDrop extends MouseAdapter {
         final Position p = getPosition(e);
         if (dragStart != null) {
             final Move move = new Move(dragStart, p);
-            final boolean validMove = board.isValid(move);
+            final boolean validMove = board.isValid(move, piece);
             final Position resultingPosition = validMove ? move.p2() : dragStart;
-            board.set(resultingPosition, PREY);
+            board.set(resultingPosition, piece);
             repaintDraggedAt(e.getPoint());
             repaintDraggedAt(dragStartPoint);
             lastDragPoint(null);
@@ -102,7 +103,7 @@ public class PreyDragAndDrop extends MouseAdapter {
     }
 
     private void repaintRectangleAround(Point p) {
-        final BufferedImage image = images.getImage(PREY);
+        final BufferedImage image = images.getImage(piece);
         int imgWidth = image.getWidth();
         int imgHeight = image.getHeight();
         final Rectangle rectangle = new Rectangle(p.x - imgWidth, p.y - imgHeight, 2 * imgWidth, 2 * imgHeight);
