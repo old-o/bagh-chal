@@ -36,7 +36,7 @@ public class Levels {
     }
 
     public boolean isGameOver() {
-        return level > maxLevel;
+        return level >= maxLevel && levelDone;
     }
 
     public void firstLevel() {

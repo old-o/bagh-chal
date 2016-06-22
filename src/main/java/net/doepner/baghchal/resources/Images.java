@@ -4,7 +4,6 @@ import net.doepner.baghchal.model.Levels;
 import net.doepner.baghchal.model.Piece;
 
 import javax.imageio.ImageIO;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -27,7 +26,7 @@ public class Images {
         this.resources = resources;
     }
 
-    public Image getImage(Piece piece) {
+    public BufferedImage getImage(Piece piece) {
         return getImage(piece == PREDATOR ? "predator.png" : "prey.png");
     }
 

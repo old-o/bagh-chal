@@ -30,7 +30,7 @@ import net.doepner.baghchal.resources.LevelProperties;
 import net.doepner.baghchal.resources.LevelResources;
 import net.doepner.baghchal.resources.Sound;
 import net.doepner.baghchal.ui.BoardPanel;
-import net.doepner.baghchal.ui.MainFrame;
+import net.doepner.baghchal.ui.GameFrame;
 
 import java.awt.Dimension;
 
@@ -54,13 +54,14 @@ public final class Main {
         final Images images = new Images(levels, levelResources);
 
         final Board board = new Board(new BoardSound(sound));
-        final BoardPanel boardPanel = new BoardPanel(board, new BoardSetup(), images, levels);
+        final BoardSetup boardSetup = new BoardSetup();
+        final BoardPanel boardPanel = new BoardPanel(board, boardSetup, images, levels);
 
         final Player preyPlayer = new UserPreyPlayer(boardPanel, images);
         final Player predatorPlayer = new PredatorStrategy(levels);
 
-        final MainFrame mainFrame = new MainFrame(boardPanel);
-        mainFrame.show(preferredSize);
+        final GameFrame gameFrame = new GameFrame(boardPanel);
+        gameFrame.show(preferredSize);
 
         while (!levels.isGameOver()) {
             preyPlayer.play(board);
@@ -70,7 +71,7 @@ public final class Main {
                 sound.playResource("/net/doepner/baghchal/congrats.wav");
             }
             levels.setLevelDone(predatorsLostLevel);
-            mainFrame.enableNextLevel(predatorsLostLevel && !levels.isGameOver());
+            gameFrame.enableNextLevel(predatorsLostLevel && !levels.isGameOver());
             boardPanel.repaint();
         }
     }

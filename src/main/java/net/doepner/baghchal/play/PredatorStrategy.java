@@ -64,14 +64,11 @@ public class PredatorStrategy implements Player {
     }
 
     private static Move tryThreateningMove(int level, Iterable<Move> possibleMoves, Board board) {
-        if (level > 1) {
-            final int tryToThreaten = level - 1;
-            final Map<Integer, List<Move>> threateningMoves = getThreateningMoves(possibleMoves, board);
-            for (int i = tryToThreaten; i > 0; i--) {
-                final Move move = tryMoveFrom(threateningMoves.get(tryToThreaten), board);
-                if (move != null) {
-                    return move;
-                }
+        final Map<Integer, List<Move>> threateningMoves = getThreateningMoves(possibleMoves, board);
+        for (int i = level; i > 0; i--) {
+            final Move move = tryMoveFrom(threateningMoves.get(level), board);
+            if (move != null) {
+                return move;
             }
         }
         return null;

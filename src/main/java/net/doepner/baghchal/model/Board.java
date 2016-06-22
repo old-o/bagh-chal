@@ -15,16 +15,13 @@ public class Board {
 
     private static final int[] STEPS = {-1, 0, +1};
 
-    private static final int CENTER_X_SIZE = 5;
-    private static final int CENTER_Y_SIZE = 5;
-
-    private static final int X_SIZE = 1 + CENTER_X_SIZE + 1;
-    private static final int Y_SIZE = 1 + CENTER_Y_SIZE + 1;
+    private static final int X_SIZE = 5;
+    private static final int Y_SIZE = 5;
 
     private final Position topLeft = new Position(1, 1);
-    private final Position bottomRight = new Position(CENTER_X_SIZE, CENTER_Y_SIZE);
+    private final Position bottomRight = new Position(X_SIZE, Y_SIZE);
 
-    private final Piece[][] b = new Piece[X_SIZE][Y_SIZE];
+    private final Piece[][] b = new Piece[1 + X_SIZE + 1][1 + Y_SIZE + 1];
 
     private final BoardListener listener;
 
@@ -78,17 +75,25 @@ public class Board {
     }
 
     public void tryStepsWhere(Piece movingPiece, Piece requiredPiece, Consumer<Move> moveProcessor) {
-        forAllPositions(p -> {
+        forAllBoardPositions(p -> {
             if (get(p) == movingPiece) {
                 tryDirections(p, requiredPiece, moveProcessor);
             }
         });
     }
 
-    private void forAllPositions(Consumer<Position> positionConsumer) {
-        for (int i = 1; i <= CENTER_X_SIZE; i++) {
-            for (int j = 1; j <= CENTER_Y_SIZE; j++) {
-                positionConsumer.accept(new Position(i, j));
+    public void forAllPositions(Consumer<Position> positionConsumer) {
+        for (int x = 0; x < b.length; x++) {
+            for (int y = 0; y < b[x].length; y++) {
+                positionConsumer.accept(new Position(x, y));
+            }
+        }
+    }
+
+    private void forAllBoardPositions(Consumer<Position> positionConsumer) {
+        for (int x = topLeft.x(); x <= bottomRight.x(); x++) {
+            for (int y = topLeft.y(); y <= bottomRight.y(); y++) {
+                positionConsumer.accept(new Position(x, y));
             }
         }
     }
@@ -138,7 +143,7 @@ public class Board {
         listener.afterReset();
     }
 
-    private Piece get(Position p) {
+    public Piece get(Position p) {
         return get(p.x(), p.y());
     }
 
@@ -167,19 +172,19 @@ public class Board {
     }
 
     public int getCentreXSize() {
-        return CENTER_X_SIZE;
-    }
-
-    public int getCentreYSize() {
-        return CENTER_Y_SIZE;
-    }
-
-    public int getXSize() {
         return X_SIZE;
     }
 
-    public int getYSize() {
+    public int getCentreYSize() {
         return Y_SIZE;
+    }
+
+    public int getXSize() {
+        return b.length;
+    }
+
+    public int getYSize() {
+        return b[0].length;
     }
 
     public boolean isValid(Move move) {
@@ -209,8 +214,8 @@ public class Board {
     }
 
     private boolean isBorderPosition(Position p) {
-        return p.x() == 0 || p.x() == CENTER_X_SIZE + 1
-                || p.y() == 0 || p.y() == CENTER_Y_SIZE + 1;
+        return p.x() == 0 || p.x() == X_SIZE + 1
+                || p.y() == 0 || p.y() == Y_SIZE + 1;
     }
 
     public Position getTopLeft() {

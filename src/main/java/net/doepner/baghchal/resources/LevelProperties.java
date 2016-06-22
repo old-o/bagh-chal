@@ -22,23 +22,18 @@ public class LevelProperties {
     }
 
     public Properties getProperties(int level) {
-        final Properties properties = propertiesMap.get(level);
-        if (properties == null) {
-            final Properties loadedProperties = loadProperties(level);
-            propertiesMap.put(level, loadedProperties);
-            return loadedProperties;
-        } else {
-            return properties;
-        }
+        final Properties p = propertiesMap.get(level);
+        return p != null ? p : loadAndCacheProperties(level);
     }
 
-    private Properties loadProperties(int level) {
+    private Properties loadAndCacheProperties(int level) {
         final Properties p = new Properties();
         try (final InputStream stream = resources.getResource(level, fileName).openStream()) {
             p.load(stream);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
+        propertiesMap.put(level, p);
         return p;
     }
 }

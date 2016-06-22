@@ -10,13 +10,13 @@ import java.awt.Dimension;
 /**
  * Main frame
  */
-public class MainFrame {
+public class GameFrame {
 
     private final JFrame frame;
     private final BoardPanel boardPanel;
     private final JButton nextLevelBtn;
 
-    public MainFrame(BoardPanel boardPanel) {
+    public GameFrame(BoardPanel boardPanel) {
         frame = new JFrame("Bagh-Chal");
         this.boardPanel = boardPanel;
 

@@ -37,7 +37,7 @@ public class BoardPanel extends JPanel {
     private final Images images;
     private final Levels levels;
 
-    private final Image congrats;
+    private final BufferedImage congrats;
 
     private final BasicStroke stroke = new BasicStroke(1.5f);
     private final RenderingHints renderingHints = createRenderingHints();
@@ -103,7 +103,7 @@ public class BoardPanel extends JPanel {
         g2.setColor(getForeground());
 
         if (levels.isLevelDone()) {
-            g2.drawImage(congrats, width / 2 - congrats.getWidth(null) / 2, height / 2 - congrats.getHeight(null), null);
+            g2.drawImage(congrats, width / 2 - congrats.getWidth() / 2, height / 2 - congrats.getHeight(), null);
             g2.setFont(new Font("SansSerif", 0, 34));
             final String s = levels.getLevelEndMessage();
             g2.drawString(s, width / 2 - (g2.getFontMetrics().stringWidth(s) / 2), height / 2 + 20);
@@ -119,21 +119,17 @@ public class BoardPanel extends JPanel {
 
         final int xStep = width / board.getXSize();
         final int yStep = height / board.getYSize();
+        final int xStart = xStep + xStep / 2;
+        final int xBoardCentreEnd = xStep * board.getCentreXSize();
+        final int xEnd = xBoardCentreEnd + xStep / 2;
+        final int yStart = yStep + yStep / 2;
+        final int yBoardCentreEnd = yStep * board.getCentreYSize();
+        final int yEnd = yBoardCentreEnd + yStep / 2;
 
-        g2.translate(xStep / 2, yStep / 2);
-
-        final int xStart = xStep;
-        final int xEnd = xStep * board.getCentreXSize();
-
-        final int yStart = yStep;
-        final int yEnd = yStep * board.getCentreYSize();
-
-        drawBoardCentreArea(g2, xStep, yStep, xStart, xEnd, yStart, yEnd);
+        drawBoardCentreArea(g2, xStep, yStep, xBoardCentreEnd, yBoardCentreEnd);
         drawGridLines(g2, xStep, yStep, xStart, xEnd, yStart, yEnd);
         drawDiagonalLines(g2, xStart, xEnd, yStart, yEnd);
-        drawPieces(g2, xStep, yStep);
-
-        g2.translate(-xStep / 2, -yStep / 2);
+        drawPieces(g2, xStep, yStep, xStart - xStep, yStart - yStep);
     }
 
     private void drawGridLines(Graphics2D g2, int xStep, int yStep, int xStart, int xEnd, int yStart, int yEnd) {
@@ -146,17 +142,12 @@ public class BoardPanel extends JPanel {
         }
     }
 
-    private void drawBoardCentreArea(Graphics2D g2, int xStep, int yStep, int xStart, int xEnd, int yStart, int yEnd) {
-        final int boardStartX = xStart - xStep / 2;
-        final int boardStartY = yStart - yStep / 2;
-        final int boardWidth = xEnd - xStart + xStep;
-        final int boardHeight = yEnd - yStart + yStep;
-
+    private void drawBoardCentreArea(Graphics2D g2, int xStep, int yStep, int xEnd, int yEnd) {
         g2.setPaint(boardPaint);
-        g2.fillRect(boardStartX, boardStartY, boardWidth, boardHeight);
+        g2.fillRect(xStep, yStep, xEnd, yEnd);
         g2.setStroke(stroke);
         g2.setColor(boardEdgeColor);
-        g2.drawRect(boardStartX, boardStartY, boardWidth, boardHeight);
+        g2.drawRect(xStep, yStep, xEnd, yEnd);
     }
 
     private void drawDiagonalLines(Graphics2D g2, int xStart, int xEnd, int yStart, int yEnd) {
@@ -173,24 +164,32 @@ public class BoardPanel extends JPanel {
         g2.drawLine(xEnd, yStart, xStart, yEnd);
     }
 
-    private void drawPieces(Graphics2D g2, int xStep, int yStep) {
-        for (int i = 0; i < board.getXSize(); i++) {
-            for (int j = 0; j < board.getYSize(); j++) {
-                final Piece piece = board.get(i, j);
-                if (piece != null) {
-                    final Image img = images.getImage(piece);
-                    final int halfImgWidth = img.getWidth(null) / 2;
-                    final int halfImgHeight = img.getHeight(null) / 2;
-                    g2.drawImage(img, i * xStep - halfImgWidth, j * yStep - halfImgHeight, null);
-                }
+    private void drawPieces(Graphics2D g2, int xStep, int yStep, int xStart, int yStart) {
+        board.forAllPositions(p -> {
+            final Piece piece = board.get(p);
+            if (piece != null) {
+                final BufferedImage img = images.getImage(piece);
+                g2.drawImage(img,
+                        xStart + p.x() * xStep - img.getWidth() / 2,
+                        yStart + p.y() * yStep - img.getHeight() / 2,
+                        null);
             }
-        }
+        });
     }
 
     private Point lastDragPoint;
     private Image draggedImage;
 
-    void repaintForDrag(Rectangle rectangle) {
+    public void setLastDragPoint(Point lastDragPoint) {
+        this.lastDragPoint = lastDragPoint;
+    }
+
+    public Point getLastDragPoint() {
+        return lastDragPoint;
+    }
+
+    void repaintForDrag(Rectangle rectangle, BufferedImage image) {
+        this.draggedImage = image;
         repaint(rectangle);
     }
 
@@ -198,17 +197,5 @@ public class BoardPanel extends JPanel {
         if (lastDragPoint != null) {
             g2.drawImage(draggedImage, lastDragPoint.x, lastDragPoint.y, null);
         }
-    }
-
-    public void setLastDragPoint(Point lastDragPoint) {
-        this.lastDragPoint = lastDragPoint;
-    }
-
-    public void setDraggedImage(Image draggedImage) {
-        this.draggedImage = draggedImage;
-    }
-
-    public Point getLastDragPoint() {
-        return lastDragPoint;
     }
 }

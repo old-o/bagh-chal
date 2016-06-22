@@ -6,8 +6,6 @@ import net.doepner.baghchal.resources.Images;
 import net.doepner.baghchal.ui.BoardPanel;
 import net.doepner.baghchal.ui.PreyDragAndDrop;
 
-import static net.doepner.baghchal.model.Piece.PREY;
-
 /**
  * Lets the user play the prey pieces
  */
@@ -28,15 +26,15 @@ public final class UserPreyPlayer implements Player {
     @Override
     public Move play(Board board) {
         final Result result = new Result();
-        final PreyDragAndDrop preyDragAndDrop = new PreyDragAndDrop(board, boardPanel, images.getImage(PREY),
+        final PreyDragAndDrop preyDnd = new PreyDragAndDrop(board, boardPanel, images,
                 move -> {
                     synchronized (result) {
                         result.move = move;
                         result.notify();
                     }
                 });
-        boardPanel.addMouseMotionListener(preyDragAndDrop);
-        boardPanel.addMouseListener(preyDragAndDrop);
+        boardPanel.addMouseMotionListener(preyDnd);
+        boardPanel.addMouseListener(preyDnd);
         try {
             synchronized (result) {
                 while (result.move == null) {
@@ -46,8 +44,8 @@ public final class UserPreyPlayer implements Player {
         } catch (InterruptedException e) {
             throw new IllegalStateException(e);
         }
-        boardPanel.removeMouseListener(preyDragAndDrop);
-        boardPanel.removeMouseMotionListener(preyDragAndDrop);
+        boardPanel.removeMouseListener(preyDnd);
+        boardPanel.removeMouseMotionListener(preyDnd);
         return result.move;
     }
 }

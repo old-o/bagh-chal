@@ -14,10 +14,12 @@ public final class BoardSetup {
     public void setup(Board board) {
         final Position p1 = board.getTopLeft();
         final Position p2 = board.getBottomRight();
+
         board.set(p1, PREDATOR);
         board.set(p1.x(), p2.y(), PREDATOR);
         board.set(p2.x(), p1.y(), PREDATOR);
         board.set(p2, PREDATOR);
+
         for (int n = 1; n <= 5; n++) {
             board.set(p1.x() - 1, n, PREY);
             board.set(p2.x() + 1, n, PREY);

@@ -4,13 +4,14 @@ import net.doepner.baghchal.model.Board;
 import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.model.Position;
 import net.doepner.baghchal.play.PlayFlow;
+import net.doepner.baghchal.resources.Images;
 
 import java.awt.Component;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 
 import static net.doepner.baghchal.model.Piece.PREY;
 
@@ -21,19 +22,18 @@ public class PreyDragAndDrop extends MouseAdapter {
 
     private final Board board;
     private final BoardPanel boardPanel;
-    private final Image image;
+    private final Images images;
 
     private final PlayFlow playFlow;
 
     private Position dragStart;
     private Point dragStartPoint;
 
-    public PreyDragAndDrop(Board board, BoardPanel boardPanel, Image image, PlayFlow playFlow) {
+    public PreyDragAndDrop(Board board, BoardPanel boardPanel, Images images, PlayFlow playFlow) {
         this.board = board;
         this.playFlow = playFlow;
         this.boardPanel = boardPanel;
-        this.image = image;
-        boardPanel.setDraggedImage(image);
+        this.images = images;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class PreyDragAndDrop extends MouseAdapter {
             dragStart = board.pick(p, PREY);
             if (dragStart != null) {
                 dragStartPoint = e.getPoint();
-                lastDragPoint(e.getPoint());
+                lastDragPoint(dragStartPoint);
             }
     }
 
@@ -50,6 +50,7 @@ public class PreyDragAndDrop extends MouseAdapter {
     public void mouseDragged(MouseEvent e) {
         if (dragStart != null) {
             final Point point = e.getPoint();
+            final BufferedImage image = images.getImage(PREY);
             point.translate(-image.getWidth(null) / 2, -image.getHeight(null) / 2);
             repaintDraggedAt(point);
         }
@@ -84,10 +85,10 @@ public class PreyDragAndDrop extends MouseAdapter {
 
     private void repaintDraggedAt(Point p) {
         if (lastDragPoint() != null) {
-            repaintRectangle(lastDragPoint());
+            repaintRectangleAround(lastDragPoint());
         }
         if (p != null && !p.equals(lastDragPoint())) {
-            repaintRectangle(p);
+            repaintRectangleAround(p);
         }
         lastDragPoint(p);
     }
@@ -100,10 +101,11 @@ public class PreyDragAndDrop extends MouseAdapter {
         boardPanel.setLastDragPoint(p);
     }
 
-    private void repaintRectangle(Point p) {
-        int imgWidth = image.getWidth(null);
-        int imgHeight = image.getHeight(null);
+    private void repaintRectangleAround(Point p) {
+        final BufferedImage image = images.getImage(PREY);
+        int imgWidth = image.getWidth();
+        int imgHeight = image.getHeight();
         final Rectangle rectangle = new Rectangle(p.x - imgWidth, p.y - imgHeight, 2 * imgWidth, 2 * imgHeight);
-        boardPanel.repaintForDrag(rectangle);
+        boardPanel.repaintForDrag(rectangle, image);
     }
 }
