@@ -1,18 +1,19 @@
 package net.doepner.baghchal.resources;
 
-import net.doepner.baghchal.model.Levels;
+import static javax.sound.sampled.AudioSystem.getAudioInputStream;
+import static javax.sound.sampled.AudioSystem.getLine;
+import static javax.sound.sampled.LineEvent.Type.STOP;
+
+import java.io.IOException;
+import java.net.URL;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine.Info;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.IOException;
-import java.net.URL;
 
-import static javax.sound.sampled.AudioSystem.getAudioInputStream;
-import static javax.sound.sampled.AudioSystem.getLine;
-import static javax.sound.sampled.LineEvent.Type.STOP;
+import net.doepner.baghchal.model.Levels;
 
 /**
  *
@@ -20,14 +21,12 @@ import static javax.sound.sampled.LineEvent.Type.STOP;
 public class Sound {
 
     private final Levels levels;
-    private final LevelResources resources;
 
     private Clip lastPrey = null;
     private int preyIndex = 1;
 
-    public Sound(Levels levels, LevelResources resources) {
+    public Sound(Levels levels) {
         this.levels = levels;
-        this.resources = resources;
     }
 
     public void playPrey() {
@@ -49,7 +48,7 @@ public class Sound {
     }
 
     public Clip play(String resourceFile) {
-        return play(resources.getResource(levels.getLevel(), resourceFile));
+        return play(levels.getResource(resourceFile));
     }
 
     public void playResource(String resourcePath) {

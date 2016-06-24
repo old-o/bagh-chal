@@ -13,7 +13,7 @@ public final class LevelResources {
         this.resourcePathFormat = resourcePathFormat;
     }
 
-    URL getResource(int level, String fileName) {
+    public URL getResource(int level, String fileName) {
         return getClass().getResource(String.format(resourcePathFormat, level, fileName));
     }
 }
