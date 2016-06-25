@@ -123,25 +123,11 @@ public class BoardPanel extends JPanel {
         final int yStep = height / board.getYSize();
         final int xStart = xStep + xStep / 2;
         final int xBoardCentreEnd = xStep * board.getCentreXSize();
-        final int xEnd = xBoardCentreEnd + xStep / 2;
         final int yStart = yStep + yStep / 2;
         final int yBoardCentreEnd = yStep * board.getCentreYSize();
-        final int yEnd = yBoardCentreEnd + yStep / 2;
 
         drawBoardCentreArea(g2, xStep, yStep, xBoardCentreEnd, yBoardCentreEnd);
-//        drawGridLines(g2, xStep, yStep, xStart, xEnd, yStart, yEnd);
-//        drawDiagonalLines(g2, xStart, xEnd, yStart, yEnd);
         drawPieces(g2, xStep, yStep, xStart - xStep, yStart - yStep);
-    }
-
-    private void drawGridLines(Graphics2D g2, int xStep, int yStep, int xStart, int xEnd, int yStart, int yEnd) {
-        g2.setColor(gridColor);
-        for (int x = xStart; x <= xEnd; x += xStep) {
-            g2.drawLine(x, yStart, x, yEnd);
-        }
-        for (int y = yStart; y <= yEnd; y += yStep) {
-            g2.drawLine(xStart, y, xEnd, y);
-        }
     }
 
     private void drawBoardCentreArea(Graphics2D g2, int xStep, int yStep, int xEnd, int yEnd) {
@@ -150,20 +136,6 @@ public class BoardPanel extends JPanel {
         g2.setStroke(stroke);
         g2.setColor(boardEdgeColor);
         g2.drawRect(xStep, yStep, xEnd, yEnd);
-    }
-
-    private void drawDiagonalLines(Graphics2D g2, int xStart, int xEnd, int yStart, int yEnd) {
-        final int xMid = (xStart + xEnd) / 2;
-        final int yMid = (yStart + yEnd) / 2;
-
-        g2.setColor(diagonalColor);
-
-        g2.drawLine(xStart, yMid, xMid, yEnd);
-        g2.drawLine(xStart, yMid, xMid, yStart);
-        g2.drawLine(xMid, yStart, xEnd, yMid);
-        g2.drawLine(xMid, yEnd, xEnd, yMid);
-        g2.drawLine(xEnd, yEnd, xStart, yStart);
-        g2.drawLine(xEnd, yStart, xStart, yEnd);
     }
 
     private void drawPieces(Graphics2D g2, int xStep, int yStep, int xStart, int yStart) {
