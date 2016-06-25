@@ -19,9 +19,13 @@
 
 package net.doepner.baghchal;
 
+import static net.doepner.baghchal.model.Piece.PREY;
+
+import java.awt.Dimension;
+
 import net.doepner.baghchal.model.Board;
 import net.doepner.baghchal.model.Levels;
-import net.doepner.baghchal.model.Move;
+import net.doepner.baghchal.play.GameLoop;
 import net.doepner.baghchal.play.Player;
 import net.doepner.baghchal.play.PredatorStrategy;
 import net.doepner.baghchal.play.UserPlayer;
@@ -31,10 +35,6 @@ import net.doepner.baghchal.resources.LevelResources;
 import net.doepner.baghchal.resources.Sound;
 import net.doepner.baghchal.ui.BoardPanel;
 import net.doepner.baghchal.ui.GameFrame;
-
-import java.awt.Dimension;
-
-import static net.doepner.baghchal.model.Piece.PREY;
 
 /**
  * Entry point of the game
@@ -51,10 +51,10 @@ public final class Main {
 
         final LevelResources levelResources = new LevelResources("/net/doepner/baghchal/levels/%d/%s");
         final LevelProperties levelProperties = new LevelProperties(levelResources, "level.properties");
-        final Levels levels = new Levels(levelProperties, maxLevel);
+        final Levels levels = new Levels(levelProperties, levelResources, maxLevel);
 
-        final Sound sound = new Sound(levels, levelResources);
-        final Images images = new Images(levels, levelResources);
+        final Sound sound = new Sound(levels);
+        final Images images = new Images(levels);
 
         final Board board = new Board(boardSize.width, boardSize.height, new BoardSound(sound));
         final BoardSetup boardSetup = new BoardSetup();
@@ -64,19 +64,10 @@ public final class Main {
         final Player predatorPlayer = new PredatorStrategy(levels);
 
         final GameFrame gameFrame = new GameFrame(boardPanel);
-        gameFrame.show(preferredSize);
+        final GameLoop gameLoop = new GameLoop(gameFrame, board, boardPanel, levels, sound, preyPlayer, predatorPlayer);
 
-        while (!levels.isGameOver()) {
-            preyPlayer.play(board);
-            final Move predatorMove = predatorPlayer.play(board);
-            final boolean predatorsLostLevel = (predatorMove == null);
-            if (predatorsLostLevel) {
-                sound.playResource("/net/doepner/baghchal/congrats.wav");
-            }
-            levels.setLevelDone(predatorsLostLevel);
-            gameFrame.enableNextLevel(predatorsLostLevel && !levels.isGameOver());
-            boardPanel.repaint();
-        }
+        gameFrame.show(preferredSize);
+        gameLoop.start();
     }
 
 }
