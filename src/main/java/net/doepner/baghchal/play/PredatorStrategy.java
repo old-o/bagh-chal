@@ -66,7 +66,7 @@ public class PredatorStrategy implements Player {
     private static Move tryThreateningMove(int level, Iterable<Move> possibleMoves, Board board) {
         final Map<Integer, List<Move>> threateningMoves = getThreateningMoves(possibleMoves, board);
         for (int i = level; i > 0; i--) {
-            final Move move = tryMoveFrom(threateningMoves.get(level), board);
+            final Move move = tryMoveFrom(threateningMoves.get(i), board);
             if (move != null) {
                 return move;
             }
@@ -76,7 +76,7 @@ public class PredatorStrategy implements Player {
 
     private static Map<Integer, List<Move>> getThreateningMoves(Iterable<Move> possibleMoves, Board board) {
         final Map<Integer, List<Move>> threateningMoves = new HashMap<>();
-        for (int i = 1; i < 8; i++) {
+        for (int i = 1; i <= 8; i++) {
             threateningMoves.put(i, new ArrayList<>());
         }
         for (Move m : possibleMoves) {
