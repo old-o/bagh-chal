@@ -15,18 +15,23 @@ public class Board {
 
     private static final int[] STEPS = {-1, 0, +1};
 
-    private static final int X_SIZE = 5;
-    private static final int Y_SIZE = 5;
+    private final int xSize;
+    private final int ySize;
 
-    private final Position topLeft = new Position(1, 1);
-    private final Position bottomRight = new Position(X_SIZE, Y_SIZE);
+    private final Position topLeft;
+    private final Position bottomRight;
 
-    private final Piece[][] b = new Piece[1 + X_SIZE + 1][1 + Y_SIZE + 1];
+    private final Piece[][] b;
 
     private final BoardListener listener;
 
-    public Board(BoardListener listener) {
+    public Board(int xSize, int ySize, BoardListener listener) {
+        this.xSize = xSize;
+        this.ySize = ySize;
         this.listener = listener;
+        topLeft = new Position(1, 1);
+        bottomRight = new Position(xSize, ySize);
+        b = new Piece[1 + xSize + 1][1 + ySize + 1];
     }
 
     /**
@@ -37,7 +42,7 @@ public class Board {
      *         An existing board instance
      */
     private Board(Board board) {
-        listener = BoardListener.NONE;
+        this(board.xSize, board.ySize, BoardListener.NONE);
         for (int x = 0; x < b.length; x++) {
             System.arraycopy(board.b[x], 0, b[x], 0, b[x].length);
         }
@@ -98,11 +103,11 @@ public class Board {
         }
     }
 
-    private void tryDirections(Position p, Piece requiredPiece, Consumer<Move> moveProcessor) {
+    public void tryDirections(Position p, Piece requiredPiece, Consumer<Move> moveProcessor) {
         for (int xStep : STEPS) {
             for (int yStep : STEPS) {
                 final Position p1 = p.add(xStep, yStep);
-                if (get(p1) == requiredPiece) {
+                if (requiredPiece == INVALID || get(p1) == requiredPiece) {
                     final Move step = new Move(p, p1);
                     if (isStepAlongLine(step)) {
                         moveProcessor.accept(step);
@@ -172,11 +177,11 @@ public class Board {
     }
 
     public int getCentreXSize() {
-        return X_SIZE;
+        return xSize;
     }
 
     public int getCentreYSize() {
-        return Y_SIZE;
+        return ySize;
     }
 
     public int getXSize() {
@@ -216,8 +221,8 @@ public class Board {
     }
 
     private boolean isBorderPosition(Position p) {
-        return p.x() == 0 || p.x() == X_SIZE + 1
-                || p.y() == 0 || p.y() == Y_SIZE + 1;
+        return p.x() == 0 || p.x() == xSize + 1
+                || p.y() == 0 || p.y() == ySize + 1;
     }
 
     public Position getTopLeft() {

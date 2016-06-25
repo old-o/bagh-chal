@@ -47,6 +47,7 @@ public final class Main {
 
         final int maxLevel = 2;
         final Dimension preferredSize = new Dimension(500, 500);
+        final Dimension boardSize = new Dimension(4,4);
 
         final LevelResources levelResources = new LevelResources("/net/doepner/baghchal/levels/%d/%s");
         final LevelProperties levelProperties = new LevelProperties(levelResources, "level.properties");
@@ -55,7 +56,7 @@ public final class Main {
         final Sound sound = new Sound(levels, levelResources);
         final Images images = new Images(levels, levelResources);
 
-        final Board board = new Board(new BoardSound(sound));
+        final Board board = new Board(boardSize.width, boardSize.height, new BoardSound(sound));
         final BoardSetup boardSetup = new BoardSetup();
         final BoardPanel boardPanel = new BoardPanel(board, boardSetup, images, levels);
 

@@ -35,7 +35,7 @@ public class Move {
         return new Move(p2, new Position(p2.x() + xStep(), p2.y() + yStep()));
     }
 
-    boolean isOneDimensional() {
+    public boolean isOneDimensional() {
         return (xStep() == 0) != (yStep() == 0);
     }
 
@@ -45,11 +45,11 @@ public class Move {
         return xd == 0 ? yd == 1 : xd == 1 && yd <= 1;
     }
 
-    private int yStep() {
+    public int yStep() {
         return p2.y() - p1.y();
     }
 
-    private int xStep() {
+    public int xStep() {
         return p2.x() - p1.x();
     }
 

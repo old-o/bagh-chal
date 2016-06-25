@@ -20,11 +20,13 @@ public final class BoardSetup {
         board.set(p2.x(), p1.y(), PREDATOR);
         board.set(p2, PREDATOR);
 
-        for (int n = 1; n <= 5; n++) {
-            board.set(p1.x() - 1, n, PREY);
-            board.set(p2.x() + 1, n, PREY);
-            board.set(n, p1.y() - 1, PREY);
-            board.set(n, p2.y() + 1, PREY);
+        for (int x = p1.x(); x <= p2.x(); x++) {
+            board.set(x, p1.y() - 1, PREY);
+            board.set(x, p2.y() + 1, PREY);
+        }
+        for (int y = p1.y(); y <= p2.y(); y++) {
+            board.set(p1.x() - 1, y, PREY);
+            board.set(p2.x() + 1, y, PREY);
         }
     }
 }

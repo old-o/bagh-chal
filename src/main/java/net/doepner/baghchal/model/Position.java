@@ -38,19 +38,19 @@ public final class Position {
         return 31 * x + y;
     }
 
-    Position add(int xStep, int yStep) {
+    public Position add(int xStep, int yStep) {
         return new Position(x + xStep, y + yStep);
     }
 
-    boolean isLessOrEqualTo(Position p) {
+    public boolean isLessOrEqualTo(Position p) {
         return x <= p.x && y <= p.y;
     }
 
-    boolean isGreaterOrEqualTo(Position p) {
+    public boolean isGreaterOrEqualTo(Position p) {
         return p.x <= x && p.y <= y;
     }
 
-    boolean hasEvenCoordSum() {
+    public boolean hasEvenCoordSum() {
         return (x+y) % 2 == 0;
     }
 

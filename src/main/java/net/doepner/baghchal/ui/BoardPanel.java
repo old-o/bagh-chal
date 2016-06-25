@@ -29,6 +29,7 @@ import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
 import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
 import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
 import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
+import static net.doepner.baghchal.model.Piece.INVALID;
 
 public class BoardPanel extends JPanel {
 
@@ -128,8 +129,8 @@ public class BoardPanel extends JPanel {
         final int yEnd = yBoardCentreEnd + yStep / 2;
 
         drawBoardCentreArea(g2, xStep, yStep, xBoardCentreEnd, yBoardCentreEnd);
-        drawGridLines(g2, xStep, yStep, xStart, xEnd, yStart, yEnd);
-        drawDiagonalLines(g2, xStart, xEnd, yStart, yEnd);
+//        drawGridLines(g2, xStep, yStep, xStart, xEnd, yStart, yEnd);
+//        drawDiagonalLines(g2, xStart, xEnd, yStart, yEnd);
         drawPieces(g2, xStep, yStep, xStart - xStep, yStart - yStep);
     }
 
@@ -167,13 +168,19 @@ public class BoardPanel extends JPanel {
 
     private void drawPieces(Graphics2D g2, int xStep, int yStep, int xStart, int yStart) {
         board.forAllPositions(p -> {
+            final int x = xStart + p.x() * xStep;
+            final int y = yStart + p.y() * yStep;
+
+            if (p.hasEvenCoordSum()) {
+                board.tryDirections(p, INVALID, m -> {
+                    g2.setColor(m.isOneDimensional() ? gridColor : diagonalColor);
+                    g2.drawLine(x, y, x + m.xStep() * xStep, y + m.yStep() * yStep);
+                });
+            }
             final Piece piece = board.get(p);
             if (piece != null) {
                 final BufferedImage img = images.getImage(piece);
-                g2.drawImage(img,
-                        xStart + p.x() * xStep - img.getWidth() / 2,
-                        yStart + p.y() * yStep - img.getHeight() / 2,
-                        null);
+                g2.drawImage(img, x - img.getWidth() / 2, y - img.getHeight() / 2, null);
             }
         });
     }
