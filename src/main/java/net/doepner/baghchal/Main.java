@@ -19,10 +19,6 @@
 
 package net.doepner.baghchal;
 
-import static net.doepner.baghchal.model.Piece.PREY;
-
-import java.awt.Dimension;
-
 import net.doepner.baghchal.model.Board;
 import net.doepner.baghchal.model.Levels;
 import net.doepner.baghchal.play.GameLoop;
@@ -36,6 +32,10 @@ import net.doepner.baghchal.resources.Sound;
 import net.doepner.baghchal.ui.BoardPanel;
 import net.doepner.baghchal.ui.GameFrame;
 
+import java.awt.Dimension;
+
+import static net.doepner.baghchal.model.Piece.PREY;
+
 /**
  * Entry point of the game
  */
@@ -47,7 +47,7 @@ public final class Main {
 
         final int maxLevel = 2;
         final Dimension preferredSize = new Dimension(500, 500);
-        final Dimension boardSize = new Dimension(4,4);
+        final Dimension boardSize = new Dimension(5, 5);
 
         final LevelResources levelResources = new LevelResources("/net/doepner/baghchal/levels/%d/%s");
         final LevelProperties levelProperties = new LevelProperties(levelResources, "level.properties");
