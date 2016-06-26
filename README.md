@@ -17,7 +17,7 @@ Build
 
 Screenshots
 -----------
-
 Goats and Tigers
+
 ![screenshot](screenshots/goats-tigers.png)
 
