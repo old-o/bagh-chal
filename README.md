@@ -6,6 +6,7 @@
 - Added sounds 
 - Refactored into classes
 - Fixed flicker when dragging goats
+- Level theming support
 
 Build
 -----
@@ -14,5 +15,9 @@ Build
 
 [Download latest build](https://bintray.com/artifact/download/odoepner/generic/bagh-chal.jar)
 
+Screenshots
+-----------
 
+Goats and Tigers
+![screenshot](screenshots/goats-tigers.png)
 
