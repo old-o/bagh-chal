@@ -7,6 +7,7 @@
 - Refactored into classes
 - Fixed flicker when dragging goats
 - Level theming support
+- Flexible game board dimensions
 
 Build
 -----
@@ -21,3 +22,6 @@ Goats and Tigers
 
 ![screenshot](screenshots/goats-tigers.png)
 
+Sharks and Fishies
+
+![screenshot](screenshots/sharks-fishies.png)
