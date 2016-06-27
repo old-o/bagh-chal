@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static java.util.stream.Collectors.toList;
 import static net.doepner.baghchal.model.Piece.PREDATOR;
 import static net.doepner.baghchal.model.Piece.PREY;
 
@@ -56,10 +55,6 @@ public class PredatorStrategy implements Player {
 
     private static Move getRandomFrom(List<Move> list) {
         return list.get(ThreadLocalRandom.current().nextInt(list.size()));
-    }
-
-    private static List<Move> allTakesIn(List<Move> moveList) {
-        return moveList.stream().filter(Move::isJump).collect(toList());
     }
 
     private static Move tryThreateningMove(int level, Iterable<Move> possibleMoves, Board board) {
