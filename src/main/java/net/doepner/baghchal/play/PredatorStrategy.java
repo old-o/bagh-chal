@@ -27,18 +27,17 @@ public class PredatorStrategy implements Player {
 
     @Override
     public Move play(Board board) {
-        final int level = levels.getLevel();
         final List<Move> possibleMoves = new ArrayList<>();
-        board.addPossibleStepsTo(possibleMoves, PREDATOR);
         board.addPossibleJumpsTo(possibleMoves, PREDATOR, PREY);
-        if (possibleMoves.isEmpty()) {
-            return null;
-        }
-        final Move take = tryMoveFrom(allTakesIn(possibleMoves), board);
+        final Move take = tryMoveFrom(possibleMoves, board);
         if (take != null) {
             return take;
         }
-        final Move threateningMove = tryThreateningMove(level, possibleMoves, board);
+        board.addPossibleStepsTo(possibleMoves, PREDATOR);
+        if (possibleMoves.isEmpty()) {
+            return null;
+        }
+        final Move threateningMove = tryThreateningMove(levels.getLevel(), possibleMoves, board);
         if (threateningMove != null) {
             return threateningMove;
         }
