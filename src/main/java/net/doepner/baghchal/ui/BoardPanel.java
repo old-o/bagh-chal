@@ -3,7 +3,9 @@ package net.doepner.baghchal.ui;
 import net.doepner.baghchal.BoardSetup;
 import net.doepner.baghchal.model.Board;
 import net.doepner.baghchal.model.Levels;
+import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.model.Piece;
+import net.doepner.baghchal.model.Position;
 import net.doepner.baghchal.resources.Images;
 
 import javax.swing.JPanel;
@@ -22,6 +24,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static java.awt.RenderingHints.KEY_ANTIALIASING;
 import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
@@ -29,7 +32,6 @@ import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
 import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
 import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
 import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
-import static net.doepner.baghchal.model.Piece.INVALID;
 
 public class BoardPanel extends JPanel {
 
@@ -143,18 +145,23 @@ public class BoardPanel extends JPanel {
             final int x = xStart + p.x() * xStep;
             final int y = yStart + p.y() * yStep;
 
-            if (p.hasEvenCoordSum()) {
-                board.tryDirections(p, INVALID, m -> {
-                    g2.setColor(m.isOneDimensional() ? gridColor : diagonalColor);
-                    g2.drawLine(x, y, x + m.xStep() * xStep, y + m.yStep() * yStep);
-                });
-            }
+            tryForwardDirections(board, p, m -> {
+                g2.setColor(m.isOneDimensional() ? gridColor : diagonalColor);
+                g2.drawLine(x, y, x + m.xStep() * xStep, y + m.yStep() * yStep);
+            });
             final Piece piece = board.get(p);
             if (piece != null) {
                 final BufferedImage img = images.getImage(piece);
                 g2.drawImage(img, x - img.getWidth() / 2, y - img.getHeight() / 2, null);
             }
         });
+    }
+
+    private static void tryForwardDirections(Board board, Position p, Consumer<Move> moveProcessor) {
+        for (int yStep = -1; yStep <= 1; yStep++) {
+            board.processStepAlongLine(p, p.add(1, yStep), moveProcessor);
+        }
+        board.processStepAlongLine(p, p.add(0, 1), moveProcessor);
     }
 
     private Point lastDragPoint;

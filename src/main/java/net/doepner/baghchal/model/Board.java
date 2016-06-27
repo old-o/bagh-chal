@@ -31,15 +31,14 @@ public class Board {
         this.listener = listener;
         topLeft = new Position(1, 1);
         bottomRight = new Position(xSize, ySize);
-        b = new Piece[1 + xSize + 1][1 + ySize + 1];
+        b = new Piece[xSize + 2][ySize + 2];
     }
 
     /**
      * Copy constructor that will copy the grid array of the provide board instance.
      * The resulting board will support no BoardListener functionality.
      *
-     * @param board
-     *         An existing board instance
+     * @param board An existing board instance
      */
     private Board(Board board) {
         this(board.xSize, board.ySize, BoardListener.NONE);
@@ -108,12 +107,16 @@ public class Board {
             for (int yStep : STEPS) {
                 final Position p1 = p.add(xStep, yStep);
                 if (requiredPiece == INVALID || get(p1) == requiredPiece) {
-                    final Move step = new Move(p, p1);
-                    if (isStepAlongLine(step)) {
-                        moveProcessor.accept(step);
-                    }
+                    processStepAlongLine(p, p1, moveProcessor);
                 }
             }
+        }
+    }
+
+    public void processStepAlongLine(Position p, Position p1, Consumer<Move> moveProcessor) {
+        final Move step = new Move(p, p1);
+        if (isStepAlongLine(step)) {
+            moveProcessor.accept(step);
         }
     }
 
@@ -207,13 +210,18 @@ public class Board {
     }
 
     private boolean isBorderEmpty() {
-        final Position p1 = topLeft;
-        final Position p2 = bottomRight;
-        for (int n = 0; n < b.length; n++) {
-            if (get(p1.x() - 1, n) != null
-                    || get(p2.x() + 1, n) != null
-                    || get(n, p1.y() - 1) != null
-                    || get(n, p2.y() + 1) != null) {
+        for (Piece piece : b[topLeft.x() - 1]) {
+            if (piece != null) {
+                return false;
+            }
+        }
+        for (Piece[] row : b) {
+            if (row[topLeft.y() - 1] != null || row[bottomRight.y() + 1] != null) {
+                return false;
+            }
+        }
+        for (Piece piece : b[bottomRight.x() + 1]) {
+            if (piece != null) {
                 return false;
             }
         }
@@ -221,8 +229,7 @@ public class Board {
     }
 
     private boolean isBorderPosition(Position p) {
-        return p.x() == 0 || p.x() == xSize + 1
-                || p.y() == 0 || p.y() == ySize + 1;
+        return p.x() == 0 || p.x() == xSize + 1 || p.y() == 0 || p.y() == ySize + 1;
     }
 
     public Position getTopLeft() {
