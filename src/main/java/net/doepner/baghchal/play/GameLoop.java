@@ -20,7 +20,8 @@ public class GameLoop {
     private final Player preyPlayer;
     private final Player predatorPlayer;
 
-    public GameLoop(GameFrame gameFrame, Board board, BoardPanel boardPanel, Levels levels, Sound sound, Player preyPlayer, Player predatorPlayer) {
+    public GameLoop(GameFrame gameFrame, Board board, BoardPanel boardPanel, Levels levels,
+                    Sound sound, Player preyPlayer, Player predatorPlayer) {
         this.gameFrame = gameFrame;
         this.board = board;
         this.boardPanel = boardPanel;
@@ -32,8 +33,10 @@ public class GameLoop {
 
     public void start() {
         while (!levels.isGameOver()) {
-            preyPlayer.play(board);
+            final Move preyMove = preyPlayer.play(board);
+            board.processMove(preyMove);
             final Move predatorMove = predatorPlayer.play(board);
+            board.processMove(predatorMove);
             final boolean predatorsLostLevel = (predatorMove == null);
             if (predatorsLostLevel) {
                 sound.playResource("/net/doepner/baghchal/congrats.wav");

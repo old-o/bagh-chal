@@ -29,7 +29,8 @@ public class DragAndDropHandler extends MouseAdapter {
     private Position dragStart;
     private Point dragStartPoint;
 
-    public DragAndDropHandler(Piece piece, Board board, BoardPanel boardPanel, Images images, PlayFlow playFlow) {
+    public DragAndDropHandler(Piece piece, Board board, BoardPanel boardPanel,
+                              Images images, PlayFlow playFlow) {
         this.piece = piece;
         this.board = board;
         this.playFlow = playFlow;

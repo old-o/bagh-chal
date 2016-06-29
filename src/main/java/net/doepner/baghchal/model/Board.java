@@ -51,8 +51,8 @@ public class Board {
         return new Board(this);
     }
 
-    public void doMove(Move move) {
-        final Piece piece = movePiece(move);
+    public void processMove(Move move) {
+        final Piece piece = get(move.p2());
         if (move.isJump()) {
             clear(move.middle());
             listener.afterJump(piece);
@@ -136,11 +136,11 @@ public class Board {
     }
 
     private boolean isStepAlongLine(Move move) {
-        return isValidOnBoardMove(move.p1()) && isValidOnBoardMove(move.p2()) && move.isStep()
+        return isValidOnBoardPosition(move.p1()) && isValidOnBoardPosition(move.p2()) && move.isStep()
                 && (move.p1().hasEvenCoordSum() || move.isOneDimensional());
     }
 
-    private boolean isValidOnBoardMove(Position pos) {
+    private boolean isValidOnBoardPosition(Position pos) {
         return pos.isGreaterOrEqualTo(topLeft) && pos.isLessOrEqualTo(bottomRight);
     }
 
@@ -196,12 +196,21 @@ public class Board {
     }
 
     public boolean isValid(Move move, Piece piece) {
-        // TODO: Factor in the rules of the game (in a flexible way that also work for other games like Alquerque)
-        // currently this is written for bagh-chal prey movements:
-        return move.isNotStationary() && isEmpty(move.p2()) && (isBorderToBoard(move) || isValidOnBoardMove(move));
+        if (move.isStationary() || !isEmpty(move.p2())) {
+            return false;
+        }
+        // TODO: Factor out the rules of the game (in a flexible way that also work for other games like Alquerque)
+        switch (piece) {
+            case PREY:
+                return isBorderToBoard(move) || isValidOnBoardStep(move);
+            case PREDATOR:
+                return isStepAlongLine(move) || (move.isJump() && get(move.middle()) == Piece.PREY);
+            default:
+                return false;
+        }
     }
 
-    private boolean isValidOnBoardMove(Move move) {
+    private boolean isValidOnBoardStep(Move move) {
         return isBorderEmpty() && isStepAlongLine(move);
     }
 

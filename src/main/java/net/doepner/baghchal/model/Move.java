@@ -66,7 +66,7 @@ public class Move {
         return String.format("Move{p1=%s, p2=%s}", p1, p2);
     }
 
-    boolean isNotStationary() {
-        return !p1.equals(p2);
+    boolean isStationary() {
+        return p1.equals(p2);
     }
 }

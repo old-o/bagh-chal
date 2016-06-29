@@ -62,6 +62,7 @@ public final class Main {
 
         final Player preyPlayer = new UserPlayer(PREY, boardPanel, images);
         final Player predatorPlayer = new PredatorStrategy(levels);
+//        final Player predatorPlayer = new UserPlayer(PREDATOR, boardPanel, images);
 
         final GameFrame gameFrame = new GameFrame(boardPanel);
         final GameLoop gameLoop = new GameLoop(gameFrame, board, boardPanel, levels, sound, preyPlayer, predatorPlayer);

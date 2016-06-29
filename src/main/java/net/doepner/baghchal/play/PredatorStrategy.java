@@ -48,7 +48,7 @@ public class PredatorStrategy implements Player {
             return null;
         } else {
             final Move move = getRandomFrom(moves);
-            board.doMove(move);
+            board.movePiece(move);
             return move;
         }
     }
