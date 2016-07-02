@@ -4,6 +4,7 @@ import net.doepner.baghchal.BoardListener;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 import static net.doepner.baghchal.model.Piece.INVALID;
@@ -52,12 +53,14 @@ public class Board {
     }
 
     public void processMove(Move move) {
-        final Piece piece = get(move.p2());
-        if (move.isJump()) {
-            clear(move.middle());
-            listener.afterJump(piece);
-        } else {
-            listener.afterStep(piece);
+        if (move != null) {
+            final Piece piece = get(move.p2());
+            if (move.isJump()) {
+                clear(move.middle());
+                listener.afterJump(piece);
+            } else {
+                listener.afterStep(piece);
+            }
         }
     }
 
@@ -84,6 +87,21 @@ public class Board {
                 tryDirections(p, requiredPiece, moveProcessor);
             }
         });
+    }
+
+    public Move tryMoveFrom(List<Move> moves) {
+        if (moves.isEmpty()) {
+            return null;
+        } else {
+            final Move move = getRandomFrom(moves);
+            movePiece(move);
+            return move;
+        }
+    }
+
+
+    private static Move getRandomFrom(List<Move> list) {
+        return list.get(ThreadLocalRandom.current().nextInt(list.size()));
     }
 
     public void forAllPositions(Consumer<Position> positionConsumer) {
@@ -218,7 +236,7 @@ public class Board {
         return isBorderPosition(move.p1()) && !isBorderPosition(move.p2());
     }
 
-    private boolean isBorderEmpty() {
+    public boolean isBorderEmpty() {
         for (Piece piece : b[topLeft.x() - 1]) {
             if (piece != null) {
                 return false;

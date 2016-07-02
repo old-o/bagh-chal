@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 import static net.doepner.baghchal.model.Piece.PREDATOR;
 import static net.doepner.baghchal.model.Piece.PREY;
@@ -28,7 +27,7 @@ public class PredatorStrategy implements Player {
     public Move play(Board board) {
         final List<Move> possibleMoves = new ArrayList<>();
         board.addPossibleJumpsTo(possibleMoves, PREDATOR, PREY);
-        final Move take = tryMoveFrom(possibleMoves, board);
+        final Move take = board.tryMoveFrom(possibleMoves);
         if (take != null) {
             return take;
         }
@@ -40,27 +39,15 @@ public class PredatorStrategy implements Player {
         if (threateningMove != null) {
             return threateningMove;
         }
-        return tryMoveFrom(possibleMoves, board);
+        return board.tryMoveFrom(possibleMoves);
     }
 
-    private static Move tryMoveFrom(List<Move> moves, Board board) {
-        if (moves.isEmpty()) {
-            return null;
-        } else {
-            final Move move = getRandomFrom(moves);
-            board.movePiece(move);
-            return move;
-        }
-    }
 
-    private static Move getRandomFrom(List<Move> list) {
-        return list.get(ThreadLocalRandom.current().nextInt(list.size()));
-    }
 
     private static Move tryThreateningMove(int level, Iterable<Move> possibleMoves, Board board) {
         final Map<Integer, List<Move>> threateningMoves = getThreateningMoves(possibleMoves, board);
         for (int i = level; i > 0; i--) {
-            final Move move = tryMoveFrom(threateningMoves.get(i), board);
+            final Move move = board.tryMoveFrom(threateningMoves.get(i));
             if (move != null) {
                 return move;
             }

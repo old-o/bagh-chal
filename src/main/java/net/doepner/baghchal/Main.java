@@ -60,6 +60,7 @@ public final class Main {
         final BoardSetup boardSetup = new BoardSetup();
         final BoardPanel boardPanel = new BoardPanel(board, boardSetup, images, levels);
 
+//        final Player preyPlayer = new PreyStrategy();
         final Player preyPlayer = new UserPlayer(PREY, boardPanel, images);
         final Player predatorPlayer = new PredatorStrategy(levels);
 //        final Player predatorPlayer = new UserPlayer(PREDATOR, boardPanel, images);
