@@ -35,8 +35,10 @@ public class GameLoop {
         while (!levels.isGameOver()) {
             final Move preyMove = preyPlayer.play(board);
             board.processMove(preyMove);
+            boardPanel.repaint();
             final Move predatorMove = predatorPlayer.play(board);
             board.processMove(predatorMove);
+            boardPanel.repaint();
             final boolean predatorsLostLevel = (predatorMove == null);
             if (predatorsLostLevel) {
                 sound.playResource("/net/doepner/baghchal/congrats.wav");
@@ -44,6 +46,14 @@ public class GameLoop {
             levels.setLevelDone(predatorsLostLevel);
             gameFrame.enableNextLevel(predatorsLostLevel && !levels.isGameOver());
             boardPanel.repaint();
+        }
+    }
+
+    private void waitSeconds(int secs) {
+        try {
+            Thread.sleep(secs * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

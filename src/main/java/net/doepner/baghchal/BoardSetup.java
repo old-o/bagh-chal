@@ -15,10 +15,7 @@ public final class BoardSetup {
         final Position p1 = board.getTopLeft();
         final Position p2 = board.getBottomRight();
 
-        board.set(p1, PREDATOR);
-        board.set(p1.x(), p2.y(), PREDATOR);
-        board.set(p2.x(), p1.y(), PREDATOR);
-        board.set(p2, PREDATOR);
+        board.forAllCornerPositions(p -> board.set(p, PREDATOR));
 
         for (int x = p1.x(); x <= p2.x(); x++) {
             board.set(x, p1.y() - 1, PREY);

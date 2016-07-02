@@ -1,10 +1,10 @@
 package net.doepner.baghchal.model;
 
 import net.doepner.baghchal.BoardListener;
+import net.doepner.baghchal.util.ListUtil;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 import static net.doepner.baghchal.model.Piece.INVALID;
@@ -90,18 +90,11 @@ public class Board {
     }
 
     public Move tryMoveFrom(List<Move> moves) {
-        if (moves.isEmpty()) {
-            return null;
-        } else {
-            final Move move = getRandomFrom(moves);
+        final Move move = ListUtil.getRandomFrom(moves);
+        if (move != null) {
             movePiece(move);
-            return move;
         }
-    }
-
-
-    private static Move getRandomFrom(List<Move> list) {
-        return list.get(ThreadLocalRandom.current().nextInt(list.size()));
+        return move;
     }
 
     public void forAllPositions(Consumer<Position> positionConsumer) {
@@ -112,7 +105,7 @@ public class Board {
         }
     }
 
-    private void forAllBoardPositions(Consumer<Position> positionConsumer) {
+    public void forAllBoardPositions(Consumer<Position> positionConsumer) {
         for (int x = topLeft.x(); x <= bottomRight.x(); x++) {
             for (int y = topLeft.y(); y <= bottomRight.y(); y++) {
                 positionConsumer.accept(new Position(x, y));
@@ -120,12 +113,27 @@ public class Board {
         }
     }
 
-    public void tryDirections(Position p, Piece requiredPiece, Consumer<Move> moveProcessor) {
+    public void forAllCornerPositions(Consumer<Position> positionConsumer) {
+        positionConsumer.accept(topLeft);
+        positionConsumer.accept(new Position(topLeft.x(), bottomRight.y()));
+        positionConsumer.accept(new Position(bottomRight.x(), topLeft.y()));
+        positionConsumer.accept(bottomRight);
+    }
+
+    public void tryDirections(Position p1, Consumer<Move> moveProcessor) {
         for (int xStep : STEPS) {
             for (int yStep : STEPS) {
-                final Position p1 = p.add(xStep, yStep);
-                if (requiredPiece == INVALID || get(p1) == requiredPiece) {
-                    processStepAlongLine(p, p1, moveProcessor);
+                processStepAlongLine(p1, p1.add(xStep, yStep), moveProcessor);
+            }
+        }
+    }
+
+    public void tryDirections(Position p1, Piece requiredPiece, Consumer<Move> moveProcessor) {
+        for (int xStep : STEPS) {
+            for (int yStep : STEPS) {
+                final Position p2 = p1.add(xStep, yStep);
+                if (requiredPiece == INVALID || get(p2) == requiredPiece) {
+                    processStepAlongLine(p1, p2, moveProcessor);
                 }
             }
         }
@@ -158,7 +166,7 @@ public class Board {
                 && (move.p1().hasEvenCoordSum() || move.isOneDimensional());
     }
 
-    private boolean isValidOnBoardPosition(Position pos) {
+    public boolean isValidOnBoardPosition(Position pos) {
         return pos.isGreaterOrEqualTo(topLeft) && pos.isLessOrEqualTo(bottomRight);
     }
 
@@ -181,7 +189,7 @@ public class Board {
         set(p, null);
     }
 
-    private boolean isEmpty(Position p) {
+    public boolean isEmpty(Position p) {
         return get(p) == null;
     }
 
@@ -237,22 +245,7 @@ public class Board {
     }
 
     public boolean isBorderEmpty() {
-        for (Piece piece : b[topLeft.x() - 1]) {
-            if (piece != null) {
-                return false;
-            }
-        }
-        for (Piece[] row : b) {
-            if (row[topLeft.y() - 1] != null || row[bottomRight.y() + 1] != null) {
-                return false;
-            }
-        }
-        for (Piece piece : b[bottomRight.x() + 1]) {
-            if (piece != null) {
-                return false;
-            }
-        }
-        return true;
+        return getBorderPosition(null) == null;
     }
 
     private boolean isBorderPosition(Position p) {
@@ -265,5 +258,27 @@ public class Board {
 
     public Position getBottomRight() {
         return bottomRight;
+    }
+
+    public Position getBorderPosition(Piece piece) {
+        for (int y = 0; y < b[topLeft.x() - 1].length; y++) {
+            if (b[topLeft.x() - 1][y] == piece) {
+                return new Position(topLeft.x() - 1, y);
+            }
+        }
+        for (int x = 0; x < b.length; x++) {
+            if (b[x][topLeft.y() - 1] == piece) {
+                return new Position(x, topLeft.y() - 1);
+            }
+            if (b[x][bottomRight.y() + 1] != null) {
+                return new Position(x, bottomRight.y() + 1);
+            }
+        }
+        for (int y = 0; y < b[bottomRight.x() + 1].length; y++) {
+            if (b[bottomRight.x() + 1][y] != null) {
+                return new Position(bottomRight.x() + 1, y);
+            }
+        }
+        return null;
     }
 }
