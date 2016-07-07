@@ -26,11 +26,11 @@ public final class PreyStrategy implements Player {
             return defensiveMove;
         }
         final Position borderPosition = board.getBorderPosition(PREY);
-        final Position boardPosition = getSafeBoardPosition(board);
-        if (borderPosition != null && boardPosition != null) {
-            final Move m = new Move(borderPosition, boardPosition);
-            board.movePiece(m);
-            return m;
+        if (borderPosition != null) {
+            final Position boardPosition = getRandomFrom(getSafeBoardPositions(board));
+            if (boardPosition != null) {
+                return getMove(board, borderPosition, boardPosition);
+            }
         }
 
         // 2) place on the board edge next to a prey if possible
@@ -41,45 +41,55 @@ public final class PreyStrategy implements Player {
         return null;
     }
 
-    private Position getSafeBoardPosition(Board board) {
+    private Move getMove(Board board, Position borderPosition, Position boardPosition) {
+        final Move m = new Move(borderPosition, boardPosition);
+        board.movePiece(m);
+        return m;
+    }
+
+    private List<Position> getSafeBoardPositions(Board board) {
         final Set<Position> positions = new HashSet<>();
-        board.forAllBoardPositions(p1 -> {
-            if (board.isEmpty(p1)) {
-                positions.add(p1);
-                board.tryDirections(p1, m -> {
-                    if (positions.contains(p1)) {
-                        final Position p3 = p1.add(-m.xStep(), -m.yStep());
-                        if (board.isValidOnBoardPosition(p3)) {
-                            final Piece piece2 = board.get(m.p2());
-                            final Piece piece3 = board.get(p3);
-                            if ((piece2 == null || piece2 == PREDATOR)
-                                    && (piece3 == null || piece3 == PREDATOR)) {
-                                positions.remove(p1);
-                                System.out.println("Removed " + p1);
-                            }
-                        }
-                    }
-                });
+        for (Position p : board.getBoardPositions()) {
+            if (isSafePosition(p, board)) {
+                positions.add(p);
             }
-        });
-        return getRandomFrom(new ArrayList<>(positions));
+        }
+        return new ArrayList<>(positions);
+    }
+
+    private boolean isSafePosition(Position p, Board board) {
+        if (!board.isEmptyAt(p)) {
+            return false;
+        }
+        for (Position d : board.getDirections()) {
+            final Move m = new Move(p, p.add(d));
+            if (board.isStepAlongLine(m)) {
+                final Position p3 = p.add(-m.xStep(), -m.yStep());
+                if (board.isValidOnBoardPosition(p3)) {
+                    final Piece piece2 = board.get(m.p2());
+                    final Piece piece3 = board.get(p3);
+                    if ((piece2 == null || piece2 == PREDATOR)
+                            && (piece3 == null || piece3 == PREDATOR)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     private List<Move> getDefensiveMoves(Board board) {
-        final List<Move> predatorJumps = new ArrayList<>();
-        board.addPossibleJumpsTo(predatorJumps, PREDATOR, PREY);
-
         final List<Move> defenseMoves = new ArrayList<>();
-        for (Move possibleJump : predatorJumps) {
+        for (Move possibleJump : board.getPossibleJumps(PREDATOR, PREY)) {
             final Position p2 = possibleJump.p2();
-            board.forAllPositions(p1 -> {
+            for (Position p1 : board.getAllPositions()) {
                 if (board.get(p1) == PREY) {
                     final Move move = new Move(p1, p2);
                     if (board.isValid(move, PREY)) {
                         defenseMoves.add(move);
                     }
                 }
-            });
+            }
         }
         return defenseMoves;
     }

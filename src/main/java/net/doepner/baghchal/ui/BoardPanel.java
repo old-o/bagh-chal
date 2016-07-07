@@ -141,7 +141,7 @@ public class BoardPanel extends JPanel {
     }
 
     private void drawPieces(Graphics2D g2, int xStep, int yStep, int xStart, int yStart) {
-        board.forAllPositions(p -> {
+        for (Position p : board.getAllPositions()) {
             final int x = xStart + p.x() * xStep;
             final int y = yStart + p.y() * yStep;
 
@@ -154,7 +154,7 @@ public class BoardPanel extends JPanel {
                 final BufferedImage img = images.getImage(piece);
                 g2.drawImage(img, x - img.getWidth() / 2, y - img.getHeight() / 2, null);
             }
-        });
+        }
     }
 
     private static void tryForwardDirections(Board board, Position p, Consumer<Move> moveProcessor) {

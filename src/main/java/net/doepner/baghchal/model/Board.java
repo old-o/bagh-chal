@@ -3,18 +3,18 @@ package net.doepner.baghchal.model;
 import net.doepner.baghchal.BoardListener;
 import net.doepner.baghchal.util.ListUtil;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
 import static net.doepner.baghchal.model.Piece.INVALID;
+import static net.doepner.baghchal.model.Position.pos;
 
 /**
  * The game board model
  */
 public class Board {
-
-    private static final int[] STEPS = {-1, 0, +1};
 
     private final int xSize;
     private final int ySize;
@@ -26,13 +26,45 @@ public class Board {
 
     private final BoardListener listener;
 
+    private final List<Position> allPositions = new ArrayList<>();
+    private final List<Position> boardPositions = new ArrayList<>();
+    private final List<Position> borderPositions = new ArrayList<>();
+    private final List<Position> cornerPositions = new ArrayList<>();
+
+    private static Position[] directions = new Position[]{
+            pos(0, +1), pos(+1, +1), pos(+1, 0), pos(+1, -1),
+            pos(0, -1), pos(-1, -1), pos(-1, 0), pos(-1, +1)
+    };
+
     public Board(int xSize, int ySize, BoardListener listener) {
+        this.listener = listener;
         this.xSize = xSize;
         this.ySize = ySize;
-        this.listener = listener;
+        b = new Piece[xSize + 2][ySize + 2];
         topLeft = new Position(1, 1);
         bottomRight = new Position(xSize, ySize);
-        b = new Piece[xSize + 2][ySize + 2];
+        initPositions(topLeft, bottomRight);
+    }
+
+    public Iterable<Position> getDirections() {
+        return Arrays.asList(directions);
+    }
+
+    private void initPositions(Position topLeft, Position bottomRight) {
+        for (int x = 0; x < b.length; x++) {
+            for (int y = 0; y < b[x].length; y++) {
+                final Position p = new Position(x, y);
+                allPositions.add(p);
+                if (topLeft.x() <= x && topLeft.y() <= y && x <= bottomRight.x() && y <= bottomRight.y()) {
+                    boardPositions.add(p);
+                    if ((x == topLeft.x() || x == bottomRight.x()) && (y == topLeft.y() || y == bottomRight.y())) {
+                        cornerPositions.add(p);
+                    }
+                } else {
+                    borderPositions.add(p);
+                }
+            }
+        }
     }
 
     /**
@@ -81,12 +113,22 @@ public class Board {
         }
     }
 
-    public void tryStepsWhere(Piece movingPiece, Piece requiredPiece, Consumer<Move> moveProcessor) {
-        forAllBoardPositions(p -> {
+    public List<Move> getStepsWhere(Piece movingPiece, Piece requiredPiece) {
+        final List<Move> steps = new ArrayList<>();
+        for (Position p : boardPositions) {
             if (get(p) == movingPiece) {
-                tryDirections(p, requiredPiece, moveProcessor);
+                for (Position d : directions) {
+                    final Position p2 = p.add(d);
+                    if (get(p2) == requiredPiece) {
+                        final Move step = new Move(p, p2);
+                        if (isStepAlongLine(step)) {
+                            steps.add(step);
+                        }
+                    }
+                }
             }
-        });
+        }
+        return steps;
     }
 
     public Move tryMoveFrom(List<Move> moves) {
@@ -97,71 +139,45 @@ public class Board {
         return move;
     }
 
-    public void forAllPositions(Consumer<Position> positionConsumer) {
-        for (int x = 0; x < b.length; x++) {
-            for (int y = 0; y < b[x].length; y++) {
-                positionConsumer.accept(new Position(x, y));
-            }
-        }
+    public Iterable<Position> getAllPositions() {
+        return allPositions;
     }
 
-    public void forAllBoardPositions(Consumer<Position> positionConsumer) {
-        for (int x = topLeft.x(); x <= bottomRight.x(); x++) {
-            for (int y = topLeft.y(); y <= bottomRight.y(); y++) {
-                positionConsumer.accept(new Position(x, y));
-            }
-        }
+    public Iterable<Position> getBoardPositions() {
+        return boardPositions;
     }
 
-    public void forAllCornerPositions(Consumer<Position> positionConsumer) {
-        positionConsumer.accept(topLeft);
-        positionConsumer.accept(new Position(topLeft.x(), bottomRight.y()));
-        positionConsumer.accept(new Position(bottomRight.x(), topLeft.y()));
-        positionConsumer.accept(bottomRight);
+    public Iterable<Position> getCornerPositions() {
+        return cornerPositions;
     }
 
-    public void tryDirections(Position p1, Consumer<Move> moveProcessor) {
-        for (int xStep : STEPS) {
-            for (int yStep : STEPS) {
-                processStepAlongLine(p1, p1.add(xStep, yStep), moveProcessor);
-            }
-        }
-    }
-
-    public void tryDirections(Position p1, Piece requiredPiece, Consumer<Move> moveProcessor) {
-        for (int xStep : STEPS) {
-            for (int yStep : STEPS) {
-                final Position p2 = p1.add(xStep, yStep);
-                if (requiredPiece == INVALID || get(p2) == requiredPiece) {
-                    processStepAlongLine(p1, p2, moveProcessor);
-                }
-            }
-        }
-    }
-
-    public void processStepAlongLine(Position p, Position p1, Consumer<Move> moveProcessor) {
-        final Move step = new Move(p, p1);
+    public void processStepAlongLine(Position p1, Position p2, Consumer<Move> moveProcessor) {
+        final Move step = new Move(p1, p2);
         if (isStepAlongLine(step)) {
             moveProcessor.accept(step);
         }
     }
 
-    public void addPossibleStepsTo(List<Move> moveList, Piece movingPiece) {
-        tryStepsWhere(movingPiece, null, moveList::add);
+    public List<Move> getPossibleSteps(Piece movingPiece) {
+        return getStepsWhere(movingPiece, null);
     }
 
-    public void addPossibleJumpsTo(List<Move> moveList, Piece movingPiece, Piece requiredPiece) {
-        tryStepsWhere(movingPiece, requiredPiece, step -> addPossibleJump(moveList, step));
+    public List<Move> getPossibleJumps(Piece movingPiece, Piece requiredPiece) {
+        final List<Move> jumps = new ArrayList<>();
+        for (Move step : getStepsWhere(movingPiece, requiredPiece)) {
+            addPossibleJump(jumps, step);
+        }
+        return jumps;
     }
 
     public void addPossibleJump(List<Move> list, Move step1) {
         final Move step2 = step1.repeat();
-        if (isStepAlongLine(step2) && isEmpty(step2.p2())) {
+        if (isStepAlongLine(step2) && isEmptyAt(step2.p2())) {
             list.add(new Move(step1.p1(), step2.p2()));
         }
     }
 
-    private boolean isStepAlongLine(Move move) {
+    public boolean isStepAlongLine(Move move) {
         return isValidOnBoardPosition(move.p1()) && isValidOnBoardPosition(move.p2()) && move.isStep()
                 && (move.p1().hasEvenCoordSum() || move.isOneDimensional());
     }
@@ -189,7 +205,7 @@ public class Board {
         set(p, null);
     }
 
-    public boolean isEmpty(Position p) {
+    public boolean isEmptyAt(Position p) {
         return get(p) == null;
     }
 
@@ -222,7 +238,7 @@ public class Board {
     }
 
     public boolean isValid(Move move, Piece piece) {
-        if (move.isStationary() || !isEmpty(move.p2())) {
+        if (move.isStationary() || !isEmptyAt(move.p2())) {
             return false;
         }
         // TODO: Factor out the rules of the game (in a flexible way that also work for other games like Alquerque)
@@ -245,11 +261,16 @@ public class Board {
     }
 
     public boolean isBorderEmpty() {
-        return getBorderPosition(null) == null;
+        for (Position p : borderPositions) {
+            if (get(p) != null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean isBorderPosition(Position p) {
-        return p.x() == 0 || p.x() == xSize + 1 || p.y() == 0 || p.y() == ySize + 1;
+        return borderPositions.contains(p);
     }
 
     public Position getTopLeft() {
@@ -261,22 +282,9 @@ public class Board {
     }
 
     public Position getBorderPosition(Piece piece) {
-        for (int y = 0; y < b[topLeft.x() - 1].length; y++) {
-            if (b[topLeft.x() - 1][y] == piece) {
-                return new Position(topLeft.x() - 1, y);
-            }
-        }
-        for (int x = 0; x < b.length; x++) {
-            if (b[x][topLeft.y() - 1] == piece) {
-                return new Position(x, topLeft.y() - 1);
-            }
-            if (b[x][bottomRight.y() + 1] != null) {
-                return new Position(x, bottomRight.y() + 1);
-            }
-        }
-        for (int y = 0; y < b[bottomRight.x() + 1].length; y++) {
-            if (b[bottomRight.x() + 1][y] != null) {
-                return new Position(bottomRight.x() + 1, y);
+        for (Position p : borderPositions) {
+            if (get(p) == piece) {
+                return p;
             }
         }
         return null;

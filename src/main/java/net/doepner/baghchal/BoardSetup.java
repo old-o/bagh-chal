@@ -12,10 +12,12 @@ import static net.doepner.baghchal.model.Piece.PREY;
 public final class BoardSetup {
 
     public void setup(Board board) {
+        for (Position p : board.getCornerPositions()) {
+            board.set(p, PREDATOR);
+        }
+
         final Position p1 = board.getTopLeft();
         final Position p2 = board.getBottomRight();
-
-        board.forAllCornerPositions(p -> board.set(p, PREDATOR));
 
         for (int x = p1.x(); x <= p2.x(); x++) {
             board.set(x, p1.y() - 1, PREY);
