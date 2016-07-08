@@ -8,6 +8,8 @@ import net.doepner.baghchal.model.Move;
  */
 public interface Player {
 
+    String getName();
+
     Move play(Board board);
 
 }

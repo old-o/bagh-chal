@@ -1,23 +1,28 @@
 package net.doepner.baghchal.play;
 
-import net.doepner.baghchal.model.Board;
-import net.doepner.baghchal.model.Move;
-import net.doepner.baghchal.model.Piece;
-import net.doepner.baghchal.model.Position;
+import static net.doepner.baghchal.model.Piece.PREDATOR;
+import static net.doepner.baghchal.model.Piece.PREY;
+import static net.doepner.baghchal.util.ListUtil.getRandomFrom;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static net.doepner.baghchal.model.Piece.PREDATOR;
-import static net.doepner.baghchal.model.Piece.PREY;
-import static net.doepner.baghchal.util.ListUtil.getRandomFrom;
+import net.doepner.baghchal.model.Board;
+import net.doepner.baghchal.model.Move;
+import net.doepner.baghchal.model.Piece;
+import net.doepner.baghchal.model.Position;
 
 /**
  * Computer player for prey pieces
  */
 public final class PreyStrategy implements Player {
+
+    @Override
+    public String getName() {
+        return "Prey AI";
+    }
 
     @Override
     public Move play(Board board) {

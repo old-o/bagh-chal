@@ -27,6 +27,11 @@ public final class UserPlayer implements Player {
     }
 
     @Override
+    public String getName() {
+        return System.getProperty("user.name");
+    }
+
+    @Override
     public Move play(Board board) {
         final Result result = new Result();
         final DragAndDropHandler dndHandler = new DragAndDropHandler(piece, board, boardPanel, images,

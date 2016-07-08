@@ -32,19 +32,20 @@ public class GameLoop {
     }
 
     public void start() {
+        int moveCount = 0;
         while (!levels.isGameOver()) {
-            final Move preyMove = preyPlayer.play(board);
-            board.processMove(preyMove);
+            final Player player = (moveCount % 2 == 0) ? preyPlayer : predatorPlayer;
+            final Move move = player.play(board);
+            board.processMove(move);
+            moveCount++;
             boardPanel.repaint();
-            final Move predatorMove = predatorPlayer.play(board);
-            board.processMove(predatorMove);
-            boardPanel.repaint();
-            final boolean predatorsLostLevel = (predatorMove == null);
-            if (predatorsLostLevel) {
+            final boolean playerGaveUp = (move == null);
+            if (playerGaveUp) {
+                // TODO: Make this dependent on whether the other player is the user
                 sound.playResource("/net/doepner/baghchal/congrats.wav");
             }
-            levels.setLevelDone(predatorsLostLevel);
-            gameFrame.enableNextLevel(predatorsLostLevel && !levels.isGameOver());
+            levels.setLevelDone(playerGaveUp);
+            gameFrame.enableNextLevel(playerGaveUp && !levels.isGameOver());
             boardPanel.repaint();
         }
     }

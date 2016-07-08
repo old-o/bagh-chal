@@ -1,16 +1,16 @@
 package net.doepner.baghchal.play;
 
-import net.doepner.baghchal.model.Board;
-import net.doepner.baghchal.model.Levels;
-import net.doepner.baghchal.model.Move;
+import static net.doepner.baghchal.model.Piece.PREDATOR;
+import static net.doepner.baghchal.model.Piece.PREY;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static net.doepner.baghchal.model.Piece.PREDATOR;
-import static net.doepner.baghchal.model.Piece.PREY;
+import net.doepner.baghchal.model.Board;
+import net.doepner.baghchal.model.Levels;
+import net.doepner.baghchal.model.Move;
 
 /**
  * The computer player's strategy (playing the tigers)
@@ -21,6 +21,11 @@ public class PredatorStrategy implements Player {
 
     public PredatorStrategy(Levels levels) {
         this.levels = levels;
+    }
+
+    @Override
+    public String getName() {
+        return "Predator AI";
     }
 
     @Override
