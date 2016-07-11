@@ -1,16 +1,13 @@
 package net.doepner.baghchal.ui;
 
-import net.doepner.baghchal.BoardSetup;
-import net.doepner.baghchal.model.Board;
-import net.doepner.baghchal.model.Levels;
-import net.doepner.baghchal.model.Move;
-import net.doepner.baghchal.model.Piece;
-import net.doepner.baghchal.model.Position;
-import net.doepner.baghchal.resources.Images;
+import static java.awt.RenderingHints.KEY_ANTIALIASING;
+import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
+import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
+import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
+import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
+import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
 
-import javax.swing.JPanel;
 import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -26,17 +23,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static java.awt.RenderingHints.KEY_ANTIALIASING;
-import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
-import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
-import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
-import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
-import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
+import javax.swing.JPanel;
 
-public class BoardPanel extends JPanel {
+import net.doepner.baghchal.GameSetup;
+import net.doepner.baghchal.model.GameTable;
+import net.doepner.baghchal.model.Levels;
+import net.doepner.baghchal.model.Move;
+import net.doepner.baghchal.model.Piece;
+import net.doepner.baghchal.model.Position;
+import net.doepner.baghchal.resources.Images;
 
-    private final Board board;
-    private final BoardSetup boardSetup;
+public class GamePanel extends JPanel {
+
+    private final GameTable gameTable;
+    private final GameSetup gameSetup;
 
     private final Images images;
     private final Levels levels;
@@ -55,21 +55,17 @@ public class BoardPanel extends JPanel {
     }
 
     private Paint boardPaint;
+    private Colors colors;
 
-    private Color gridColor;
-    private Color diagonalColor;
-    private Color backgroundColor;
-    private Color boardEdgeColor;
-
-    public BoardPanel(Board board, BoardSetup boardSetup, Images images, Levels levels) {
-        this.board = board;
-        this.boardSetup = boardSetup;
+    public GamePanel(GameTable gameTable, GameSetup gameSetup, Images images, Levels levels) {
+        this.gameTable = gameTable;
+        this.gameSetup = gameSetup;
         this.images = images;
         this.levels = levels;
         congrats = images.getImageResource(getClass().getResource("/net/doepner/baghchal/congrats.gif"));
     }
 
-    void start() {
+    public void start() {
         levels.firstLevel();
         startLevel();
     }
@@ -80,19 +76,12 @@ public class BoardPanel extends JPanel {
     }
 
     private void startLevel() {
-        board.reset();
-        boardSetup.setup(board);
+        gameTable.reset();
+        gameSetup.setup(gameTable);
         final BufferedImage bgImage = images.getImage("background.jpg");
         boardPaint = new TexturePaint(bgImage, new Rectangle(0, 0, bgImage.getWidth(), bgImage.getHeight()));
-        backgroundColor = getLevelColor("backgroundColor");
-        diagonalColor = getLevelColor("diagonalColor");
-        gridColor = getLevelColor("gridColor");
-        boardEdgeColor = getLevelColor("boardEdgeColor");
+        colors = new Colors(levels);
         repaint();
-    }
-
-    private Color getLevelColor(String name) {
-        return Color.decode(levels.getLevelProperty(name));
     }
 
     @Override
@@ -112,44 +101,44 @@ public class BoardPanel extends JPanel {
             final String s = levels.getLevelEndMessage();
             g2.drawString(s, width / 2 - (g2.getFontMetrics().stringWidth(s) / 2), height / 2 + 20);
         } else {
-            drawBoard(g2, width, height);
+            drawGameTable(g2, width, height);
             drawDraggedImage(g2);
         }
     }
 
-    private void drawBoard(Graphics2D g2, int width, int height) {
-        setBackground(backgroundColor);
+    private void drawGameTable(Graphics2D g2, int width, int height) {
+        setBackground(colors.backgroundColor());
         setOpaque(true);
 
-        final int xStep = width / board.getXSize();
-        final int yStep = height / board.getYSize();
+        final int xStep = width / gameTable.getXSize();
+        final int yStep = height / gameTable.getYSize();
         final int xStart = xStep + xStep / 2;
-        final int xBoardCentreEnd = xStep * board.getCentreXSize();
+        final int xBoardEnd = xStep * gameTable.getCentreXSize();
         final int yStart = yStep + yStep / 2;
-        final int yBoardCentreEnd = yStep * board.getCentreYSize();
+        final int yBoardEnd = yStep * gameTable.getCentreYSize();
 
-        drawBoardCentreArea(g2, xStep, yStep, xBoardCentreEnd, yBoardCentreEnd);
+        drawBoard(g2, xStep, yStep, xBoardEnd, yBoardEnd);
         drawPieces(g2, xStep, yStep, xStart - xStep, yStart - yStep);
     }
 
-    private void drawBoardCentreArea(Graphics2D g2, int xStep, int yStep, int xEnd, int yEnd) {
+    private void drawBoard(Graphics2D g2, int xStep, int yStep, int xEnd, int yEnd) {
         g2.setPaint(boardPaint);
         g2.fillRect(xStep, yStep, xEnd, yEnd);
         g2.setStroke(stroke);
-        g2.setColor(boardEdgeColor);
+        g2.setColor(colors.boardEdgeColor());
         g2.drawRect(xStep, yStep, xEnd, yEnd);
     }
 
     private void drawPieces(Graphics2D g2, int xStep, int yStep, int xStart, int yStart) {
-        for (Position p : board.getAllPositions()) {
+        for (Position p : gameTable.getAllPositions()) {
             final int x = xStart + p.x() * xStep;
             final int y = yStart + p.y() * yStep;
 
-            tryForwardDirections(board, p, m -> {
-                g2.setColor(m.isOneDimensional() ? gridColor : diagonalColor);
+            tryForwardDirections(gameTable, p, m -> {
+                g2.setColor(m.isOneDimensional() ? colors.gridColor() : colors.diagonalColor());
                 g2.drawLine(x, y, x + m.xStep() * xStep, y + m.yStep() * yStep);
             });
-            final Piece piece = board.get(p);
+            final Piece piece = gameTable.get(p);
             if (piece != null) {
                 final BufferedImage img = images.getImage(piece);
                 g2.drawImage(img, x - img.getWidth() / 2, y - img.getHeight() / 2, null);
@@ -157,11 +146,11 @@ public class BoardPanel extends JPanel {
         }
     }
 
-    private static void tryForwardDirections(Board board, Position p, Consumer<Move> moveProcessor) {
+    private static void tryForwardDirections(GameTable gameTable, Position p, Consumer<Move> moveProcessor) {
         for (int yStep = -1; yStep <= 1; yStep++) {
-            board.processStepAlongLine(p, p.add(1, yStep), moveProcessor);
+            gameTable.processStepAlongLine(p, p.add(1, yStep), moveProcessor);
         }
-        board.processStepAlongLine(p, p.add(0, 1), moveProcessor);
+        gameTable.processStepAlongLine(p, p.add(0, 1), moveProcessor);
     }
 
     private Point lastDragPoint;

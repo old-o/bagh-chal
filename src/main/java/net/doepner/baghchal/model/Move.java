@@ -3,7 +3,7 @@ package net.doepner.baghchal.model;
 import static java.lang.Math.abs;
 
 /**
- * From / to coordinates of a move on the game board
+ * From / to coordinates of a move on the game table
  */
 public class Move {
 

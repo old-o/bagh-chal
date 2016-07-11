@@ -1,20 +1,20 @@
 package net.doepner.baghchal.model;
 
-import net.doepner.baghchal.BoardListener;
-import net.doepner.baghchal.util.ListUtil;
+import static net.doepner.baghchal.model.Piece.INVALID;
+import static net.doepner.baghchal.model.Position.pos;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static net.doepner.baghchal.model.Piece.INVALID;
-import static net.doepner.baghchal.model.Position.pos;
+import net.doepner.baghchal.GameTableListener;
+import net.doepner.baghchal.util.ListUtil;
 
 /**
  * The game board model
  */
-public class Board {
+public class GameTable {
 
     private final int xSize;
     private final int ySize;
@@ -22,9 +22,9 @@ public class Board {
     private final Position topLeft;
     private final Position bottomRight;
 
-    private final Piece[][] b;
+    private final Piece[][] grid;
 
-    private final BoardListener listener;
+    private final GameTableListener listener;
 
     private final List<Position> allPositions = new ArrayList<>();
     private final List<Position> boardPositions = new ArrayList<>();
@@ -36,11 +36,11 @@ public class Board {
             pos(0, -1), pos(-1, -1), pos(-1, 0), pos(-1, +1)
     };
 
-    public Board(int xSize, int ySize, BoardListener listener) {
+    public GameTable(int xSize, int ySize, GameTableListener listener) {
         this.listener = listener;
         this.xSize = xSize;
         this.ySize = ySize;
-        b = new Piece[xSize + 2][ySize + 2];
+        grid = new Piece[xSize + 2][ySize + 2];
         topLeft = new Position(1, 1);
         bottomRight = new Position(xSize, ySize);
         initPositions(topLeft, bottomRight);
@@ -51,11 +51,11 @@ public class Board {
     }
 
     private void initPositions(Position topLeft, Position bottomRight) {
-        for (int x = 0; x < b.length; x++) {
-            for (int y = 0; y < b[x].length; y++) {
+        for (int x = 0; x < grid.length; x++) {
+            for (int y = 0; y < grid[x].length; y++) {
                 final Position p = new Position(x, y);
                 allPositions.add(p);
-                if (topLeft.x() <= x && topLeft.y() <= y && x <= bottomRight.x() && y <= bottomRight.y()) {
+                if (p.isGreaterOrEqualTo(topLeft) && p.isLessOrEqualTo(bottomRight)) {
                     boardPositions.add(p);
                     if ((x == topLeft.x() || x == bottomRight.x()) && (y == topLeft.y() || y == bottomRight.y())) {
                         cornerPositions.add(p);
@@ -68,20 +68,20 @@ public class Board {
     }
 
     /**
-     * Copy constructor that will copy the grid array of the provide board instance.
-     * The resulting board will support no BoardListener functionality.
+     * Copy constructor that will copy the grid array of the provided GameTable instance.
+     * The resulting board will support no GameTable functionality.
      *
-     * @param board An existing board instance
+     * @param gameTable An existing GameTable instance
      */
-    private Board(Board board) {
-        this(board.xSize, board.ySize, BoardListener.NONE);
-        for (int x = 0; x < b.length; x++) {
-            System.arraycopy(board.b[x], 0, b[x], 0, b[x].length);
+    private GameTable(GameTable gameTable) {
+        this(gameTable.xSize, gameTable.ySize, GameTableListener.NONE);
+        for (int x = 0; x < grid.length; x++) {
+            System.arraycopy(gameTable.grid[x], 0, grid[x], 0, grid[x].length);
         }
     }
 
-    public Board copyBoard() {
-        return new Board(this);
+    public GameTable copy() {
+        return new GameTable(this);
     }
 
     public void processMove(Move move) {
@@ -139,27 +139,11 @@ public class Board {
         return move;
     }
 
-    public Iterable<Position> getAllPositions() {
-        return allPositions;
-    }
-
-    public Iterable<Position> getBoardPositions() {
-        return boardPositions;
-    }
-
-    public Iterable<Position> getCornerPositions() {
-        return cornerPositions;
-    }
-
     public void processStepAlongLine(Position p1, Position p2, Consumer<Move> moveProcessor) {
         final Move step = new Move(p1, p2);
         if (isStepAlongLine(step)) {
             moveProcessor.accept(step);
         }
-    }
-
-    public List<Move> getPossibleSteps(Piece movingPiece) {
-        return getStepsWhere(movingPiece, null);
     }
 
     public List<Move> getPossibleJumps(Piece movingPiece, Piece requiredPiece) {
@@ -178,16 +162,16 @@ public class Board {
     }
 
     public boolean isStepAlongLine(Move move) {
-        return isValidOnBoardPosition(move.p1()) && isValidOnBoardPosition(move.p2()) && move.isStep()
+        return isBoardPosition(move.p1()) && isBoardPosition(move.p2()) && move.isStep()
                 && (move.p1().hasEvenCoordSum() || move.isOneDimensional());
     }
 
-    public boolean isValidOnBoardPosition(Position pos) {
-        return pos.isGreaterOrEqualTo(topLeft) && pos.isLessOrEqualTo(bottomRight);
+    public boolean isBoardPosition(Position p) {
+        return boardPositions.contains(p);
     }
 
     public void reset() {
-        for (Piece[] pieces : b) {
+        for (Piece[] pieces : grid) {
             Arrays.fill(pieces, null);
         }
         listener.afterReset();
@@ -211,52 +195,21 @@ public class Board {
 
     public Piece get(int x, int y) {
         try {
-            return b[x][y];
+            return grid[x][y];
         } catch (ArrayIndexOutOfBoundsException e) {
             return INVALID;
         }
     }
 
-    public void set(int x, int y, Piece piece) {
-        b[x][y] = piece;
-    }
-
-    public int getCentreXSize() {
-        return xSize;
-    }
-
-    public int getCentreYSize() {
-        return ySize;
-    }
-
-    public int getXSize() {
-        return b.length;
-    }
-
-    public int getYSize() {
-        return b[0].length;
-    }
-
     public boolean isValid(Move move, Piece piece) {
-        if (move.isStationary() || !isEmptyAt(move.p2())) {
-            return false;
-        }
-        // TODO: Factor out the rules of the game (in a flexible way that also work for other games like Alquerque)
-        switch (piece) {
-            case PREY:
-                return isBorderToBoard(move) || isValidOnBoardStep(move);
-            case PREDATOR:
-                return isStepAlongLine(move) || (move.isJump() && get(move.middle()) == Piece.PREY);
-            default:
-                return false;
-        }
+        return !move.isStationary() && isEmptyAt(move.p2()) && piece.isValid(move, this);
     }
 
-    private boolean isValidOnBoardStep(Move move) {
+    public boolean isValidOnBoardStep(Move move) {
         return isBorderEmpty() && isStepAlongLine(move);
     }
 
-    private boolean isBorderToBoard(Move move) {
+    public boolean isBorderToBoard(Move move) {
         return isBorderPosition(move.p1()) && !isBorderPosition(move.p2());
     }
 
@@ -273,6 +226,35 @@ public class Board {
         return borderPositions.contains(p);
     }
 
+    public Position getBorderPosition(Piece piece) {
+        for (Position p : borderPositions) {
+            if (get(p) == piece) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    public void set(int x, int y, Piece piece) {
+        grid[x][y] = piece;
+    }
+
+    public int getCentreXSize() {
+        return xSize;
+    }
+
+    public int getCentreYSize() {
+        return ySize;
+    }
+
+    public int getXSize() {
+        return grid.length;
+    }
+
+    public int getYSize() {
+        return grid[0].length;
+    }
+
     public Position getTopLeft() {
         return topLeft;
     }
@@ -281,12 +263,15 @@ public class Board {
         return bottomRight;
     }
 
-    public Position getBorderPosition(Piece piece) {
-        for (Position p : borderPositions) {
-            if (get(p) == piece) {
-                return p;
-            }
-        }
-        return null;
+    public Iterable<Position> getAllPositions() {
+        return allPositions;
+    }
+
+    public Iterable<Position> getBoardPositions() {
+        return boardPositions;
+    }
+
+    public Iterable<Position> getCornerPositions() {
+        return cornerPositions;
     }
 }

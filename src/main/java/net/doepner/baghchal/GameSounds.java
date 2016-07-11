@@ -1,18 +1,18 @@
 package net.doepner.baghchal;
 
+import static net.doepner.baghchal.model.Piece.PREDATOR;
+
 import net.doepner.baghchal.model.Piece;
 import net.doepner.baghchal.resources.Sound;
 
-import static net.doepner.baghchal.model.Piece.PREDATOR;
-
 /**
- * Plays sounds as board events occur
+ * Plays sounds as game table events occur
  */
-public class BoardSound implements BoardListener {
+public class GameSounds implements GameTableListener {
 
     private final Sound sound;
 
-    public BoardSound(Sound sound) {
+    public GameSounds(Sound sound) {
         this.sound = sound;
     }
 

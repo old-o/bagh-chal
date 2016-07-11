@@ -19,7 +19,11 @@
 
 package net.doepner.baghchal;
 
-import net.doepner.baghchal.model.Board;
+import static net.doepner.baghchal.model.Piece.PREY;
+
+import java.awt.Dimension;
+
+import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Levels;
 import net.doepner.baghchal.play.GameLoop;
 import net.doepner.baghchal.play.Player;
@@ -29,12 +33,8 @@ import net.doepner.baghchal.resources.Images;
 import net.doepner.baghchal.resources.LevelProperties;
 import net.doepner.baghchal.resources.LevelResources;
 import net.doepner.baghchal.resources.Sound;
-import net.doepner.baghchal.ui.BoardPanel;
 import net.doepner.baghchal.ui.GameFrame;
-
-import java.awt.Dimension;
-
-import static net.doepner.baghchal.model.Piece.PREY;
+import net.doepner.baghchal.ui.GamePanel;
 
 /**
  * Entry point of the game
@@ -56,17 +56,17 @@ public final class Main {
         final Sound sound = new Sound(levels);
         final Images images = new Images(levels);
 
-        final Board board = new Board(boardSize.width, boardSize.height, new BoardSound(sound));
-        final BoardSetup boardSetup = new BoardSetup();
-        final BoardPanel boardPanel = new BoardPanel(board, boardSetup, images, levels);
+        final GameTable gameTable = new GameTable(boardSize.width, boardSize.height, new GameSounds(sound));
+        final GameSetup gameSetup = new GameSetup();
+        final GamePanel gamePanel = new GamePanel(gameTable, gameSetup, images, levels);
 
 //        final Player preyPlayer = new PreyStrategy();
-        final Player preyPlayer = new UserPlayer(PREY, boardPanel, images);
+        final Player preyPlayer = new UserPlayer(PREY, gamePanel, images);
         final Player predatorPlayer = new PredatorStrategy(levels);
-//        final Player predatorPlayer = new UserPlayer(PREDATOR, boardPanel, images);
+//        final Player predatorPlayer = new UserPlayer(PREDATOR, gamePanel, images);
 
-        final GameFrame gameFrame = new GameFrame(boardPanel);
-        final GameLoop gameLoop = new GameLoop(gameFrame, board, boardPanel, levels, sound, preyPlayer, predatorPlayer);
+        final GameFrame gameFrame = new GameFrame(gamePanel);
+        final GameLoop gameLoop = new GameLoop(gameFrame, gameTable, gamePanel, levels, sound, preyPlayer, predatorPlayer);
 
         gameFrame.show(preferredSize);
         gameLoop.start();

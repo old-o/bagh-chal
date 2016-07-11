@@ -1,6 +1,6 @@
 package net.doepner.baghchal.play;
 
-import net.doepner.baghchal.model.Board;
+import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Move;
 
 /**
@@ -10,6 +10,6 @@ public interface Player {
 
     String getName();
 
-    Move play(Board board);
+    Move play(GameTable gameTable);
 
 }

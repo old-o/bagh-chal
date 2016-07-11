@@ -3,9 +3,9 @@ package net.doepner.baghchal;
 import net.doepner.baghchal.model.Piece;
 
 /**
- * Listens to board events
+ * Listens to game table events
  */
-public interface BoardListener {
+public interface GameTableListener {
 
     void afterJump(Piece piece);
 
@@ -15,7 +15,7 @@ public interface BoardListener {
 
     void afterReset();
 
-    BoardListener NONE = new BoardListener() {
+    GameTableListener NONE = new GameTableListener() {
 
         @Override
         public void afterJump(Piece piece) {

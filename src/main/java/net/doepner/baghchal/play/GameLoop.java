@@ -1,10 +1,10 @@
 package net.doepner.baghchal.play;
 
-import net.doepner.baghchal.model.Board;
+import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Levels;
 import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.resources.Sound;
-import net.doepner.baghchal.ui.BoardPanel;
+import net.doepner.baghchal.ui.GamePanel;
 import net.doepner.baghchal.ui.GameFrame;
 
 /**
@@ -13,18 +13,20 @@ import net.doepner.baghchal.ui.GameFrame;
 public class GameLoop {
 
     private final GameFrame gameFrame;
-    private final Board board;
-    private final BoardPanel boardPanel;
-    private final Levels levels;
+    private final GamePanel gamePanel;
+    private final GameTable gameTable;
+
     private final Sound sound;
+    private final Levels levels;
+
     private final Player preyPlayer;
     private final Player predatorPlayer;
 
-    public GameLoop(GameFrame gameFrame, Board board, BoardPanel boardPanel, Levels levels,
+    public GameLoop(GameFrame gameFrame, GameTable gameTable, GamePanel gamePanel, Levels levels,
                     Sound sound, Player preyPlayer, Player predatorPlayer) {
         this.gameFrame = gameFrame;
-        this.board = board;
-        this.boardPanel = boardPanel;
+        this.gameTable = gameTable;
+        this.gamePanel = gamePanel;
         this.levels = levels;
         this.sound = sound;
         this.preyPlayer = preyPlayer;
@@ -32,13 +34,14 @@ public class GameLoop {
     }
 
     public void start() {
+        gamePanel.start();
         int moveCount = 0;
         while (!levels.isGameOver()) {
             final Player player = (moveCount % 2 == 0) ? preyPlayer : predatorPlayer;
-            final Move move = player.play(board);
-            board.processMove(move);
+            final Move move = player.play(gameTable);
+            gameTable.processMove(move);
             moveCount++;
-            boardPanel.repaint();
+            gamePanel.repaint();
             final boolean playerGaveUp = (move == null);
             if (playerGaveUp) {
                 // TODO: Make this dependent on whether the other player is the user
@@ -46,7 +49,7 @@ public class GameLoop {
             }
             levels.setLevelDone(playerGaveUp);
             gameFrame.enableNextLevel(playerGaveUp && !levels.isGameOver());
-            boardPanel.repaint();
+            gamePanel.repaint();
         }
     }
 

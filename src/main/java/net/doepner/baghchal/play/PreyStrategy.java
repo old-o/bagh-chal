@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.doepner.baghchal.model.Board;
+import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.model.Piece;
 import net.doepner.baghchal.model.Position;
@@ -25,16 +25,16 @@ public final class PreyStrategy implements Player {
     }
 
     @Override
-    public Move play(Board board) {
-        final Move defensiveMove = board.tryMoveFrom(getDefensiveMoves(board));
+    public Move play(GameTable gameTable) {
+        final Move defensiveMove = gameTable.tryMoveFrom(getDefensiveMoves(gameTable));
         if (defensiveMove != null) {
             return defensiveMove;
         }
-        final Position borderPosition = board.getBorderPosition(PREY);
+        final Position borderPosition = gameTable.getBorderPosition(PREY);
         if (borderPosition != null) {
-            final Position boardPosition = getRandomFrom(getSafeBoardPositions(board));
+            final Position boardPosition = getRandomFrom(getSafeBoardPositions(gameTable));
             if (boardPosition != null) {
-                return getMove(board, borderPosition, boardPosition);
+                return getMove(gameTable, borderPosition, boardPosition);
             }
         }
 
@@ -46,33 +46,33 @@ public final class PreyStrategy implements Player {
         return null;
     }
 
-    private Move getMove(Board board, Position borderPosition, Position boardPosition) {
+    private Move getMove(GameTable gameTable, Position borderPosition, Position boardPosition) {
         final Move m = new Move(borderPosition, boardPosition);
-        board.movePiece(m);
+        gameTable.movePiece(m);
         return m;
     }
 
-    private List<Position> getSafeBoardPositions(Board board) {
+    private List<Position> getSafeBoardPositions(GameTable gameTable) {
         final Set<Position> positions = new HashSet<>();
-        for (Position p : board.getBoardPositions()) {
-            if (isSafePosition(p, board)) {
+        for (Position p : gameTable.getBoardPositions()) {
+            if (isSafePosition(p, gameTable)) {
                 positions.add(p);
             }
         }
         return new ArrayList<>(positions);
     }
 
-    private boolean isSafePosition(Position p, Board board) {
-        if (!board.isEmptyAt(p)) {
+    private boolean isSafePosition(Position p, GameTable gameTable) {
+        if (!gameTable.isEmptyAt(p)) {
             return false;
         }
-        for (Position d : board.getDirections()) {
+        for (Position d : gameTable.getDirections()) {
             final Move m = new Move(p, p.add(d));
-            if (board.isStepAlongLine(m)) {
+            if (gameTable.isStepAlongLine(m)) {
                 final Position p3 = p.add(-m.xStep(), -m.yStep());
-                if (board.isValidOnBoardPosition(p3)) {
-                    final Piece piece2 = board.get(m.p2());
-                    final Piece piece3 = board.get(p3);
+                if (gameTable.isBoardPosition(p3)) {
+                    final Piece piece2 = gameTable.get(m.p2());
+                    final Piece piece3 = gameTable.get(p3);
                     if ((piece2 == null || piece2 == PREDATOR)
                             && (piece3 == null || piece3 == PREDATOR)) {
                         return false;
@@ -83,14 +83,14 @@ public final class PreyStrategy implements Player {
         return true;
     }
 
-    private List<Move> getDefensiveMoves(Board board) {
+    private List<Move> getDefensiveMoves(GameTable gameTable) {
         final List<Move> defenseMoves = new ArrayList<>();
-        for (Move possibleJump : board.getPossibleJumps(PREDATOR, PREY)) {
+        for (Move possibleJump : gameTable.getPossibleJumps(PREDATOR, PREY)) {
             final Position p2 = possibleJump.p2();
-            for (Position p1 : board.getAllPositions()) {
-                if (board.get(p1) == PREY) {
+            for (Position p1 : gameTable.getAllPositions()) {
+                if (gameTable.get(p1) == PREY) {
                     final Move move = new Move(p1, p2);
-                    if (board.isValid(move, PREY)) {
+                    if (gameTable.isValid(move, PREY)) {
                         defenseMoves.add(move);
                     }
                 }

@@ -1,6 +1,6 @@
 package net.doepner.baghchal.ui;
 
-import net.doepner.baghchal.model.Board;
+import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.model.Piece;
 import net.doepner.baghchal.model.Position;
@@ -19,8 +19,8 @@ import java.awt.image.BufferedImage;
  */
 public class DragAndDropHandler extends MouseAdapter {
 
-    private final Board board;
-    private final BoardPanel boardPanel;
+    private final GameTable gameTable;
+    private final GamePanel gamePanel;
     private final Images images;
 
     private final PlayFlow playFlow;
@@ -29,19 +29,19 @@ public class DragAndDropHandler extends MouseAdapter {
     private Position dragStart;
     private Point dragStartPoint;
 
-    public DragAndDropHandler(Piece piece, Board board, BoardPanel boardPanel,
+    public DragAndDropHandler(Piece piece, GameTable gameTable, GamePanel gamePanel,
                               Images images, PlayFlow playFlow) {
         this.piece = piece;
-        this.board = board;
+        this.gameTable = gameTable;
         this.playFlow = playFlow;
-        this.boardPanel = boardPanel;
+        this.gamePanel = gamePanel;
         this.images = images;
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
         final Position p = getPosition(e);
-            dragStart = board.pick(p, piece);
+            dragStart = gameTable.pick(p, piece);
             if (dragStart != null) {
                 dragStartPoint = e.getPoint();
                 lastDragPoint(dragStartPoint);
@@ -63,9 +63,9 @@ public class DragAndDropHandler extends MouseAdapter {
         final Position p = getPosition(e);
         if (dragStart != null) {
             final Move move = new Move(dragStart, p);
-            final boolean validMove = board.isValid(move, piece);
+            final boolean validMove = gameTable.isValid(move, piece);
             final Position resultingPosition = validMove ? move.p2() : dragStart;
-            board.set(resultingPosition, piece);
+            gameTable.set(resultingPosition, piece);
             repaintDraggedAt(e.getPoint());
             repaintDraggedAt(dragStartPoint);
             lastDragPoint(null);
@@ -80,8 +80,8 @@ public class DragAndDropHandler extends MouseAdapter {
     private Position getPosition(MouseEvent e) {
         final Point p = e.getPoint();
         final Component c = e.getComponent();
-        final double xStep = c.getWidth() / board.getXSize();
-        final double yStep = c.getHeight() / board.getYSize();
+        final double xStep = c.getWidth() / gameTable.getXSize();
+        final double yStep = c.getHeight() / gameTable.getYSize();
         return new Position((int) (p.x / xStep), (int) (p.y / yStep));
     }
 
@@ -96,11 +96,11 @@ public class DragAndDropHandler extends MouseAdapter {
     }
 
     private Point lastDragPoint() {
-        return boardPanel.getLastDragPoint();
+        return gamePanel.getLastDragPoint();
     }
 
     private void lastDragPoint(Point p) {
-        boardPanel.setLastDragPoint(p);
+        gamePanel.setLastDragPoint(p);
     }
 
     private void repaintRectangleAround(Point p) {
@@ -108,6 +108,6 @@ public class DragAndDropHandler extends MouseAdapter {
         int imgWidth = image.getWidth();
         int imgHeight = image.getHeight();
         final Rectangle rectangle = new Rectangle(p.x - imgWidth, p.y - imgHeight, 2 * imgWidth, 2 * imgHeight);
-        boardPanel.repaintForDrag(rectangle, image);
+        gamePanel.repaintForDrag(rectangle, image);
     }
 }
