@@ -1,7 +1,7 @@
 # bagh-chal
 
-How to install
---------------
+Install and run
+---------------
 
 [Install Java first](https://java.com/en/download/)
 
