@@ -24,7 +24,8 @@ Sharks and Fishies
 Build status
 ------------
 
-travis-ci: [![travis-ci](https://travis-ci.org/odoepner/bagh-chal.svg?branch=master)](https://travis-ci.org/odoepner/bagh-chal)
+Travis CI : 
+[![travis-ci](https://travis-ci.org/odoepner/bagh-chal.svg?branch=master)](https://travis-ci.org/odoepner/bagh-chal)
 
 Origin and improvements
 -----------------------
