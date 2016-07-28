@@ -11,8 +11,6 @@ During the Java installation, make sure to unselect any 3rd party add-ons, like 
 
 This will download the file "bagh-chal.jar". When the download is finished double-click it to run the game.
 
-[![Build Status](https://travis-ci.org/odoepner/bagh-chal.svg?branch=master)](https://travis-ci.org/odoepner/bagh-chal)
-
 Screenshots
 -----------
 Goats and Tigers
@@ -22,6 +20,11 @@ Goats and Tigers
 Sharks and Fishies
 
 ![screenshot](screenshots/sharks-fishies.png)
+
+Build status
+------------
+
+[![travis-ci](https://travis-ci.org/odoepner/bagh-chal.svg?branch=master)](https://travis-ci.org/odoepner/bagh-chal)
 
 Origin and improvements
 -----------------------
