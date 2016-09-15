@@ -8,7 +8,7 @@ import net.doepner.baghchal.resources.LevelResources;
 /**
  * Phases of the game (beginning, middle, end)
  */
-public class Levels {
+public final class Levels {
 
     private final LevelProperties levelProperties;
     private final LevelResources levelResources;

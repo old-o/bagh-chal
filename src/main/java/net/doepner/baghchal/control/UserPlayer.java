@@ -1,4 +1,4 @@
-package net.doepner.baghchal.play;
+package net.doepner.baghchal.control;
 
 import java.awt.event.MouseAdapter;
 
@@ -6,11 +6,11 @@ import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.model.Piece;
 import net.doepner.baghchal.resources.Images;
-import net.doepner.baghchal.ui.GamePanel;
-import net.doepner.baghchal.ui.DragAndDropHandler;
+import net.doepner.baghchal.view.GamePanel;
+import net.doepner.baghchal.view.DragAndDropHandler;
 
 /**
- * Lets the user play the prey pieces
+ * Lets the user control the prey pieces
  */
 public final class UserPlayer implements Player {
 

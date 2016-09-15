@@ -1,10 +1,10 @@
-package net.doepner.baghchal.ui;
+package net.doepner.baghchal.view;
 
 import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.model.Piece;
 import net.doepner.baghchal.model.Position;
-import net.doepner.baghchal.play.PlayFlow;
+import net.doepner.baghchal.control.PlayFlow;
 import net.doepner.baghchal.resources.Images;
 
 import java.awt.Component;

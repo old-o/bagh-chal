@@ -1,4 +1,4 @@
-package net.doepner.baghchal.play;
+package net.doepner.baghchal.control;
 
 import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Move;

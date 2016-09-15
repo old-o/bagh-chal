@@ -8,11 +8,11 @@ import net.doepner.baghchal.resources.Sound;
 /**
  * Plays sounds as game table events occur
  */
-public class GameSounds implements GameTableListener {
+public class Sounds implements Listener {
 
     private final Sound sound;
 
-    public GameSounds(Sound sound) {
+    public Sounds(Sound sound) {
         this.sound = sound;
     }
 

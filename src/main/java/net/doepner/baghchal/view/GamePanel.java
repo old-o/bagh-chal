@@ -1,4 +1,4 @@
-package net.doepner.baghchal.ui;
+package net.doepner.baghchal.view;
 
 import static java.awt.RenderingHints.KEY_ANTIALIASING;
 import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 
 import javax.swing.JPanel;
 
-import net.doepner.baghchal.GameSetup;
+import net.doepner.baghchal.Setup;
 import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Levels;
 import net.doepner.baghchal.model.Move;
@@ -36,7 +36,7 @@ import net.doepner.baghchal.resources.Images;
 public class GamePanel extends JPanel {
 
     private final GameTable gameTable;
-    private final GameSetup gameSetup;
+    private final Setup setup;
 
     private final Images images;
     private final Levels levels;
@@ -57,9 +57,9 @@ public class GamePanel extends JPanel {
     private Paint boardPaint;
     private Colors colors;
 
-    public GamePanel(GameTable gameTable, GameSetup gameSetup, Images images, Levels levels) {
+    public GamePanel(GameTable gameTable, Setup setup, Images images, Levels levels) {
         this.gameTable = gameTable;
-        this.gameSetup = gameSetup;
+        this.setup = setup;
         this.images = images;
         this.levels = levels;
         congrats = images.getImageResource(getClass().getResource("/net/doepner/baghchal/congrats.gif"));
@@ -77,7 +77,7 @@ public class GamePanel extends JPanel {
 
     private void startLevel() {
         gameTable.reset();
-        gameSetup.setup(gameTable);
+        setup.setup(gameTable);
         final BufferedImage bgImage = images.getImage("background.jpg");
         boardPaint = new TexturePaint(bgImage, new Rectangle(0, 0, bgImage.getWidth(), bgImage.getHeight()));
         colors = new Colors(levels);

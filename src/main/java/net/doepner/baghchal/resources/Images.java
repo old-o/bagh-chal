@@ -14,7 +14,7 @@ import net.doepner.baghchal.model.Levels;
 import net.doepner.baghchal.model.Piece;
 
 /**
- * Loads images for play pieces from classpath
+ * Loads images for control pieces from classpath
  */
 public class Images {
 

@@ -1,4 +1,4 @@
-package net.doepner.baghchal.ui;
+package net.doepner.baghchal.view;
 
 import java.awt.Color;
 

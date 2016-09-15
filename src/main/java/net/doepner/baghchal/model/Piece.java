@@ -1,7 +1,7 @@
 package net.doepner.baghchal.model;
 
 /**
- * Possible play pieces with their move-ability constraints
+ * Possible control pieces with their move-ability constraints
  */
 public enum Piece implements MoveConstraints {
 

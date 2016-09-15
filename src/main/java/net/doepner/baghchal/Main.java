@@ -19,22 +19,22 @@
 
 package net.doepner.baghchal;
 
-import static net.doepner.baghchal.model.Piece.PREY;
-
-import java.awt.Dimension;
-
+import net.doepner.baghchal.control.GameLoop;
+import net.doepner.baghchal.control.Player;
+import net.doepner.baghchal.control.PredatorStrategy;
+import net.doepner.baghchal.control.UserPlayer;
 import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Levels;
-import net.doepner.baghchal.play.GameLoop;
-import net.doepner.baghchal.play.Player;
-import net.doepner.baghchal.play.PredatorStrategy;
-import net.doepner.baghchal.play.UserPlayer;
 import net.doepner.baghchal.resources.Images;
 import net.doepner.baghchal.resources.LevelProperties;
 import net.doepner.baghchal.resources.LevelResources;
 import net.doepner.baghchal.resources.Sound;
-import net.doepner.baghchal.ui.GameFrame;
-import net.doepner.baghchal.ui.GamePanel;
+import net.doepner.baghchal.view.GameFrame;
+import net.doepner.baghchal.view.GamePanel;
+
+import java.awt.Dimension;
+
+import static net.doepner.baghchal.model.Piece.PREY;
 
 /**
  * Entry point of the game
@@ -56,9 +56,9 @@ public final class Main {
         final Sound sound = new Sound(levels);
         final Images images = new Images(levels);
 
-        final GameTable gameTable = new GameTable(boardSize.width, boardSize.height, new GameSounds(sound));
-        final GameSetup gameSetup = new GameSetup();
-        final GamePanel gamePanel = new GamePanel(gameTable, gameSetup, images, levels);
+        final GameTable gameTable = new GameTable(boardSize.width, boardSize.height, new Sounds(sound));
+        final Setup setup = new Setup();
+        final GamePanel gamePanel = new GamePanel(gameTable, setup, images, levels);
 
 //        final Player preyPlayer = new PreyStrategy();
         final Player preyPlayer = new UserPlayer(PREY, gamePanel, images);
@@ -68,6 +68,7 @@ public final class Main {
         final GameFrame gameFrame = new GameFrame(gamePanel);
         final GameLoop gameLoop = new GameLoop(gameFrame, gameTable, gamePanel, levels, sound, preyPlayer, predatorPlayer);
 
+        gamePanel.start();
         gameFrame.show(preferredSize);
         gameLoop.start();
     }

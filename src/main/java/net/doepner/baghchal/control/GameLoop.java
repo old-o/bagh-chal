@@ -1,11 +1,11 @@
-package net.doepner.baghchal.play;
+package net.doepner.baghchal.control;
 
 import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Levels;
 import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.resources.Sound;
-import net.doepner.baghchal.ui.GamePanel;
-import net.doepner.baghchal.ui.GameFrame;
+import net.doepner.baghchal.view.GamePanel;
+import net.doepner.baghchal.view.GameFrame;
 
 /**
  * Loop for the turn-taking of players
@@ -34,7 +34,6 @@ public class GameLoop {
     }
 
     public void start() {
-        gamePanel.start();
         int moveCount = 0;
         while (!levels.isGameOver()) {
             final Player player = (moveCount % 2 == 0) ? preyPlayer : predatorPlayer;

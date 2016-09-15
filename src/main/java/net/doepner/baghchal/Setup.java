@@ -9,7 +9,7 @@ import net.doepner.baghchal.model.Position;
 /**
  * Sets up the pieces on the game table
  */
-public final class GameSetup {
+public final class Setup {
 
     public void setup(GameTable gameTable) {
         for (Position p : gameTable.getCornerPositions()) {

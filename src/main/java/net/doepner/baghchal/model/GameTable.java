@@ -5,11 +5,12 @@ import static net.doepner.baghchal.model.Position.pos;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-import net.doepner.baghchal.GameTableListener;
-import net.doepner.baghchal.util.ListUtil;
+import net.doepner.baghchal.Listener;
+import org.guppy4j.Lists;
 
 /**
  * The game board model
@@ -24,19 +25,19 @@ public class GameTable {
 
     private final Piece[][] grid;
 
-    private final GameTableListener listener;
+    private final Listener listener;
 
-    private final List<Position> allPositions = new ArrayList<>();
-    private final List<Position> boardPositions = new ArrayList<>();
-    private final List<Position> borderPositions = new ArrayList<>();
-    private final List<Position> cornerPositions = new ArrayList<>();
+    private final Collection<Position> allPositions = new ArrayList<>();
+    private final Collection<Position> boardPositions = new ArrayList<>();
+    private final Collection<Position> borderPositions = new ArrayList<>();
+    private final Collection<Position> cornerPositions = new ArrayList<>();
 
-    private static Position[] directions = new Position[]{
+    private static Position[] directions = {
             pos(0, +1), pos(+1, +1), pos(+1, 0), pos(+1, -1),
             pos(0, -1), pos(-1, -1), pos(-1, 0), pos(-1, +1)
     };
 
-    public GameTable(int xSize, int ySize, GameTableListener listener) {
+    public GameTable(int xSize, int ySize, Listener listener) {
         this.listener = listener;
         this.xSize = xSize;
         this.ySize = ySize;
@@ -74,7 +75,7 @@ public class GameTable {
      * @param gameTable An existing GameTable instance
      */
     private GameTable(GameTable gameTable) {
-        this(gameTable.xSize, gameTable.ySize, GameTableListener.NONE);
+        this(gameTable.xSize, gameTable.ySize, Listener.NONE);
         for (int x = 0; x < grid.length; x++) {
             System.arraycopy(gameTable.grid[x], 0, grid[x], 0, grid[x].length);
         }
@@ -132,7 +133,7 @@ public class GameTable {
     }
 
     public Move tryMoveFrom(List<Move> moves) {
-        final Move move = ListUtil.getRandomFrom(moves);
+        final Move move = Lists.getRandomFrom(moves);
         if (move != null) {
             movePiece(move);
         }

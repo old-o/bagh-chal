@@ -5,7 +5,7 @@ import net.doepner.baghchal.model.Piece;
 /**
  * Listens to game table events
  */
-public interface GameTableListener {
+public interface Listener {
 
     void afterJump(Piece piece);
 
@@ -15,7 +15,7 @@ public interface GameTableListener {
 
     void afterReset();
 
-    GameTableListener NONE = new GameTableListener() {
+    Listener NONE = new Listener() {
 
         @Override
         public void afterJump(Piece piece) {

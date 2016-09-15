@@ -1,8 +1,8 @@
-package net.doepner.baghchal.play;
+package net.doepner.baghchal.control;
 
 import static net.doepner.baghchal.model.Piece.PREDATOR;
 import static net.doepner.baghchal.model.Piece.PREY;
-import static net.doepner.baghchal.util.ListUtil.getRandomFrom;
+import static org.guppy4j.Lists.getRandomFrom;
 
 import java.util.ArrayList;
 import java.util.HashSet;
