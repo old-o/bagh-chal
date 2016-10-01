@@ -1,7 +1,9 @@
 package net.doepner.baghchal.model;
 
-import static net.doepner.baghchal.model.Piece.INVALID;
-import static net.doepner.baghchal.model.Position.pos;
+import net.doepner.baghchal.Listener;
+import org.guppy4j.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,13 +11,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-import net.doepner.baghchal.Listener;
-import org.guppy4j.Lists;
+import static net.doepner.baghchal.model.Piece.INVALID;
+import static net.doepner.baghchal.model.Position.pos;
 
 /**
  * The game board model
  */
 public class GameTable {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final int xSize;
     private final int ySize;
@@ -94,6 +98,7 @@ public class GameTable {
             } else {
                 listener.afterStep(piece);
             }
+            logger.debug(toString(move));
         }
     }
 
@@ -274,5 +279,20 @@ public class GameTable {
 
     public Iterable<Position> getCornerPositions() {
         return cornerPositions;
+    }
+
+    public String toString(Move move) {
+        final String nl = System.lineSeparator();
+        final StringBuilder sb = new StringBuilder(nl);
+        sb.append(move).append(nl);
+        for (int x = 0; x < grid.length; x++) {
+            for (int y = 0; y < grid[x].length; y++) {
+                Piece piece = grid[y][x];
+                sb.append(piece == null ? "    " : piece.toString().substring(0, 4));
+                sb.append('|');
+            }
+            sb.append(nl);
+        }
+        return sb.toString();
     }
 }
