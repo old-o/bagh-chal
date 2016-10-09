@@ -19,6 +19,11 @@ import static net.doepner.baghchal.model.Position.pos;
  */
 public class GameTable {
 
+    private static Position[] directions = {
+            pos(0, +1), pos(+1, +1), pos(+1, 0), pos(+1, -1),
+            pos(0, -1), pos(-1, -1), pos(-1, 0), pos(-1, +1)
+    };
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final int xSize;
@@ -35,11 +40,6 @@ public class GameTable {
     private final Collection<Position> boardPositions = new ArrayList<>();
     private final Collection<Position> borderPositions = new ArrayList<>();
     private final Collection<Position> cornerPositions = new ArrayList<>();
-
-    private static Position[] directions = {
-            pos(0, +1), pos(+1, +1), pos(+1, 0), pos(+1, -1),
-            pos(0, -1), pos(-1, -1), pos(-1, 0), pos(-1, +1)
-    };
 
     public GameTable(int xSize, int ySize, Listener listener) {
         this.listener = listener;
@@ -74,7 +74,7 @@ public class GameTable {
 
     /**
      * Copy constructor that will copy the grid array of the provided GameTable instance.
-     * The resulting board will support no GameTable functionality.
+     * The resulting board will support no listener functionality.
      *
      * @param gameTable An existing GameTable instance
      */
@@ -92,7 +92,7 @@ public class GameTable {
     public void processMove(Move move) {
         if (move != null) {
             final Piece piece = get(move.p2());
-            if (move.isJump()) {
+            if (!isBorderToBoard(move) && move.isJump()) {
                 clear(move.middle());
                 listener.afterJump(piece);
             } else {
@@ -104,9 +104,13 @@ public class GameTable {
 
     public Piece movePiece(Move move) {
         final Piece piece = get(move.p1());
-        clear(move.p1());
-        set(move.p2(), piece);
-        return piece;
+        if (piece == null || piece == INVALID) {
+            throw new IllegalStateException("Cannot move piece from empty or off-board position:" + move.p1());
+        } else {
+            clear(move.p1());
+            set(move.p2(), piece);
+            return piece;
+        }
     }
 
     public Position pick(Position p, Piece piece) {
@@ -209,10 +213,6 @@ public class GameTable {
 
     public boolean isValid(Move move, Piece piece) {
         return !move.isStationary() && isEmptyAt(move.p2()) && piece.isValid(move, this);
-    }
-
-    public boolean isValidOnBoardStep(Move move) {
-        return isBorderEmpty() && isStepAlongLine(move);
     }
 
     public boolean isBorderToBoard(Move move) {
