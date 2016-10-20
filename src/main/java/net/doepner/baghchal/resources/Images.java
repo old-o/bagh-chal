@@ -1,17 +1,16 @@
 package net.doepner.baghchal.resources;
 
-import static net.doepner.baghchal.model.Piece.PREDATOR;
+import net.doepner.baghchal.model.Levels;
+import net.doepner.baghchal.model.Piece;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.imageio.ImageIO;
-
-import net.doepner.baghchal.model.Levels;
-import net.doepner.baghchal.model.Piece;
+import static net.doepner.baghchal.model.Piece.PREDATOR;
 
 /**
  * Loads images for control pieces from classpath
@@ -30,10 +29,10 @@ public class Images {
     }
 
     public BufferedImage getImage(String resourceFileName) {
-        return getImageResource(levels.getResource(resourceFileName));
+        return getImage(levels.getResource(resourceFileName));
     }
 
-    public BufferedImage getImageResource(URL resourceLocation) {
+    public BufferedImage getImage(URL resourceLocation) {
         final BufferedImage cachedImage = cache.get(resourceLocation);
         if (cachedImage != null) {
             return cachedImage;

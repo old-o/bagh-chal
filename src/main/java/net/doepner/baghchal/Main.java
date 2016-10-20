@@ -46,8 +46,8 @@ public final class Main {
         System.setProperty("sun.java2d.opengl", "true");
 
         final int maxLevel = 2;
-        final Dimension preferredSize = new Dimension(500, 500);
         final Dimension boardSize = new Dimension(5, 5);
+        final Dimension preferredSize = new Dimension(500, 500);
 
         final LevelResources levelResources = new LevelResources("/net/doepner/baghchal/levels/%d/%s");
         final LevelProperties levelProperties = new LevelProperties(levelResources, "level.properties");

@@ -1,12 +1,14 @@
 package net.doepner.baghchal.view;
 
-import static java.awt.RenderingHints.KEY_ANTIALIASING;
-import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
-import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
-import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
-import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
-import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
+import net.doepner.baghchal.Setup;
+import net.doepner.baghchal.model.GameTable;
+import net.doepner.baghchal.model.Levels;
+import net.doepner.baghchal.model.Move;
+import net.doepner.baghchal.model.Piece;
+import net.doepner.baghchal.model.Position;
+import net.doepner.baghchal.resources.Images;
 
+import javax.swing.JPanel;
 import java.awt.BasicStroke;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -21,17 +23,17 @@ import java.awt.event.MouseAdapter;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
-import javax.swing.JPanel;
-
-import net.doepner.baghchal.Setup;
-import net.doepner.baghchal.model.GameTable;
-import net.doepner.baghchal.model.Levels;
-import net.doepner.baghchal.model.Move;
-import net.doepner.baghchal.model.Piece;
-import net.doepner.baghchal.model.Position;
-import net.doepner.baghchal.resources.Images;
+import static java.awt.RenderingHints.KEY_ANTIALIASING;
+import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
+import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
+import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
+import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
+import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
+import static net.doepner.baghchal.model.Directions.DOWN;
+import static net.doepner.baghchal.model.Directions.RIGHT;
+import static net.doepner.baghchal.model.Directions.RIGHT_DOWN;
+import static net.doepner.baghchal.model.Directions.RIGHT_UP;
 
 public class GamePanel extends JPanel {
 
@@ -62,7 +64,7 @@ public class GamePanel extends JPanel {
         this.setup = setup;
         this.images = images;
         this.levels = levels;
-        congrats = images.getImageResource(getClass().getResource("/net/doepner/baghchal/congrats.gif"));
+        congrats = images.getImage(getClass().getResource("/net/doepner/baghchal/congrats.gif"));
     }
 
     public void start() {
@@ -77,7 +79,7 @@ public class GamePanel extends JPanel {
 
     private void startLevel() {
         gameTable.reset();
-        setup.setup(gameTable);
+        setup.prepare(gameTable);
         final BufferedImage bgImage = images.getImage("background.jpg");
         boardPaint = new TexturePaint(bgImage, new Rectangle(0, 0, bgImage.getWidth(), bgImage.getHeight()));
         colors = new Colors(levels);
@@ -129,15 +131,20 @@ public class GamePanel extends JPanel {
         g2.drawRect(xStep, yStep, xEnd, yEnd);
     }
 
+    private static final Position[] directions = new Position[]{
+            RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN
+    };
+
     private void drawPieces(Graphics2D g2, int xStep, int yStep, int xStart, int yStart) {
         for (Position p : gameTable.getAllPositions()) {
             final int x = xStart + p.x() * xStep;
             final int y = yStart + p.y() * yStep;
 
-            tryForwardDirections(gameTable, p, m -> {
-                g2.setColor(m.isOneDimensional() ? colors.gridColor() : colors.diagonalColor());
-                g2.drawLine(x, y, x + m.xStep() * xStep, y + m.yStep() * yStep);
-            });
+            for (Position d : directions) {
+                final Move step = new Move(p, p.add(d));
+                drawLine(g2, xStep, yStep, x, y, step);
+            }
+
             final Piece piece = gameTable.get(p);
             if (piece != null) {
                 final BufferedImage img = images.getImage(piece);
@@ -146,11 +153,11 @@ public class GamePanel extends JPanel {
         }
     }
 
-    private static void tryForwardDirections(GameTable gameTable, Position p, Consumer<Move> moveProcessor) {
-        for (int yStep = -1; yStep <= 1; yStep++) {
-            gameTable.processStepAlongLine(p, p.add(1, yStep), moveProcessor);
+    private void drawLine(Graphics2D g2, int xStep, int yStep, int x, int y, Move m) {
+        if (gameTable.isStepAlongLine(m)) {
+            g2.setColor(m.isOneDimensional() ? colors.gridColor() : colors.diagonalColor());
+            g2.drawLine(x, y, x + m.xStep() * xStep, y + m.yStep() * yStep);
         }
-        gameTable.processStepAlongLine(p, p.add(0, 1), moveProcessor);
     }
 
     private Point lastDragPoint;

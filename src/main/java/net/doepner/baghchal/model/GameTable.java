@@ -9,28 +9,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static net.doepner.baghchal.model.Piece.INVALID;
-import static net.doepner.baghchal.model.Position.pos;
 
 /**
  * The game board model
  */
 public class GameTable {
 
-    private static Position[] directions = {
-            pos(0, +1), pos(+1, +1), pos(+1, 0), pos(+1, -1),
-            pos(0, -1), pos(-1, -1), pos(-1, 0), pos(-1, +1)
-    };
-
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final int xSize;
     private final int ySize;
-
-    private final Position topLeft;
-    private final Position bottomRight;
 
     private final Piece[][] grid;
 
@@ -46,13 +36,7 @@ public class GameTable {
         this.xSize = xSize;
         this.ySize = ySize;
         grid = new Piece[xSize + 2][ySize + 2];
-        topLeft = new Position(1, 1);
-        bottomRight = new Position(xSize, ySize);
-        initPositions(topLeft, bottomRight);
-    }
-
-    public Iterable<Position> getDirections() {
-        return Arrays.asList(directions);
+        initPositions(new Position(1, 1), new Position(xSize, ySize));
     }
 
     private void initPositions(Position topLeft, Position bottomRight) {
@@ -123,11 +107,11 @@ public class GameTable {
         }
     }
 
-    public List<Move> getStepsWhere(Piece movingPiece, Piece requiredPiece) {
+    public List<Move> getStepsWhereAdjacent(Piece movingPiece, Piece requiredPiece) {
         final List<Move> steps = new ArrayList<>();
         for (Position p : boardPositions) {
             if (get(p) == movingPiece) {
-                for (Position d : directions) {
+                for (Position d : Directions.getAll()) {
                     final Position p2 = p.add(d);
                     if (get(p2) == requiredPiece) {
                         final Move step = new Move(p, p2);
@@ -149,16 +133,9 @@ public class GameTable {
         return move;
     }
 
-    public void processStepAlongLine(Position p1, Position p2, Consumer<Move> moveProcessor) {
-        final Move step = new Move(p1, p2);
-        if (isStepAlongLine(step)) {
-            moveProcessor.accept(step);
-        }
-    }
-
     public List<Move> getPossibleJumps(Piece movingPiece, Piece requiredPiece) {
         final List<Move> jumps = new ArrayList<>();
-        for (Move step : getStepsWhere(movingPiece, requiredPiece)) {
+        for (Move step : getStepsWhereAdjacent(movingPiece, requiredPiece)) {
             addPossibleJump(jumps, step);
         }
         return jumps;
@@ -172,7 +149,7 @@ public class GameTable {
     }
 
     public boolean isStepAlongLine(Move move) {
-        return isBoardPosition(move.p1()) && isBoardPosition(move.p2()) && move.isStep()
+        return move.isStep() && isBoardPosition(move.p1()) && isBoardPosition(move.p2())
                 && (move.p1().hasEvenCoordSum() || move.isOneDimensional());
     }
 
@@ -188,11 +165,15 @@ public class GameTable {
     }
 
     public Piece get(Position p) {
-        return get(p.x(), p.y());
+        try {
+            return grid[p.x()][p.y()];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return INVALID;
+        }
     }
 
     public void set(Position p, Piece piece) {
-        set(p.x(), p.y(), piece);
+        grid[p.x()][p.y()] = piece;
     }
 
     private void clear(Position p) {
@@ -201,14 +182,6 @@ public class GameTable {
 
     public boolean isEmptyAt(Position p) {
         return get(p) == null;
-    }
-
-    public Piece get(int x, int y) {
-        try {
-            return grid[x][y];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            return INVALID;
-        }
     }
 
     public boolean isValid(Move move, Piece piece) {
@@ -241,10 +214,6 @@ public class GameTable {
         return null;
     }
 
-    public void set(int x, int y, Piece piece) {
-        grid[x][y] = piece;
-    }
-
     public int getCentreXSize() {
         return xSize;
     }
@@ -261,24 +230,12 @@ public class GameTable {
         return grid[0].length;
     }
 
-    public Position getTopLeft() {
-        return topLeft;
-    }
-
-    public Position getBottomRight() {
-        return bottomRight;
-    }
-
     public Iterable<Position> getAllPositions() {
         return allPositions;
     }
 
     public Iterable<Position> getBoardPositions() {
         return boardPositions;
-    }
-
-    public Iterable<Position> getCornerPositions() {
-        return cornerPositions;
     }
 
     public String toString(Move move) {
@@ -294,5 +251,25 @@ public class GameTable {
             sb.append(nl);
         }
         return sb.toString();
+    }
+
+    public void setCornerPositions(Piece piece) {
+        for (Position p : cornerPositions) {
+            set(p, piece);
+        }
+    }
+
+    public void setBorderPositions(Piece piece, int count) {
+        final int available = borderPositions.size();
+        if (count <= available) {
+            for (Position p : borderPositions) {
+                if (count-- > 0) {
+                    set(p, piece);
+                }
+            }
+        } else {
+            throw new IllegalArgumentException(
+                    "Cannot place " + count + " pieces on " + available + " border positions");
+        }
     }
 }

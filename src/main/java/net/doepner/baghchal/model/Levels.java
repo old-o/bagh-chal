@@ -1,9 +1,9 @@
 package net.doepner.baghchal.model;
 
-import java.net.URL;
-
 import net.doepner.baghchal.resources.LevelProperties;
 import net.doepner.baghchal.resources.LevelResources;
+
+import java.net.URL;
 
 /**
  * Phases of the game (beginning, middle, end)
@@ -60,7 +60,7 @@ public final class Levels {
         return levelProperties.getProperties(level).get(name).toString();
     }
 
-    public URL getResource(String resourceFile) {
-        return levelResources.getResource(level, resourceFile);
+    public URL getResource(String fileName) {
+        return levelResources.getResource(level, fileName);
     }
 }

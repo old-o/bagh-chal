@@ -8,10 +8,6 @@ public final class Position {
     private final int x;
     private final int y;
 
-    public static Position pos(int x, int y) {
-        return new Position(x, y);
-    }
-
     public Position(int x, int y) {
         this.x = x;
         this.y = y;

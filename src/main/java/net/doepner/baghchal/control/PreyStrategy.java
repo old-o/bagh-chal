@@ -1,18 +1,19 @@
 package net.doepner.baghchal.control;
 
-import static net.doepner.baghchal.model.Piece.PREDATOR;
-import static net.doepner.baghchal.model.Piece.PREY;
-import static org.guppy4j.Lists.getRandomFrom;
+import net.doepner.baghchal.model.Directions;
+import net.doepner.baghchal.model.GameTable;
+import net.doepner.baghchal.model.Move;
+import net.doepner.baghchal.model.Piece;
+import net.doepner.baghchal.model.Position;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.doepner.baghchal.model.GameTable;
-import net.doepner.baghchal.model.Move;
-import net.doepner.baghchal.model.Piece;
-import net.doepner.baghchal.model.Position;
+import static net.doepner.baghchal.model.Piece.PREDATOR;
+import static net.doepner.baghchal.model.Piece.PREY;
+import static org.guppy4j.Lists.getRandomFrom;
 
 /**
  * Computer player for prey pieces
@@ -66,7 +67,7 @@ public final class PreyStrategy implements Player {
         if (!gameTable.isEmptyAt(p)) {
             return false;
         }
-        for (Position d : gameTable.getDirections()) {
+        for (Position d : Directions.getAll()) {
             final Move m = new Move(p, p.add(d));
             if (gameTable.isStepAlongLine(m)) {
                 final Position p3 = p.add(-m.xStep(), -m.yStep());

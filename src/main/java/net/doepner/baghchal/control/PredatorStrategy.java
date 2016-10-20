@@ -34,7 +34,7 @@ public class PredatorStrategy implements Player {
         if (take != null) {
             return take;
         }
-        final List<Move> possibleSteps = gameTable.getStepsWhere(PREDATOR, null);
+        final List<Move> possibleSteps = gameTable.getStepsWhereAdjacent(PREDATOR, null);
         if (possibleSteps.isEmpty()) {
             return null;
         }
@@ -71,7 +71,7 @@ public class PredatorStrategy implements Player {
         final GameTable b = gameTable.copy();
         b.movePiece(m);
         final List<Move> jumps = new ArrayList<>();
-        for (Move step : b.getStepsWhere(PREDATOR, PREY)) {
+        for (Move step : b.getStepsWhereAdjacent(PREDATOR, PREY)) {
             b.addPossibleJump(jumps, step);
         }
         return jumps.size();

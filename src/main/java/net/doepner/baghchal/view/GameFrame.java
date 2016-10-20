@@ -1,12 +1,11 @@
 package net.doepner.baghchal.view;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JToolBar;
 import javax.swing.WindowConstants;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 
 /**
  * Main frame
@@ -18,9 +17,9 @@ public class GameFrame {
     private final JButton nextLevelBtn;
 
     public GameFrame(GamePanel gamePanel) {
-        frame = new JFrame("Bagh-Chal");
         this.gamePanel = gamePanel;
 
+        frame = new JFrame("Bagh-Chal");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
@@ -44,7 +43,6 @@ public class GameFrame {
         frame.pack();
         frame.setVisible(true);
     }
-
 
     public void enableNextLevel(boolean enable) {
         nextLevelBtn.setEnabled(enable);
