@@ -1,22 +1,3 @@
-/*
- * Copyright 2003, Daniel Newman (danielnewman106@hotmail.com)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Some refactorings in 2016 by Oliver Doepner
- */
-
 package net.doepner.baghchal;
 
 import net.doepner.baghchal.control.GameLoop;
@@ -33,7 +14,6 @@ import net.doepner.baghchal.view.GameFrame;
 import net.doepner.baghchal.view.GamePanel;
 import org.guppy4j.log.LogProvider;
 import org.guppy4j.log.Slf4jLogProvider;
-import org.guppy4j.log.SystemLogProvider;
 
 import java.awt.Dimension;
 
@@ -61,9 +41,8 @@ public final class Main {
         final Sound sound = new Sound(levels);
         final Images images = new Images(levels);
 
-        final GameTable gameTable = new GameTable(logProvider, boardSize.width, boardSize.height, new Sounds(sound));
-        final Setup setup = new Setup();
-        final GamePanel gamePanel = new GamePanel(gameTable, setup, images, levels);
+        final GameTable gameTable = new GameTable(logProvider, boardSize.width, boardSize.height, new Setup(), new Sounds(sound));
+        final GamePanel gamePanel = new GamePanel(gameTable, images, levels);
 
 //        final Player preyPlayer = new PreyStrategy();
         final Player preyPlayer = new UserPlayer(PREY, gamePanel, images);

@@ -55,7 +55,7 @@ public final class PreyStrategy implements Player {
 
     private List<Position> getSafeBoardPositions(GameTable gameTable) {
         final Set<Position> positions = new HashSet<>();
-        for (Position p : gameTable.getBoardPositions()) {
+        for (Position p : gameTable.getPositions().getBoard()) {
             if (isSafePosition(p, gameTable)) {
                 positions.add(p);
             }
@@ -71,7 +71,7 @@ public final class PreyStrategy implements Player {
             final Move m = new Move(p, p.add(d));
             if (gameTable.isStepAlongLine(m)) {
                 final Position p3 = p.add(-m.xStep(), -m.yStep());
-                if (gameTable.isBoardPosition(p3)) {
+                if (gameTable.getPositions().isBoard(p3)) {
                     final Piece piece2 = gameTable.get(m.p2());
                     final Piece piece3 = gameTable.get(p3);
                     if ((piece2 == null || piece2 == PREDATOR)
@@ -88,7 +88,7 @@ public final class PreyStrategy implements Player {
         final List<Move> defenseMoves = new ArrayList<>();
         for (Move possibleJump : gameTable.getPossibleJumps(PREDATOR, PREY)) {
             final Position p2 = possibleJump.p2();
-            for (Position p1 : gameTable.getAllPositions()) {
+            for (Position p1 : gameTable.getPositions().getAll()) {
                 if (gameTable.get(p1) == PREY) {
                     final Move move = new Move(p1, p2);
                     if (gameTable.isValid(move, PREY)) {

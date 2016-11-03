@@ -1,13 +1,13 @@
 package net.doepner.baghchal.model;
 
 import net.doepner.baghchal.Listener;
+import net.doepner.baghchal.Setup;
 import org.guppy4j.Lists;
 import org.guppy4j.log.Log;
 import org.guppy4j.log.LogProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import static net.doepner.baghchal.model.Piece.INVALID;
@@ -25,37 +25,33 @@ public class GameTable {
 
     private final Piece[][] grid;
 
+    private final Setup setup;
     private final Listener listener;
+    private final TablePositions positions;
 
-    private final Collection<Position> allPositions = new ArrayList<>();
-    private final Collection<Position> boardPositions = new ArrayList<>();
-    private final Collection<Position> borderPositions = new ArrayList<>();
-    private final Collection<Position> cornerPositions = new ArrayList<>();
-
-    public GameTable(LogProvider logProvider, int xSize, int ySize, Listener listener) {
+    public GameTable(LogProvider logProvider, int xSize, int ySize, Setup setup, Listener listener) {
         this.logProvider = logProvider;
+        this.setup = setup;
         this.listener = listener;
         this.xSize = xSize;
         this.ySize = ySize;
         grid = new Piece[xSize + 2][ySize + 2];
-        initPositions(new Position(1, 1), new Position(xSize, ySize));
+        positions = getTablePositions(xSize, ySize, grid);
     }
 
-    private void initPositions(Position topLeft, Position bottomRight) {
+    private TablePositions getTablePositions(int xSize, int ySize, Piece[][] grid) {
+        final TablePositions positions = new TablePositions(new Position(1, 1), new Position(xSize, ySize));
         for (int x = 0; x < grid.length; x++) {
             for (int y = 0; y < grid[x].length; y++) {
                 final Position p = new Position(x, y);
-                allPositions.add(p);
-                if (p.isGreaterOrEqualTo(topLeft) && p.isLessOrEqualTo(bottomRight)) {
-                    boardPositions.add(p);
-                    if ((x == topLeft.x() || x == bottomRight.x()) && (y == topLeft.y() || y == bottomRight.y())) {
-                        cornerPositions.add(p);
-                    }
-                } else {
-                    borderPositions.add(p);
-                }
+                positions.add(p);
             }
         }
+        return positions;
+    }
+
+    public TablePositions getPositions() {
+        return positions;
     }
 
     /**
@@ -65,7 +61,7 @@ public class GameTable {
      * @param gameTable An existing GameTable instance
      */
     private GameTable(GameTable gameTable) {
-        this(gameTable.logProvider, gameTable.xSize, gameTable.ySize, Listener.NONE);
+        this(gameTable.logProvider, gameTable.xSize, gameTable.ySize, gameTable.setup, Listener.NONE);
         for (int x = 0; x < grid.length; x++) {
             System.arraycopy(gameTable.grid[x], 0, grid[x], 0, grid[x].length);
         }
@@ -78,7 +74,7 @@ public class GameTable {
     public void processMove(Move move) {
         if (move != null) {
             final Piece piece = get(move.p2());
-            if (!isBorderToBoard(move) && move.isJump()) {
+            if (!positions.isBorderToBoard(move) && move.isJump()) {
                 clear(move.middle());
                 listener.afterJump(piece);
             } else {
@@ -103,9 +99,20 @@ public class GameTable {
         }
     }
 
+    public void setHiddenBorderPieceCount(int count) {
+        this.hiddenBorderPieceCount = count;
+    }
+
+    private int hiddenBorderPieceCount;
+
     public Position pick(Position p, Piece piece) {
         if (get(p) == piece) {
-            clear(p);
+            if (positions.isBorder(p) && hiddenBorderPieceCount > 0) {
+                hiddenBorderPieceCount--;
+            }
+            if (positions.isBoard(p) || hiddenBorderPieceCount <= 0) {
+                clear(p);
+            }
             listener.afterPicked(piece);
             return p;
         } else {
@@ -115,7 +122,7 @@ public class GameTable {
 
     public List<Move> getStepsWhereAdjacent(Piece movingPiece, Piece requiredPiece) {
         final List<Move> steps = new ArrayList<>();
-        for (Position p : boardPositions) {
+        for (Position p : positions.getBoard()) {
             if (get(p) == movingPiece) {
                 for (Position d : Directions.getAll()) {
                     final Position p2 = p.add(d);
@@ -155,18 +162,15 @@ public class GameTable {
     }
 
     public boolean isStepAlongLine(Move move) {
-        return move.isStep() && isBoardPosition(move.p1()) && isBoardPosition(move.p2())
+        return move.isStep() && positions.isBoardMove(move)
                 && (move.p1().hasEvenCoordSum() || move.isOneDimensional());
-    }
-
-    public boolean isBoardPosition(Position p) {
-        return boardPositions.contains(p);
     }
 
     public void reset() {
         for (Piece[] pieces : grid) {
             Arrays.fill(pieces, null);
         }
+        setup.prepare(this);
         listener.afterReset();
     }
 
@@ -194,12 +198,8 @@ public class GameTable {
         return !move.isStationary() && isEmptyAt(move.p2()) && piece.isValid(move, this);
     }
 
-    public boolean isBorderToBoard(Move move) {
-        return isBorderPosition(move.p1()) && !isBorderPosition(move.p2());
-    }
-
     public boolean isBorderEmpty() {
-        for (Position p : borderPositions) {
+        for (Position p : positions.getBorder()) {
             if (get(p) != null) {
                 return false;
             }
@@ -207,12 +207,8 @@ public class GameTable {
         return true;
     }
 
-    private boolean isBorderPosition(Position p) {
-        return borderPositions.contains(p);
-    }
-
     public Position getBorderPosition(Piece piece) {
-        for (Position p : borderPositions) {
+        for (Position p : positions.getBorder()) {
             if (get(p) == piece) {
                 return p;
             }
@@ -220,11 +216,11 @@ public class GameTable {
         return null;
     }
 
-    public int getCentreXSize() {
+    public int getBoardXSize() {
         return xSize;
     }
 
-    public int getCentreYSize() {
+    public int getBoardYSize() {
         return ySize;
     }
 
@@ -236,46 +232,17 @@ public class GameTable {
         return grid[0].length;
     }
 
-    public Iterable<Position> getAllPositions() {
-        return allPositions;
-    }
-
-    public Iterable<Position> getBoardPositions() {
-        return boardPositions;
-    }
-
     public String toString(Move move) {
         final String nl = System.lineSeparator();
         final StringBuilder sb = new StringBuilder(nl);
         sb.append(move).append(nl);
-        for (int x = 0; x < grid.length; x++) {
-            for (int y = 0; y < grid[x].length; y++) {
-                Piece piece = grid[y][x];
+        for (Piece[] aGrid : grid) {
+            for (Piece piece : aGrid) {
                 sb.append(piece == null ? "    " : piece.toString().substring(0, 4));
                 sb.append('|');
             }
             sb.append(nl);
         }
         return sb.toString();
-    }
-
-    public void setCornerPositions(Piece piece) {
-        for (Position p : cornerPositions) {
-            set(p, piece);
-        }
-    }
-
-    public void setBorderPositions(Piece piece, int count) {
-        final int available = borderPositions.size();
-        if (count <= available) {
-            for (Position p : borderPositions) {
-                if (count-- > 0) {
-                    set(p, piece);
-                }
-            }
-        } else {
-            throw new IllegalArgumentException(
-                    "Cannot place " + count + " pieces on " + available + " border positions");
-        }
     }
 }

@@ -1,6 +1,5 @@
 package net.doepner.baghchal.view;
 
-import net.doepner.baghchal.Setup;
 import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Levels;
 import net.doepner.baghchal.model.Move;
@@ -38,7 +37,6 @@ import static net.doepner.baghchal.model.Directions.RIGHT_UP;
 public class GamePanel extends JPanel {
 
     private final GameTable gameTable;
-    private final Setup setup;
 
     private final Images images;
     private final Levels levels;
@@ -59,9 +57,8 @@ public class GamePanel extends JPanel {
     private Paint boardPaint;
     private Colors colors;
 
-    public GamePanel(GameTable gameTable, Setup setup, Images images, Levels levels) {
+    public GamePanel(GameTable gameTable, Images images, Levels levels) {
         this.gameTable = gameTable;
-        this.setup = setup;
         this.images = images;
         this.levels = levels;
         congrats = images.getImage(getClass().getResource("/net/doepner/baghchal/congrats.gif"));
@@ -79,7 +76,6 @@ public class GamePanel extends JPanel {
 
     private void startLevel() {
         gameTable.reset();
-        setup.prepare(gameTable);
         final BufferedImage bgImage = images.getImage("background.jpg");
         boardPaint = new TexturePaint(bgImage, new Rectangle(0, 0, bgImage.getWidth(), bgImage.getHeight()));
         colors = new Colors(levels);
@@ -115,9 +111,9 @@ public class GamePanel extends JPanel {
         final int xStep = width / gameTable.getXSize();
         final int yStep = height / gameTable.getYSize();
         final int xStart = xStep + xStep / 2;
-        final int xBoardEnd = xStep * gameTable.getCentreXSize();
+        final int xBoardEnd = xStep * gameTable.getBoardXSize();
         final int yStart = yStep + yStep / 2;
-        final int yBoardEnd = yStep * gameTable.getCentreYSize();
+        final int yBoardEnd = yStep * gameTable.getBoardYSize();
 
         drawBoard(g2, xStep, yStep, xBoardEnd, yBoardEnd);
         drawPieces(g2, xStep, yStep, xStart - xStep, yStart - yStep);
@@ -136,7 +132,7 @@ public class GamePanel extends JPanel {
     };
 
     private void drawPieces(Graphics2D g2, int xStep, int yStep, int xStart, int yStart) {
-        for (Position p : gameTable.getAllPositions()) {
+        for (Position p : gameTable.getPositions().getAll()) {
             final int x = xStart + p.x() * xStep;
             final int y = yStart + p.y() * yStep;
 

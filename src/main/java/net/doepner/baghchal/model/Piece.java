@@ -8,7 +8,7 @@ public enum Piece implements MoveConstraints {
     PREY {
         @Override
         public boolean isValid(Move move, GameTable gameTable) {
-            return gameTable.isBorderToBoard(move)
+            return gameTable.getPositions().isBorderToBoard(move)
                     || gameTable.isBorderEmpty() && gameTable.isStepAlongLine(move);
         }
     },
