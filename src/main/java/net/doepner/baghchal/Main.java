@@ -31,6 +31,8 @@ import net.doepner.baghchal.resources.LevelResources;
 import net.doepner.baghchal.resources.Sound;
 import net.doepner.baghchal.view.GameFrame;
 import net.doepner.baghchal.view.GamePanel;
+import org.guppy4j.log.LogProvider;
+import org.guppy4j.log.SystemLogProvider;
 
 import java.awt.Dimension;
 
@@ -45,6 +47,8 @@ public final class Main {
 
         System.setProperty("sun.java2d.opengl", "true");
 
+        final LogProvider logProvider = new SystemLogProvider();
+
         final int maxLevel = 2;
         final Dimension boardSize = new Dimension(5, 5);
         final Dimension preferredSize = new Dimension(500, 500);
@@ -56,7 +60,7 @@ public final class Main {
         final Sound sound = new Sound(levels);
         final Images images = new Images(levels);
 
-        final GameTable gameTable = new GameTable(boardSize.width, boardSize.height, new Sounds(sound));
+        final GameTable gameTable = new GameTable(logProvider, boardSize.width, boardSize.height, new Sounds(sound));
         final Setup setup = new Setup();
         final GamePanel gamePanel = new GamePanel(gameTable, setup, images, levels);
 

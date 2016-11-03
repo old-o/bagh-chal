@@ -2,8 +2,8 @@ package net.doepner.baghchal.model;
 
 import net.doepner.baghchal.Listener;
 import org.guppy4j.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.guppy4j.log.Log;
+import org.guppy4j.log.LogProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,13 +11,14 @@ import java.util.Collection;
 import java.util.List;
 
 import static net.doepner.baghchal.model.Piece.INVALID;
+import static org.guppy4j.log.Log.Level.debug;
 
 /**
  * The game board model
  */
 public class GameTable {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final LogProvider logProvider;
 
     private final int xSize;
     private final int ySize;
@@ -31,7 +32,8 @@ public class GameTable {
     private final Collection<Position> borderPositions = new ArrayList<>();
     private final Collection<Position> cornerPositions = new ArrayList<>();
 
-    public GameTable(int xSize, int ySize, Listener listener) {
+    public GameTable(LogProvider logProvider, int xSize, int ySize, Listener listener) {
+        this.logProvider = logProvider;
         this.listener = listener;
         this.xSize = xSize;
         this.ySize = ySize;
@@ -63,7 +65,7 @@ public class GameTable {
      * @param gameTable An existing GameTable instance
      */
     private GameTable(GameTable gameTable) {
-        this(gameTable.xSize, gameTable.ySize, Listener.NONE);
+        this(gameTable.logProvider, gameTable.xSize, gameTable.ySize, Listener.NONE);
         for (int x = 0; x < grid.length; x++) {
             System.arraycopy(gameTable.grid[x], 0, grid[x], 0, grid[x].length);
         }
@@ -82,8 +84,12 @@ public class GameTable {
             } else {
                 listener.afterStep(piece);
             }
-            logger.debug(toString(move));
+            log().as(debug, toString(move));
         }
+    }
+
+    private Log log() {
+        return logProvider.getLog(getClass());
     }
 
     public Piece movePiece(Move move) {
