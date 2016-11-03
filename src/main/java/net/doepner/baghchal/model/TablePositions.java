@@ -43,7 +43,9 @@ public final class TablePositions {
     }
 
     public Iterable<Position> getBorder() {
-        return border;
+        final ArrayList<Position> list = new ArrayList<>(border);
+        // TODO: order list so that filling it with pieces will look symmetric
+        return list;
     }
 
     public Iterable<Position> getCorners() {

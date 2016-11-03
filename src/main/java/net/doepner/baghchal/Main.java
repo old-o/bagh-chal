@@ -31,7 +31,7 @@ public final class Main {
         final LogProvider logProvider = new Slf4jLogProvider();
 
         final int maxLevel = 2;
-        final Dimension boardSize = new Dimension(5, 5);
+        final Dimension boardSize = new Dimension(10, 3);
         final Dimension preferredSize = new Dimension(500, 500);
 
         final LevelResources levelResources = new LevelResources("/net/doepner/baghchal/levels/%d/%s");

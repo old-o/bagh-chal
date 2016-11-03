@@ -107,11 +107,11 @@ public class GameTable {
 
     public Position pick(Position p, Piece piece) {
         if (get(p) == piece) {
-            if (positions.isBorder(p) && hiddenBorderPieceCount > 0) {
-                hiddenBorderPieceCount--;
-            }
             if (positions.isBoard(p) || hiddenBorderPieceCount <= 0) {
                 clear(p);
+            }
+            if (positions.isBorder(p) && hiddenBorderPieceCount > 0) {
+                hiddenBorderPieceCount--;
             }
             listener.afterPicked(piece);
             return p;
