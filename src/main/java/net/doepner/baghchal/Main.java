@@ -32,6 +32,7 @@ import net.doepner.baghchal.resources.Sound;
 import net.doepner.baghchal.view.GameFrame;
 import net.doepner.baghchal.view.GamePanel;
 import org.guppy4j.log.LogProvider;
+import org.guppy4j.log.Slf4jLogProvider;
 import org.guppy4j.log.SystemLogProvider;
 
 import java.awt.Dimension;
@@ -47,7 +48,7 @@ public final class Main {
 
         System.setProperty("sun.java2d.opengl", "true");
 
-        final LogProvider logProvider = new SystemLogProvider();
+        final LogProvider logProvider = new Slf4jLogProvider();
 
         final int maxLevel = 2;
         final Dimension boardSize = new Dimension(5, 5);
