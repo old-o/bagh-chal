@@ -1,31 +1,30 @@
 package net.doepner.baghchal.resources;
 
-import static javax.sound.sampled.AudioSystem.getAudioInputStream;
-import static javax.sound.sampled.AudioSystem.getLine;
-import static javax.sound.sampled.LineEvent.Type.STOP;
-
-import java.io.IOException;
-import java.net.URL;
+import net.doepner.baghchal.model.Levels;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine.Info;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.IOException;
+import java.net.URL;
 
-import net.doepner.baghchal.model.Levels;
+import static javax.sound.sampled.AudioSystem.getAudioInputStream;
+import static javax.sound.sampled.AudioSystem.getLine;
+import static javax.sound.sampled.LineEvent.Type.STOP;
 
 /**
  *
  */
-public class Sound {
+public class AudioPlayer {
 
     private final Levels levels;
 
     private Clip lastPrey = null;
     private int preyIndex = 1;
 
-    public Sound(Levels levels) {
+    public AudioPlayer(Levels levels) {
         this.levels = levels;
     }
 

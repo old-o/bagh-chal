@@ -12,6 +12,7 @@ public final class TablePositions {
     private final Collection<Position> board = new ArrayList<>();
     private final Collection<Position> border = new ArrayList<>();
     private final Collection<Position> corners = new ArrayList<>();
+    private final Collection<Position> borderCorners = new ArrayList<>();
 
     private final Position topLeft;
     private final Position bottomRight;
@@ -30,7 +31,12 @@ public final class TablePositions {
                 corners.add(p);
             }
         } else {
-            border.add(p);
+            if ((p.x() < topLeft.x() || p.x() > bottomRight.x())
+                    && (p.y() < topLeft.y() || p.y() > bottomRight.y())) {
+                borderCorners.add(p);
+            } else {
+                border.add(p);
+            }
         }
     }
 
@@ -44,7 +50,7 @@ public final class TablePositions {
 
     public Iterable<Position> getBorder() {
         final ArrayList<Position> list = new ArrayList<>(border);
-        // TODO: order list so that filling it with pieces will look symmetric
+        list.addAll(borderCorners);
         return list;
     }
 

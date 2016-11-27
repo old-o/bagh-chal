@@ -1,44 +1,44 @@
 package net.doepner.baghchal;
 
-import static net.doepner.baghchal.model.Piece.PREDATOR;
-
 import net.doepner.baghchal.model.Piece;
-import net.doepner.baghchal.resources.Sound;
+import net.doepner.baghchal.resources.AudioPlayer;
+
+import static net.doepner.baghchal.model.Piece.PREDATOR;
 
 /**
  * Plays sounds as game table events occur
  */
-public class Sounds implements Listener {
+public class EventSounds implements Listener {
 
-    private final Sound sound;
+    private final AudioPlayer audioPlayer;
 
-    public Sounds(Sound sound) {
-        this.sound = sound;
+    public EventSounds(AudioPlayer audioPlayer) {
+        this.audioPlayer = audioPlayer;
     }
 
     @Override
     public void afterJump(Piece piece) {
         if (piece == PREDATOR) {
-            sound.playPredatorKills();
+            audioPlayer.playPredatorKills();
         }
     }
 
     @Override
     public void afterStep(Piece piece) {
         if (piece == PREDATOR) {
-            sound.playPredatorStep();
+            audioPlayer.playPredatorStep();
         }
     }
 
     @Override
     public void afterPicked(Piece piece) {
         if (piece == Piece.PREY) {
-            sound.playPrey();
+            audioPlayer.playPrey();
         }
     }
 
     @Override
     public void afterReset() {
-        sound.play("welcome.wav");
+        audioPlayer.play("welcome.wav");
     }
 }
