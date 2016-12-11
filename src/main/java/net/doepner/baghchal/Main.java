@@ -3,6 +3,7 @@ package net.doepner.baghchal;
 import net.doepner.baghchal.control.GameLoop;
 import net.doepner.baghchal.control.Player;
 import net.doepner.baghchal.control.PredatorStrategy;
+import net.doepner.baghchal.control.PreyStrategy;
 import net.doepner.baghchal.control.UserPlayer;
 import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Levels;
@@ -17,6 +18,7 @@ import org.guppy4j.log.Slf4jLogProvider;
 
 import java.awt.Dimension;
 
+import static net.doepner.baghchal.model.Piece.PREDATOR;
 import static net.doepner.baghchal.model.Piece.PREY;
 
 /**
@@ -31,8 +33,7 @@ public final class Main {
         final LogProvider logProvider = new Slf4jLogProvider();
 
         final int maxLevel = 2;
-        final Dimension boardSize = new Dimension(4,4);
-        final Dimension preferredSize = new Dimension(500, 500);
+        final Dimension boardSize = new Dimension(5, 5);
 
         final LevelResources levelResources = new LevelResources("/net/doepner/baghchal/levels/%d/%s");
         final LevelProperties levelProperties = new LevelProperties(levelResources, "level.properties");
@@ -45,16 +46,15 @@ public final class Main {
                 new EventSounds(audioPlayer));
         final GamePanel gamePanel = new GamePanel(gameTable, images, levels);
 
-//        final Player preyPlayer = new PreyStrategy();
+        final Player preyStrategy = new PreyStrategy();
         final Player preyPlayer = new UserPlayer(PREY, gamePanel, images);
-        final Player predatorPlayer = new PredatorStrategy(levels);
-//        final Player predatorPlayer = new UserPlayer(PREDATOR, gamePanel, images);
+        final Player predatorStrategy = new PredatorStrategy(levels);
+        final Player predatorPlayer = new UserPlayer(PREDATOR, gamePanel, images);
 
         final GameFrame gameFrame = new GameFrame(gamePanel);
-        final GameLoop gameLoop = new GameLoop(gameFrame, gameTable, gamePanel, levels, audioPlayer, preyPlayer, predatorPlayer);
+        final GameLoop gameLoop = new GameLoop(gameFrame, gameTable, gamePanel, levels, audioPlayer,
+                preyPlayer, predatorStrategy);
 
-        gamePanel.start();
-        gameFrame.show(preferredSize);
         gameLoop.start();
     }
 

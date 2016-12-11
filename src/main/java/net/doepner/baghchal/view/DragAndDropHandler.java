@@ -1,10 +1,10 @@
 package net.doepner.baghchal.view;
 
+import net.doepner.baghchal.control.PlayFlow;
 import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.model.Piece;
 import net.doepner.baghchal.model.Position;
-import net.doepner.baghchal.control.PlayFlow;
 import net.doepner.baghchal.resources.Images;
 
 import java.awt.Component;
@@ -107,7 +107,7 @@ public class DragAndDropHandler extends MouseAdapter {
         final BufferedImage image = images.getImage(piece);
         int imgWidth = image.getWidth();
         int imgHeight = image.getHeight();
-        final Rectangle rectangle = new Rectangle(p.x - imgWidth, p.y - imgHeight, 2 * imgWidth, 2 * imgHeight);
+        final Rectangle rectangle = new Rectangle(p.x - (imgWidth / 2), p.y - (imgHeight / 2), 2 * imgWidth, 2 * imgHeight);
         gamePanel.repaintForDrag(rectangle, image);
     }
 }

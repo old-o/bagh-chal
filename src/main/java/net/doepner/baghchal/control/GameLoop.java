@@ -6,6 +6,7 @@ import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.resources.AudioPlayer;
 import net.doepner.baghchal.view.GameFrame;
 import net.doepner.baghchal.view.GamePanel;
+import org.guppy4j.WaitClock;
 
 import java.util.Arrays;
 
@@ -23,6 +24,8 @@ public class GameLoop {
 
     private final Iterable<Player> players;
 
+    private final WaitClock waitClock = new WaitClock(1000);
+
     public GameLoop(GameFrame gameFrame, GameTable gameTable, GamePanel gamePanel, Levels levels,
                     AudioPlayer audioPlayer, Player... players) {
         this.gameFrame = gameFrame;
@@ -34,8 +37,11 @@ public class GameLoop {
     }
 
     public void start() {
+        gamePanel.start();
+        gameFrame.show();
         while (!levels.isGameOver()) {
             for (Player player : players) {
+                waitClock.start();
                 final Move move = player.play(gameTable);
                 gameTable.processMove(move);
                 gamePanel.repaint();
@@ -47,15 +53,8 @@ public class GameLoop {
                 levels.setLevelDone(playerGaveUp);
                 gameFrame.enableNextLevel(playerGaveUp && !levels.isGameOver());
                 gamePanel.repaint();
+                waitClock.waitRemaining();
             }
-        }
-    }
-
-    private void waitSeconds(int secs) {
-        try {
-            Thread.sleep(secs * 1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 }

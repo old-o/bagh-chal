@@ -5,7 +5,6 @@ import javax.swing.JFrame;
 import javax.swing.JToolBar;
 import javax.swing.WindowConstants;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 
 /**
  * Main frame
@@ -38,8 +37,7 @@ public class GameFrame {
         frame.add(gamePanel, BorderLayout.CENTER);
     }
 
-    public void show(Dimension preferredSize) {
-        gamePanel.setPreferredSize(preferredSize);
+    public void show() {
         frame.pack();
         frame.setVisible(true);
     }

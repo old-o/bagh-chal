@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static net.doepner.baghchal.model.Piece.PREDATOR;
+import static net.doepner.baghchal.model.Piece.PREY;
 
 /**
  * Loads images for control pieces from classpath
@@ -49,5 +50,13 @@ public class Images {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    public int getPieceWidth() {
+        return Math.max(getImage(PREDATOR).getWidth(), getImage(PREY).getWidth());
+    }
+
+    public int getPieceHeight() {
+        return Math.max(getImage(PREDATOR).getHeight(), getImage(PREY).getHeight());
     }
 }

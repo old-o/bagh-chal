@@ -9,20 +9,23 @@ import net.doepner.baghchal.resources.Images;
 
 import javax.swing.JPanel;
 import java.awt.BasicStroke;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Paint;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.event.MouseAdapter;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.awt.BasicStroke.CAP_BUTT;
+import static java.awt.BasicStroke.JOIN_MITER;
 import static java.awt.RenderingHints.KEY_ANTIALIASING;
 import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
 import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
@@ -43,7 +46,7 @@ public class GamePanel extends JPanel {
 
     private final BufferedImage congrats;
 
-    private final BasicStroke stroke = new BasicStroke(1.5f);
+    private final BasicStroke stroke = new BasicStroke(3f);
     private final RenderingHints renderingHints = createRenderingHints();
 
     private static RenderingHints createRenderingHints() {
@@ -62,6 +65,13 @@ public class GamePanel extends JPanel {
         this.images = images;
         this.levels = levels;
         congrats = images.getImage(getClass().getResource("/net/doepner/baghchal/congrats.gif"));
+        initPreferredSize();
+    }
+
+    private void initPreferredSize() {
+        int width = (3 * gameTable.getXSize() * images.getPieceWidth()) / 2;
+        int height = (3 * gameTable.getYSize() * images.getPieceHeight()) / 2;
+        setPreferredSize(new Dimension(width, height));
     }
 
     public void start() {
@@ -157,7 +167,7 @@ public class GamePanel extends JPanel {
     }
 
     private Point lastDragPoint;
-    private Image draggedImage;
+    private BufferedImage draggedImage;
 
     public void setLastDragPoint(Point lastDragPoint) {
         this.lastDragPoint = lastDragPoint;
@@ -172,9 +182,14 @@ public class GamePanel extends JPanel {
         repaint(rectangle);
     }
 
+    private final Stroke dragBoxStroke = new BasicStroke(2f, CAP_BUTT, JOIN_MITER, 2, new float[]{2}, 0);
+
     private void drawDraggedImage(Graphics2D g2) {
         if (lastDragPoint != null) {
             g2.drawImage(draggedImage, lastDragPoint.x, lastDragPoint.y, null);
+            g2.setStroke(dragBoxStroke);
+            g2.drawRect(lastDragPoint.x - 3, lastDragPoint.y - 3,
+                    draggedImage.getWidth() + 6 , draggedImage.getHeight() + 6);
         }
     }
 
