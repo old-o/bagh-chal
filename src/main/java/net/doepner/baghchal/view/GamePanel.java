@@ -5,7 +5,6 @@ import net.doepner.baghchal.model.Levels;
 import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.model.Piece;
 import net.doepner.baghchal.model.Position;
-import net.doepner.baghchal.resources.Images;
 
 import javax.swing.JPanel;
 import java.awt.BasicStroke;
@@ -13,19 +12,14 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Paint;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Stroke;
-import java.awt.TexturePaint;
 import java.awt.event.MouseAdapter;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.awt.BasicStroke.CAP_BUTT;
-import static java.awt.BasicStroke.JOIN_MITER;
 import static java.awt.RenderingHints.KEY_ANTIALIASING;
 import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
 import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
@@ -36,18 +30,21 @@ import static net.doepner.baghchal.model.Directions.DOWN;
 import static net.doepner.baghchal.model.Directions.RIGHT;
 import static net.doepner.baghchal.model.Directions.RIGHT_DOWN;
 import static net.doepner.baghchal.model.Directions.RIGHT_UP;
+import static net.doepner.baghchal.resources.Images.ImageId.CONGRATS;
+import static net.doepner.baghchal.view.Theme.ColorId.BACKGROUND;
+import static net.doepner.baghchal.view.Theme.ColorId.BOARD_EDGE;
+import static net.doepner.baghchal.view.Theme.ColorId.DIAGONAL;
+import static net.doepner.baghchal.view.Theme.ColorId.GRID;
 
 public class GamePanel extends JPanel {
 
     private final GameTable gameTable;
-
-    private final Images images;
     private final Levels levels;
-
-    private final BufferedImage congrats;
 
     private final BasicStroke stroke = new BasicStroke(3f);
     private final RenderingHints renderingHints = createRenderingHints();
+
+    private final Theme theme;
 
     private static RenderingHints createRenderingHints() {
         final Map<RenderingHints.Key, Object> map = new HashMap<>();
@@ -57,21 +54,19 @@ public class GamePanel extends JPanel {
         return new RenderingHints(map);
     }
 
-    private Paint boardPaint;
-    private Colors colors;
-
-    public GamePanel(GameTable gameTable, Images images, Levels levels) {
+    public GamePanel(GameTable gameTable, Theme theme, Levels levels) {
         this.gameTable = gameTable;
-        this.images = images;
         this.levels = levels;
-        congrats = images.getImage(getClass().getResource("/net/doepner/baghchal/congrats.gif"));
+        this.theme = theme;
         initPreferredSize();
     }
 
-    private void initPreferredSize() {
-        int width = (3 * gameTable.getXSize() * images.getPieceWidth()) / 2;
-        int height = (3 * gameTable.getYSize() * images.getPieceHeight()) / 2;
-        setPreferredSize(new Dimension(width, height));
+    void initPreferredSize() {
+        int width = (3 * gameTable.getXSize() * theme.getPieceWidth()) / 2;
+        int height = (3 * gameTable.getYSize() * theme.getPieceHeight()) / 2;
+        final Dimension preferredSize = new Dimension(width, height);
+        setPreferredSize(preferredSize);
+        setSize(preferredSize);
     }
 
     public void start() {
@@ -86,9 +81,6 @@ public class GamePanel extends JPanel {
 
     private void startLevel() {
         gameTable.reset();
-        final BufferedImage bgImage = images.getImage("background.jpg");
-        boardPaint = new TexturePaint(bgImage, new Rectangle(0, 0, bgImage.getWidth(), bgImage.getHeight()));
-        colors = new Colors(levels);
         repaint();
     }
 
@@ -104,6 +96,7 @@ public class GamePanel extends JPanel {
         g2.setColor(getForeground());
 
         if (levels.isLevelDone()) {
+            final BufferedImage congrats = theme.getImage(CONGRATS);
             g2.drawImage(congrats, width / 2 - congrats.getWidth() / 2, height / 2 - congrats.getHeight(), null);
             g2.setFont(new Font("SansSerif", 0, 34));
             final String s = levels.getLevelEndMessage();
@@ -115,7 +108,7 @@ public class GamePanel extends JPanel {
     }
 
     private void drawGameTable(Graphics2D g2, int width, int height) {
-        setBackground(colors.backgroundColor());
+        setBackground(theme.getColor(BACKGROUND));
         setOpaque(true);
 
         final int xStep = width / gameTable.getXSize();
@@ -130,10 +123,10 @@ public class GamePanel extends JPanel {
     }
 
     private void drawBoard(Graphics2D g2, int xStep, int yStep, int xEnd, int yEnd) {
-        g2.setPaint(boardPaint);
+        g2.setPaint(theme.getBoardPaint());
         g2.fillRect(xStep, yStep, xEnd, yEnd);
         g2.setStroke(stroke);
-        g2.setColor(colors.boardEdgeColor());
+        g2.setColor(theme.getColor(BOARD_EDGE));
         g2.drawRect(xStep, yStep, xEnd, yEnd);
     }
 
@@ -153,7 +146,7 @@ public class GamePanel extends JPanel {
 
             final Piece piece = gameTable.get(p);
             if (piece != null) {
-                final BufferedImage img = images.getImage(piece);
+                final BufferedImage img = theme.getImage(piece);
                 g2.drawImage(img, x - img.getWidth() / 2, y - img.getHeight() / 2, null);
             }
         }
@@ -161,7 +154,7 @@ public class GamePanel extends JPanel {
 
     private void drawLine(Graphics2D g2, int xStep, int yStep, int x, int y, Move m) {
         if (gameTable.isStepAlongLine(m)) {
-            g2.setColor(m.isOneDimensional() ? colors.gridColor() : colors.diagonalColor());
+            g2.setColor(theme.getColor(m.isOneDimensional() ? GRID : DIAGONAL));
             g2.drawLine(x, y, x + m.xStep() * xStep, y + m.yStep() * yStep);
         }
     }
@@ -169,11 +162,11 @@ public class GamePanel extends JPanel {
     private Point lastDragPoint;
     private BufferedImage draggedImage;
 
-    public void setLastDragPoint(Point lastDragPoint) {
+    void setLastDragPoint(Point lastDragPoint) {
         this.lastDragPoint = lastDragPoint;
     }
 
-    public Point getLastDragPoint() {
+    Point getLastDragPoint() {
         return lastDragPoint;
     }
 
@@ -182,12 +175,10 @@ public class GamePanel extends JPanel {
         repaint(rectangle);
     }
 
-    private final Stroke dragBoxStroke = new BasicStroke(2f, CAP_BUTT, JOIN_MITER, 2, new float[]{2}, 0);
-
     private void drawDraggedImage(Graphics2D g2) {
         if (lastDragPoint != null) {
             g2.drawImage(draggedImage, lastDragPoint.x, lastDragPoint.y, null);
-            g2.setStroke(dragBoxStroke);
+            g2.setStroke(theme.getDragBoxStroke());
             g2.drawRect(lastDragPoint.x - 3, lastDragPoint.y - 3,
                     draggedImage.getWidth() + 6 , draggedImage.getHeight() + 6);
         }

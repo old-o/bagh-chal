@@ -1,62 +1,18 @@
 package net.doepner.baghchal.resources;
 
-import net.doepner.baghchal.model.Levels;
 import net.doepner.baghchal.model.Piece;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import static net.doepner.baghchal.model.Piece.PREDATOR;
-import static net.doepner.baghchal.model.Piece.PREY;
 
 /**
- * Loads images for control pieces from classpath
+ * Loads images from classpath
  */
-public class Images {
+public interface Images {
 
-    private final ConcurrentMap<URL, BufferedImage> cache = new ConcurrentHashMap<>();
-    private final Levels levels;
+    enum ImageId {BACKGROUND, CONGRATS }
 
-    public Images(Levels levels) {
-        this.levels = levels;
-    }
+    BufferedImage getImage(Piece piece);
 
-    public BufferedImage getImage(Piece piece) {
-        return getImage(piece == PREDATOR ? "predator.png" : "prey.png");
-    }
+    BufferedImage getImage(ImageId imageId);
 
-    public BufferedImage getImage(String resourceFileName) {
-        return getImage(levels.getResource(resourceFileName));
-    }
-
-    public BufferedImage getImage(URL resourceLocation) {
-        final BufferedImage cachedImage = cache.get(resourceLocation);
-        if (cachedImage != null) {
-            return cachedImage;
-        } else {
-            final BufferedImage image = loadImage(resourceLocation);
-            cache.put(resourceLocation, image);
-            return image;
-        }
-    }
-
-    private BufferedImage loadImage(URL location) {
-        try {
-            return ImageIO.read(location);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    public int getPieceWidth() {
-        return Math.max(getImage(PREDATOR).getWidth(), getImage(PREY).getWidth());
-    }
-
-    public int getPieceHeight() {
-        return Math.max(getImage(PREDATOR).getHeight(), getImage(PREY).getHeight());
-    }
 }

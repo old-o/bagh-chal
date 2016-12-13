@@ -1,25 +1,16 @@
 package net.doepner.baghchal.model;
 
-import net.doepner.baghchal.resources.LevelProperties;
-import net.doepner.baghchal.resources.LevelResources;
-
-import java.net.URL;
-
 /**
  * Phases of the game (beginning, middle, end)
  */
 public final class Levels {
 
-    private final LevelProperties levelProperties;
-    private final LevelResources levelResources;
     private final int maxLevel;
 
     private int level;
     private boolean levelDone;
 
-    public Levels(LevelProperties levelProperties, LevelResources levelResources, int maxLevel) {
-        this.levelProperties = levelProperties;
-        this.levelResources = levelResources;
+    public Levels(int maxLevel) {
         this.maxLevel = maxLevel;
         firstLevel();
     }
@@ -56,11 +47,4 @@ public final class Levels {
         this.levelDone = levelDone;
     }
 
-    public String getLevelProperty(String name) {
-        return levelProperties.getProperties(level).get(name).toString();
-    }
-
-    public URL getResource(String fileName) {
-        return levelResources.getResource(level, fileName);
-    }
 }

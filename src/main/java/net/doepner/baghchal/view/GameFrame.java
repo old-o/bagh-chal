@@ -1,6 +1,9 @@
 package net.doepner.baghchal.view;
 
+import net.doepner.baghchal.model.Themes;
+
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JToolBar;
 import javax.swing.WindowConstants;
@@ -12,11 +15,9 @@ import java.awt.BorderLayout;
 public class GameFrame {
 
     private final JFrame frame;
-    private final GamePanel gamePanel;
     private final JButton nextLevelBtn;
 
-    public GameFrame(GamePanel gamePanel) {
-        this.gamePanel = gamePanel;
+    public GameFrame(final GamePanel gamePanel, final Themes themes) {
 
         frame = new JFrame("Bagh-Chal");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -29,12 +30,29 @@ public class GameFrame {
         nextLevelBtn.addActionListener(e -> gamePanel.nextLevel());
         nextLevelBtn.setEnabled(false);
 
+        final JComboBox<String> themeChooser = new JComboBox<>();
+        for (String themeName : themes.getNames()) {
+            themeChooser.addItem(themeName);
+        }
+        themeChooser.addItemListener(e -> selectTheme(themes, themeChooser, gamePanel));
+        themeChooser.setSelectedItem(themes.getThemeName());
+
+
         final JToolBar toolBar = new JToolBar();
         toolBar.add(newGameBtn);
         toolBar.add(nextLevelBtn);
+        toolBar.add(themeChooser);
 
         frame.add(toolBar, BorderLayout.PAGE_START);
         frame.add(gamePanel, BorderLayout.CENTER);
+    }
+
+    private void selectTheme(Themes themes, JComboBox<String> themeChooser, GamePanel gamePanel) {
+        final String themeName = themeChooser.getItemAt(themeChooser.getSelectedIndex());
+        themes.selectTheme(themeName);
+        gamePanel.initPreferredSize();
+        frame.pack();
+        gamePanel.repaint();
     }
 
     public void show() {

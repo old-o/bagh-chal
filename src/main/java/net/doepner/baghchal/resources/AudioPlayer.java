@@ -1,7 +1,5 @@
 package net.doepner.baghchal.resources;
 
-import net.doepner.baghchal.model.Levels;
-
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine.Info;
@@ -19,42 +17,13 @@ import static javax.sound.sampled.LineEvent.Type.STOP;
  */
 public class AudioPlayer {
 
-    private final Levels levels;
+    private Clip lastClip = null;
 
-    private Clip lastPrey = null;
-    private int preyIndex = 1;
-
-    public AudioPlayer(Levels levels) {
-        this.levels = levels;
-    }
-
-    public void playPrey() {
-        lastPrey = play("prey" + preyIndex + ".wav");
-        preyIndex = (preyIndex % 3) + 1;
-    }
-
-    public void playPredatorKills() {
-        if (lastPrey != null) {
-            lastPrey.stop();
-            lastPrey = null;
+    public void play(URL url) {
+        if (lastClip != null) {
+            lastClip.stop();
+            lastClip = null;
         }
-        play("predator-kills.wav");
-    }
-
-
-    public void playPredatorStep() {
-        play("predator-step.wav");
-    }
-
-    public Clip play(String resourceFile) {
-        return play(levels.getResource(resourceFile));
-    }
-
-    public void playResource(String resourcePath) {
-        play(getClass().getResource(resourcePath));
-    }
-
-    private Clip play(URL url) {
         try (AudioInputStream stream = getAudioInputStream(url)) {
 
             final Clip clip = (Clip) getLine(new Info(Clip.class, stream.getFormat()));
@@ -68,7 +37,7 @@ public class AudioPlayer {
                 }
             });
 
-            return clip;
+            lastClip = clip;
 
         } catch (UnsupportedAudioFileException | LineUnavailableException e) {
             throw new IllegalArgumentException(e);

@@ -232,7 +232,7 @@ public class GameTable {
         return grid[0].length;
     }
 
-    public String toString(Move move) {
+    private String toString(Move move) {
         final String nl = System.lineSeparator();
         final StringBuilder sb = new StringBuilder(nl);
         sb.append(move).append(nl);

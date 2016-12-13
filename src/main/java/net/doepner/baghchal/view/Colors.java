@@ -1,43 +1,41 @@
 package net.doepner.baghchal.view;
 
-import java.awt.Color;
+import net.doepner.baghchal.view.Theme.ColorId;
 
-import net.doepner.baghchal.model.Levels;
+import java.awt.Color;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
- * UI colors for a game level
+ * UI colors for a game theme
  */
 public class Colors {
 
-    private final Color gridColor;
-    private final Color diagonalColor;
-    private final Color backgroundColor;
-    private final Color boardEdgeColor;
+    private final Map<ColorId, Color> colorMap = new EnumMap<>(ColorId.class);
 
-    public Colors(Levels levels) {
-        backgroundColor = getColor(levels, "backgroundColor");
-        diagonalColor = getColor(levels, "diagonalColor");
-        gridColor = getColor(levels, "gridColor");
-        boardEdgeColor = getColor(levels, "boardEdgeColor");
+    public Colors(Properties properties) {
+        for (ColorId colorId : ColorId.values()) {
+            colorMap.put(colorId, Color.decode(properties.getProperty(key(colorId))));
+        }
     }
 
-    private static Color getColor(Levels levels, String name) {
-        return Color.decode(levels.getLevelProperty(name));
+    public Color getColor(ColorId colorId) {
+        return colorMap.get(colorId);
     }
 
-    Color backgroundColor() {
-        return backgroundColor;
+    private static String key(ColorId colorId) {
+        switch (colorId) {
+            case BACKGROUND:
+                return "backgroundColor";
+            case BOARD_EDGE:
+                return "boardEdgeColor";
+            case DIAGONAL:
+                return "diagonalColor";
+            case GRID:
+                return "gridColor";
+        }
+        throw new IllegalArgumentException("Unknown color id : " + colorId);
     }
 
-    Color boardEdgeColor() {
-        return boardEdgeColor;
-    }
-
-    Color gridColor() {
-        return gridColor;
-    }
-
-    Color diagonalColor() {
-        return diagonalColor;
-    }
 }

@@ -6,9 +6,12 @@ import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.resources.AudioPlayer;
 import net.doepner.baghchal.view.GameFrame;
 import net.doepner.baghchal.view.GamePanel;
+import net.doepner.baghchal.view.Theme;
 import org.guppy4j.WaitClock;
 
 import java.util.Arrays;
+
+import static net.doepner.baghchal.view.Theme.SoundResourceId.WELCOME;
 
 /**
  * Loop for the turn-taking of players
@@ -22,17 +25,19 @@ public class GameLoop {
     private final AudioPlayer audioPlayer;
     private final Levels levels;
 
+    private final Theme theme;
     private final Iterable<Player> players;
 
     private final WaitClock waitClock = new WaitClock(1000);
 
     public GameLoop(GameFrame gameFrame, GameTable gameTable, GamePanel gamePanel, Levels levels,
-                    AudioPlayer audioPlayer, Player... players) {
+                    AudioPlayer audioPlayer, Theme theme, Player... players) {
         this.gameFrame = gameFrame;
         this.gameTable = gameTable;
         this.gamePanel = gamePanel;
         this.levels = levels;
         this.audioPlayer = audioPlayer;
+        this.theme = theme;
         this.players = Arrays.asList(players);
     }
 
@@ -48,7 +53,7 @@ public class GameLoop {
                 final boolean playerGaveUp = (move == null);
                 if (playerGaveUp) {
                     // TODO: Make this dependent on whether the other player is the user
-                    audioPlayer.playResource("/net/doepner/baghchal/congrats.wav");
+                    audioPlayer.play(theme.getSoundResource(WELCOME));
                 }
                 levels.setLevelDone(playerGaveUp);
                 gameFrame.enableNextLevel(playerGaveUp && !levels.isGameOver());

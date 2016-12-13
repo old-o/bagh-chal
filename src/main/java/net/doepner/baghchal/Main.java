@@ -7,10 +7,8 @@ import net.doepner.baghchal.control.PreyStrategy;
 import net.doepner.baghchal.control.UserPlayer;
 import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Levels;
+import net.doepner.baghchal.model.Themes;
 import net.doepner.baghchal.resources.AudioPlayer;
-import net.doepner.baghchal.resources.Images;
-import net.doepner.baghchal.resources.LevelProperties;
-import net.doepner.baghchal.resources.LevelResources;
 import net.doepner.baghchal.view.GameFrame;
 import net.doepner.baghchal.view.GamePanel;
 import org.guppy4j.log.LogProvider;
@@ -35,24 +33,23 @@ public final class Main {
         final int maxLevel = 2;
         final Dimension boardSize = new Dimension(5, 5);
 
-        final LevelResources levelResources = new LevelResources("/net/doepner/baghchal/levels/%d/%s");
-        final LevelProperties levelProperties = new LevelProperties(levelResources, "level.properties");
-        final Levels levels = new Levels(levelProperties, levelResources, maxLevel);
+        final Themes themes = new Themes("/net/doepner/baghchal/themes", "%s/%s.%s",
+                "goats-and-tigers");
+        final Levels levels = new Levels(maxLevel);
 
-        final AudioPlayer audioPlayer = new AudioPlayer(levels);
-        final Images images = new Images(levels);
+        final AudioPlayer audioPlayer = new AudioPlayer();
 
         final GameTable gameTable = new GameTable(logProvider, boardSize.width, boardSize.height, new Setup(),
-                new EventSounds(audioPlayer));
-        final GamePanel gamePanel = new GamePanel(gameTable, images, levels);
+                new EventSounds(audioPlayer, themes));
+        final GamePanel gamePanel = new GamePanel(gameTable, themes, levels);
 
         final Player preyStrategy = new PreyStrategy();
-        final Player preyPlayer = new UserPlayer(PREY, gamePanel, images);
+        final Player preyPlayer = new UserPlayer(PREY, gamePanel, themes);
         final Player predatorStrategy = new PredatorStrategy(levels);
-        final Player predatorPlayer = new UserPlayer(PREDATOR, gamePanel, images);
+        final Player predatorPlayer = new UserPlayer(PREDATOR, gamePanel, themes);
 
-        final GameFrame gameFrame = new GameFrame(gamePanel);
-        final GameLoop gameLoop = new GameLoop(gameFrame, gameTable, gamePanel, levels, audioPlayer,
+        final GameFrame gameFrame = new GameFrame(gamePanel, themes);
+        final GameLoop gameLoop = new GameLoop(gameFrame, gameTable, gamePanel, levels, audioPlayer, themes,
                 preyPlayer, predatorStrategy);
 
         gameLoop.start();
