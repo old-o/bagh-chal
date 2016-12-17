@@ -58,14 +58,15 @@ public class GamePanel extends JPanel {
         this.gameTable = gameTable;
         this.levels = levels;
         this.theme = theme;
-        initPreferredSize();
+        initSize();
     }
 
-    void initPreferredSize() {
+    void initSize() {
         int width = (3 * gameTable.getXSize() * theme.getPieceWidth()) / 2;
         int height = (3 * gameTable.getYSize() * theme.getPieceHeight()) / 2;
         final Dimension preferredSize = new Dimension(width, height);
         setPreferredSize(preferredSize);
+        setMinimumSize(preferredSize);
         setSize(preferredSize);
     }
 

@@ -5,6 +5,7 @@ import net.doepner.baghchal.model.Themes;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.WindowConstants;
 import java.awt.BorderLayout;
@@ -37,20 +38,19 @@ public class GameFrame {
         themeChooser.addItemListener(e -> selectTheme(themes, themeChooser, gamePanel));
         themeChooser.setSelectedItem(themes.getThemeName());
 
-
         final JToolBar toolBar = new JToolBar();
         toolBar.add(newGameBtn);
         toolBar.add(nextLevelBtn);
         toolBar.add(themeChooser);
 
         frame.add(toolBar, BorderLayout.PAGE_START);
-        frame.add(gamePanel, BorderLayout.CENTER);
+        frame.add(new JScrollPane(gamePanel), BorderLayout.CENTER);
     }
 
     private void selectTheme(Themes themes, JComboBox<String> themeChooser, GamePanel gamePanel) {
         final String themeName = themeChooser.getItemAt(themeChooser.getSelectedIndex());
         themes.selectTheme(themeName);
-        gamePanel.initPreferredSize();
+        gamePanel.initSize();
         frame.pack();
         gamePanel.repaint();
     }

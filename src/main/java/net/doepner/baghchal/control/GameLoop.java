@@ -58,7 +58,7 @@ public class GameLoop {
                 levels.setLevelDone(playerGaveUp);
                 gameFrame.enableNextLevel(playerGaveUp && !levels.isGameOver());
                 gamePanel.repaint();
-//                waitClock.waitRemaining();
+                waitClock.waitRemaining();
             }
         }
     }

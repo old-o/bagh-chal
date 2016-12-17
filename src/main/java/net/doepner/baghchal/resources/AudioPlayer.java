@@ -17,13 +17,7 @@ import static javax.sound.sampled.LineEvent.Type.STOP;
  */
 public class AudioPlayer {
 
-    private Clip lastClip = null;
-
     public void play(URL url) {
-        if (lastClip != null) {
-//            lastClip.stop();
-            lastClip = null;
-        }
         try (AudioInputStream stream = getAudioInputStream(url)) {
 
             final Clip clip = (Clip) getLine(new Info(Clip.class, stream.getFormat()));
@@ -37,12 +31,10 @@ public class AudioPlayer {
                 }
             });
 
-            lastClip = clip;
-
         } catch (UnsupportedAudioFileException | LineUnavailableException e) {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException("Could not play " + url, e);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException("Could not read " + url, e);
         }
     }
 }
