@@ -21,7 +21,7 @@ public class AudioPlayer {
 
     public void play(URL url) {
         if (lastClip != null) {
-            lastClip.stop();
+//            lastClip.stop();
             lastClip = null;
         }
         try (AudioInputStream stream = getAudioInputStream(url)) {
