@@ -33,8 +33,7 @@ Build status
 Credits and code structure
 --------------------------
 
-- Idea based on http://goatsandtigers.com/downloads/goats_and_tigers_1_java.zip
-- Copyright of the original code was by Daniel Newman (danielnewman106@hotmail.com)
+- Originally based on code by Daniel Newman (danielnewman106@hotmail.com)
 - All code was completely rewritten and reorganized
 - Design Patterns : Model-View-Controller, Object-orientation
 - Codebase now uses Dependency Inject Yourself (DIY) for decoupling
