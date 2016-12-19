@@ -9,13 +9,14 @@ public enum Piece implements MoveConstraints {
         @Override
         public boolean isValid(Move move, GameTable gameTable) {
             return gameTable.getPositions().isBorderToBoard(move)
-                    || gameTable.isBorderEmpty() && gameTable.isStepAlongLine(move);
+                    || (gameTable.isBorderEmpty() && gameTable.isStepAlongLine(move));
         }
     },
     PREDATOR {
         @Override
         public boolean isValid(Move move, GameTable gameTable) {
-            return gameTable.isStepAlongLine(move) || (move.isJump() && gameTable.get(move.middle()) == Piece.PREY);
+            return gameTable.isStepAlongLine(move)
+                    || (move.isJump() && (gameTable.get(move.middle()) == PREY));
         }
     },
     INVALID {

@@ -2,13 +2,14 @@ package net.doepner.baghchal;
 
 import net.doepner.baghchal.model.Piece;
 import net.doepner.baghchal.resources.AudioPlayer;
-import net.doepner.baghchal.view.Theme;
+import net.doepner.baghchal.theming.Theme;
+import net.doepner.baghchal.theming.Theme.SoundResourceId;
 
 import static net.doepner.baghchal.model.Piece.PREDATOR;
-import static net.doepner.baghchal.view.Theme.SoundResourceId.PREDATOR_KILLS;
-import static net.doepner.baghchal.view.Theme.SoundResourceId.PREDATOR_MOVES;
-import static net.doepner.baghchal.view.Theme.SoundResourceId.PREY_MOVES;
-import static net.doepner.baghchal.view.Theme.SoundResourceId.WELCOME;
+import static net.doepner.baghchal.theming.Theme.SoundResourceId.PREDATOR_KILLS;
+import static net.doepner.baghchal.theming.Theme.SoundResourceId.PREDATOR_MOVES;
+import static net.doepner.baghchal.theming.Theme.SoundResourceId.PREY_MOVES;
+import static net.doepner.baghchal.theming.Theme.SoundResourceId.WELCOME;
 
 /**
  * Plays sounds as game table events occur
@@ -49,7 +50,7 @@ public class EventSounds implements Listener {
         play(WELCOME);
     }
 
-    private void play(Theme.SoundResourceId resourceId) {
+    private void play(SoundResourceId resourceId) {
         audioPlayer.play(theme.getSoundResource(resourceId));
     }
 }

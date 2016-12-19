@@ -6,17 +6,17 @@ import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.resources.AudioPlayer;
 import net.doepner.baghchal.view.GameFrame;
 import net.doepner.baghchal.view.GamePanel;
-import net.doepner.baghchal.view.Theme;
+import net.doepner.baghchal.theming.Theme;
 import org.guppy4j.WaitClock;
 
 import java.util.Arrays;
 
-import static net.doepner.baghchal.view.Theme.SoundResourceId.WELCOME;
+import static net.doepner.baghchal.theming.Theme.SoundResourceId.WELCOME;
 
 /**
  * Loop for the turn-taking of players
  */
-public class GameLoop {
+public final class GameLoop {
 
     private final GameFrame gameFrame;
     private final GamePanel gamePanel;
@@ -50,7 +50,7 @@ public class GameLoop {
                 final Move move = player.play(gameTable);
                 gameTable.processMove(move);
                 gamePanel.repaint();
-                final boolean playerGaveUp = (move == null);
+                final boolean playerGaveUp = move == null;
                 if (playerGaveUp) {
                     // TODO: Make this dependent on whether the other player is the user
                     audioPlayer.play(theme.getSoundResource(WELCOME));

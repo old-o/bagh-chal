@@ -8,6 +8,7 @@ import org.guppy4j.log.LogProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import static net.doepner.baghchal.model.Piece.INVALID;
@@ -16,7 +17,7 @@ import static org.guppy4j.log.Log.Level.debug;
 /**
  * The game board model
  */
-public class GameTable {
+public final class GameTable {
 
     private final LogProvider logProvider;
 
@@ -39,15 +40,15 @@ public class GameTable {
         positions = getTablePositions(xSize, ySize, grid);
     }
 
-    private TablePositions getTablePositions(int xSize, int ySize, Piece[][] grid) {
-        final TablePositions positions = new TablePositions(new Position(1, 1), new Position(xSize, ySize));
+    private static TablePositions getTablePositions(int xSize, int ySize, Piece[][] grid) {
+        final TablePositions tps = new TablePositions(new Position(1, 1), new Position(xSize, ySize));
         for (int x = 0; x < grid.length; x++) {
             for (int y = 0; y < grid[x].length; y++) {
                 final Position p = new Position(x, y);
-                positions.add(p);
+                tps.add(p);
             }
         }
-        return positions;
+        return tps;
     }
 
     public TablePositions getPositions() {
@@ -154,7 +155,7 @@ public class GameTable {
         return jumps;
     }
 
-    public void addPossibleJump(List<Move> list, Move step1) {
+    public void addPossibleJump(Collection<Move> list, Move step1) {
         final Move step2 = step1.repeat();
         if (isStepAlongLine(step2) && isEmptyAt(step2.p2())) {
             list.add(new Move(step1.p1(), step2.p2()));
@@ -194,11 +195,11 @@ public class GameTable {
         return get(p) == null;
     }
 
-    public boolean isValid(Move move, Piece piece) {
+    public boolean isValid(Move move, MoveConstraints piece) {
         return !move.isStationary() && isEmptyAt(move.p2()) && piece.isValid(move, this);
     }
 
-    public boolean isBorderEmpty() {
+    boolean isBorderEmpty() {
         for (Position p : positions.getBorder()) {
             if (get(p) != null) {
                 return false;

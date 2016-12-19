@@ -1,6 +1,6 @@
 package net.doepner.baghchal.view;
 
-import net.doepner.baghchal.view.Theme.ColorId;
+import net.doepner.baghchal.theming.Theme.ColorId;
 
 import java.awt.Color;
 import java.util.EnumMap;
@@ -10,7 +10,7 @@ import java.util.Properties;
 /**
  * UI colors for a game theme
  */
-public class Colors {
+public final class Colors {
 
     private final Map<ColorId, Color> colorMap = new EnumMap<>(ColorId.class);
 

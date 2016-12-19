@@ -1,4 +1,4 @@
-package net.doepner.baghchal.view;
+package net.doepner.baghchal.theming;
 
 import net.doepner.baghchal.resources.Images;
 

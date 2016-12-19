@@ -21,11 +21,6 @@ import static org.guppy4j.Lists.getRandomFrom;
 public final class PreyStrategy implements Player {
 
     @Override
-    public String getName() {
-        return "Prey AI";
-    }
-
-    @Override
     public Move play(GameTable gameTable) {
         final Move defensiveMove = gameTable.tryMoveFrom(getDefensiveMoves(gameTable));
         if (defensiveMove != null) {
@@ -47,13 +42,13 @@ public final class PreyStrategy implements Player {
         return null;
     }
 
-    private Move getMove(GameTable gameTable, Position borderPosition, Position boardPosition) {
+    private static Move getMove(GameTable gameTable, Position borderPosition, Position boardPosition) {
         final Move m = new Move(borderPosition, boardPosition);
         gameTable.movePiece(m);
         return m;
     }
 
-    private List<Position> getSafeBoardPositions(GameTable gameTable) {
+    private static List<Position> getSafeBoardPositions(GameTable gameTable) {
         final Set<Position> positions = new HashSet<>();
         for (Position p : gameTable.getPositions().getBoard()) {
             if (isSafePosition(p, gameTable)) {
@@ -63,7 +58,7 @@ public final class PreyStrategy implements Player {
         return new ArrayList<>(positions);
     }
 
-    private boolean isSafePosition(Position p, GameTable gameTable) {
+    private static boolean isSafePosition(Position p, GameTable gameTable) {
         if (!gameTable.isEmptyAt(p)) {
             return false;
         }
@@ -84,7 +79,7 @@ public final class PreyStrategy implements Player {
         return true;
     }
 
-    private List<Move> getDefensiveMoves(GameTable gameTable) {
+    private static List<Move> getDefensiveMoves(GameTable gameTable) {
         final List<Move> defenseMoves = new ArrayList<>();
         for (Move possibleJump : gameTable.getPossibleJumps(PREDATOR, PREY)) {
             final Position p2 = possibleJump.p2();

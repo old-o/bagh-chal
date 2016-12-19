@@ -1,8 +1,8 @@
-package net.doepner.baghchal.model;
+package net.doepner.baghchal.theming;
 
+import net.doepner.baghchal.model.Piece;
 import net.doepner.baghchal.resources.ImageLoader;
 import net.doepner.baghchal.view.Colors;
-import net.doepner.baghchal.view.Theme;
 import org.guppy4j.DirectoryLister;
 
 import java.awt.BasicStroke;
@@ -27,7 +27,7 @@ import static net.doepner.baghchal.model.Piece.PREY;
 /**
  * Switchable themes
  */
-public final class Themes implements Theme {
+public final class Themes implements Theme, ThemeSelector {
 
     private final String resourcePattern;
     private final Iterable<String> themeNames;
@@ -45,15 +45,15 @@ public final class Themes implements Theme {
         selectTheme(defaultThemeName);
     }
 
-
-
-    public Iterable<String> getNames() {
+    @Override
+    public Iterable<String> getAvailableThemeNames() {
         return themeNames;
     }
 
+    @Override
     public void selectTheme(String themeName) {
         this.themeName = themeName;
-        this.colors = new Colors(getProperties(themeName));
+        colors = new Colors(getProperties(themeName));
     }
 
     @Override
@@ -96,10 +96,12 @@ public final class Themes implements Theme {
         throw new IllegalArgumentException("Unknown sound : " + resourceId);
     }
 
+    @Override
     public int getPieceWidth() {
         return Math.max(getImage(PREDATOR).getWidth(), getImage(PREY).getWidth());
     }
 
+    @Override
     public int getPieceHeight() {
         return Math.max(getImage(PREDATOR).getHeight(), getImage(PREY).getHeight());
     }
@@ -139,7 +141,8 @@ public final class Themes implements Theme {
         return p1;
     }
 
-    public String getThemeName() {
+    @Override
+    public String getSelectedThemeName() {
         return themeName;
     }
 }

@@ -6,9 +6,8 @@ import net.doepner.baghchal.model.Move;
 /**
  * Player interface
  */
+@FunctionalInterface
 public interface Player {
-
-    String getName();
 
     Move play(GameTable gameTable);
 

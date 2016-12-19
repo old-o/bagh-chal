@@ -1,9 +1,11 @@
 package org.guppy4j;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.nio.file.DirectoryStream;
+import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,14 +25,14 @@ public final class SimpleClassPathScanner implements DirectoryLister {
         final String protocol = url.getProtocol();
         final Set<String> result = new HashSet<>();
         if ("file".equals(protocol)) {
-            getPaths(Paths.get(url.getPath()), Files::isDirectory).forEach(
+            getPaths(Paths.get(getUri(url)), Files::isDirectory).forEach(
                     p -> result.add(p.getFileName().toString())
             );
             return result;
         }
         if ("jar".equals(protocol)) {
             final String urlPath = url.getPath();
-            final int separatorIndex = urlPath.indexOf("!");
+            final int separatorIndex = urlPath.indexOf('!');
             final String jarPath = urlPath.substring("file:".length(), separatorIndex);
             final String path = urlPath.substring(separatorIndex + 1);
             final String baseEntryPath = (path.startsWith("/") ? path.substring(1) : path) + '/';
@@ -38,10 +40,10 @@ public final class SimpleClassPathScanner implements DirectoryLister {
                 final String entryPath = entries.nextElement().getName();
                 if (entryPath.startsWith(baseEntryPath) && entryPath.endsWith("/")) {
                     final String entry = entryPath.substring(baseEntryPath.length());
-                    int slashIndex = entry.indexOf("/");
+                    final int slashIndex = entry.indexOf('/');
                     if (slashIndex != -1) {
                         final String dir = entry.substring(0, slashIndex);
-                        if (dir.length() > 0) {
+                        if (!dir.isEmpty()) {
                             result.add(dir);
                         }
                     }
@@ -52,7 +54,15 @@ public final class SimpleClassPathScanner implements DirectoryLister {
         throw new IllegalArgumentException("Cannot list contents of :" + url);
     }
 
-    private static DirectoryStream<Path> getPaths(Path dir, DirectoryStream.Filter<Path> filter) {
+    private static URI getUri(URL url) {
+        try {
+            return url.toURI();
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    private static Iterable<Path> getPaths(Path dir, Filter<Path> filter) {
         try {
             return Files.newDirectoryStream(dir, filter);
         } catch (IOException e) {

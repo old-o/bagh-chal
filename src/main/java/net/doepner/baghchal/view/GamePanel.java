@@ -5,6 +5,7 @@ import net.doepner.baghchal.model.Levels;
 import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.model.Piece;
 import net.doepner.baghchal.model.Position;
+import net.doepner.baghchal.theming.Theme;
 
 import javax.swing.JPanel;
 import java.awt.BasicStroke;
@@ -15,6 +16,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.RenderingHints.Key;
 import java.awt.event.MouseAdapter;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -31,12 +33,12 @@ import static net.doepner.baghchal.model.Directions.RIGHT;
 import static net.doepner.baghchal.model.Directions.RIGHT_DOWN;
 import static net.doepner.baghchal.model.Directions.RIGHT_UP;
 import static net.doepner.baghchal.resources.Images.ImageId.CONGRATS;
-import static net.doepner.baghchal.view.Theme.ColorId.BACKGROUND;
-import static net.doepner.baghchal.view.Theme.ColorId.BOARD_EDGE;
-import static net.doepner.baghchal.view.Theme.ColorId.DIAGONAL;
-import static net.doepner.baghchal.view.Theme.ColorId.GRID;
+import static net.doepner.baghchal.theming.Theme.ColorId.BACKGROUND;
+import static net.doepner.baghchal.theming.Theme.ColorId.BOARD_EDGE;
+import static net.doepner.baghchal.theming.Theme.ColorId.DIAGONAL;
+import static net.doepner.baghchal.theming.Theme.ColorId.GRID;
 
-public class GamePanel extends JPanel {
+public final class GamePanel extends JPanel {
 
     private final GameTable gameTable;
     private final Levels levels;
@@ -47,7 +49,7 @@ public class GamePanel extends JPanel {
     private final Theme theme;
 
     private static RenderingHints createRenderingHints() {
-        final Map<RenderingHints.Key, Object> map = new HashMap<>();
+        final Map<Key, Object> map = new HashMap<>();
         map.put(KEY_TEXT_ANTIALIASING, VALUE_TEXT_ANTIALIAS_ON);
         map.put(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
         map.put(KEY_STROKE_CONTROL, VALUE_STROKE_NORMALIZE);
@@ -62,8 +64,8 @@ public class GamePanel extends JPanel {
     }
 
     void initSize() {
-        int width = (3 * gameTable.getXSize() * theme.getPieceWidth()) / 2;
-        int height = (3 * gameTable.getYSize() * theme.getPieceHeight()) / 2;
+        final int width = (3 * gameTable.getXSize() * theme.getPieceWidth()) / 2;
+        final int height = (3 * gameTable.getYSize() * theme.getPieceHeight()) / 2;
         final Dimension preferredSize = new Dimension(width, height);
         setPreferredSize(preferredSize);
         setMinimumSize(preferredSize);
@@ -114,12 +116,14 @@ public class GamePanel extends JPanel {
 
         final int xStep = width / gameTable.getXSize();
         final int yStep = height / gameTable.getYSize();
-        final int xStart = xStep + xStep / 2;
         final int xBoardEnd = xStep * gameTable.getBoardXSize();
-        final int yStart = yStep + yStep / 2;
         final int yBoardEnd = yStep * gameTable.getBoardYSize();
 
         drawBoard(g2, xStep, yStep, xBoardEnd, yBoardEnd);
+
+        final int xStart = xStep + xStep / 2;
+        final int yStart = yStep + yStep / 2;
+
         drawPieces(g2, xStep, yStep, xStart - xStep, yStart - yStep);
     }
 
@@ -131,9 +135,7 @@ public class GamePanel extends JPanel {
         g2.drawRect(xStep, yStep, xEnd, yEnd);
     }
 
-    private static final Position[] directions = new Position[]{
-            RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN
-    };
+    private static final Position[] directions = { RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN };
 
     private void drawPieces(Graphics2D g2, int xStep, int yStep, int xStart, int yStart) {
         for (Position p : gameTable.getPositions().getAll()) {
@@ -172,7 +174,7 @@ public class GamePanel extends JPanel {
     }
 
     void repaintForDrag(Rectangle rectangle, BufferedImage image) {
-        this.draggedImage = image;
+        draggedImage = image;
         repaint(rectangle);
     }
 

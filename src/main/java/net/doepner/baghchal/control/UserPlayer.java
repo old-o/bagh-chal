@@ -25,18 +25,13 @@ public final class UserPlayer implements Player {
     }
 
     @Override
-    public String getName() {
-        return System.getProperty("user.name");
-    }
-
-    @Override
     public Move play(GameTable gameTable) {
         final Result result = new Result();
         final MouseAdapter dndHandler = new DragAndDropHandler(piece, gameTable, gamePanel, images,
                 move -> {
                     synchronized (result) {
                         result.move = move;
-                        result.notify();
+                        result.notifyAll();
                     }
                 });
         gamePanel.addMouseAdapter(dndHandler);
@@ -54,6 +49,6 @@ public final class UserPlayer implements Player {
     }
 
     private static class Result {
-        public Move move;
+        Move move;
     }
 }

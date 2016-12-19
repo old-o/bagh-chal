@@ -7,7 +7,7 @@ import net.doepner.baghchal.control.PreyStrategy;
 import net.doepner.baghchal.control.UserPlayer;
 import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Levels;
-import net.doepner.baghchal.model.Themes;
+import net.doepner.baghchal.theming.Themes;
 import net.doepner.baghchal.resources.AudioPlayer;
 import net.doepner.baghchal.view.GameFrame;
 import net.doepner.baghchal.view.GamePanel;
@@ -25,6 +25,7 @@ import static net.doepner.baghchal.model.Piece.PREY;
  */
 public final class Main {
 
+    @SuppressWarnings("OverlyCoupledMethod") //
     public static void main(String... args) {
 
         System.setProperty("sun.java2d.opengl", "true");

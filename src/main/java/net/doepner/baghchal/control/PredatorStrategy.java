@@ -15,17 +15,12 @@ import static net.doepner.baghchal.model.Piece.PREY;
 /**
  * The computer player's strategy (playing the tigers)
  */
-public class PredatorStrategy implements Player {
+public final class PredatorStrategy implements Player {
 
     private final Levels levels;
 
     public PredatorStrategy(Levels levels) {
         this.levels = levels;
-    }
-
-    @Override
-    public String getName() {
-        return "Predator AI";
     }
 
     @Override
@@ -59,7 +54,7 @@ public class PredatorStrategy implements Player {
             threateningMoves.put(i, new ArrayList<>());
         }
         for (Move m : possibleMoves) {
-            int npt = numberOfPiecesThreatened(m, gameTable);
+            final int npt = numberOfPiecesThreatened(m, gameTable);
             if (npt > 0) {
                 threateningMoves.get(npt).add(m);
             }
