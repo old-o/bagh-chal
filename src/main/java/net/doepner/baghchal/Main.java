@@ -11,6 +11,7 @@ import net.doepner.baghchal.model.Themes;
 import net.doepner.baghchal.resources.AudioPlayer;
 import net.doepner.baghchal.view.GameFrame;
 import net.doepner.baghchal.view.GamePanel;
+import org.guppy4j.SimpleClassPathScanner;
 import org.guppy4j.log.LogProvider;
 import org.guppy4j.log.Slf4jLogProvider;
 
@@ -33,8 +34,9 @@ public final class Main {
         final int maxLevel = 2;
         final Dimension boardSize = new Dimension(5, 5);
 
-        final Themes themes = new Themes("/net/doepner/baghchal/themes", "%s/%s.%s",
-                "goats-and-tigers");
+        final Themes themes = new Themes(new SimpleClassPathScanner(),
+                "/net/doepner/baghchal/themes",
+                "%s/%s.%s","goats-and-tigers");
         final Levels levels = new Levels(maxLevel);
 
         final AudioPlayer audioPlayer = new AudioPlayer();

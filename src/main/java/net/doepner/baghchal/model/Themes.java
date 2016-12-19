@@ -3,6 +3,7 @@ package net.doepner.baghchal.model;
 import net.doepner.baghchal.resources.ImageLoader;
 import net.doepner.baghchal.view.Colors;
 import net.doepner.baghchal.view.Theme;
+import org.guppy4j.DirectoryLister;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -11,13 +12,9 @@ import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -41,27 +38,14 @@ public final class Themes implements Theme {
     private String themeName;
     private Colors colors;
 
-    public Themes(String resourceBasePath, String resourcePattern, String defaultThemeName) {
+    public Themes(DirectoryLister directoryLister, String resourceBasePath,
+                  String resourcePattern, String defaultThemeName) {
         this.resourcePattern = resourceBasePath + '/' + resourcePattern;
-        themeNames = getSubDirectories(resourceBasePath);
+        themeNames = directoryLister.getSubDirectories(getClass().getResource(resourceBasePath));
         selectTheme(defaultThemeName);
     }
 
-    private List<String> getSubDirectories(String resourceBasePath) {
-        List<String> filenames = new ArrayList<>();
 
-        try (InputStream in = getClass().getResourceAsStream(resourceBasePath);
-             BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
-            String resource;
-
-            while ((resource = br.readLine()) != null) {
-                filenames.add(resource);
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-        return filenames;
-    }
 
     public Iterable<String> getNames() {
         return themeNames;
