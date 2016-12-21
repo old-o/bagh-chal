@@ -6,6 +6,7 @@ import org.guppy4j.Lists;
 import org.guppy4j.log.Log;
 import org.guppy4j.log.LogProvider;
 
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,8 +22,8 @@ public final class GameTable {
 
     private final LogProvider logProvider;
 
-    private final int xSize;
-    private final int ySize;
+    private final int boardXSize;
+    private final int boardYSize;
 
     private final Piece[][] grid;
 
@@ -30,14 +31,14 @@ public final class GameTable {
     private final Listener listener;
     private final TablePositions positions;
 
-    public GameTable(LogProvider logProvider, int xSize, int ySize, Setup setup, Listener listener) {
+    public GameTable(LogProvider logProvider, int boardXSize, int boardYSize, Setup setup, Listener listener) {
         this.logProvider = logProvider;
         this.setup = setup;
         this.listener = listener;
-        this.xSize = xSize;
-        this.ySize = ySize;
-        grid = new Piece[xSize + 2][ySize + 2];
-        positions = getTablePositions(xSize, ySize, grid);
+        this.boardXSize = boardXSize;
+        this.boardYSize = boardYSize;
+        grid = new Piece[boardXSize + 2][boardYSize + 2];
+        positions = getTablePositions(boardXSize, boardYSize, grid);
     }
 
     private static TablePositions getTablePositions(int xSize, int ySize, Piece[][] grid) {
@@ -62,7 +63,7 @@ public final class GameTable {
      * @param gameTable An existing GameTable instance
      */
     private GameTable(GameTable gameTable) {
-        this(gameTable.logProvider, gameTable.xSize, gameTable.ySize, gameTable.setup, Listener.NONE);
+        this(gameTable.logProvider, gameTable.boardXSize, gameTable.boardYSize, gameTable.setup, Listener.NONE);
         for (int x = 0; x < grid.length; x++) {
             System.arraycopy(gameTable.grid[x], 0, grid[x], 0, grid[x].length);
         }
@@ -172,7 +173,6 @@ public final class GameTable {
             Arrays.fill(pieces, null);
         }
         setup.prepare(this);
-        listener.afterReset();
     }
 
     public Piece get(Position p) {
@@ -218,11 +218,11 @@ public final class GameTable {
     }
 
     public int getBoardXSize() {
-        return xSize;
+        return boardXSize;
     }
 
     public int getBoardYSize() {
-        return ySize;
+        return boardYSize;
     }
 
     public int getXSize() {
@@ -245,5 +245,19 @@ public final class GameTable {
             sb.append(nl);
         }
         return sb.toString();
+    }
+
+    private final List<Runnable> discardListeners = new ArrayList<>();
+
+    public void addDiscardListener(Runnable listener) {
+        discardListeners.add(listener);
+    }
+
+    public void discard() {
+        discardListeners.forEach(Runnable::run);
+    }
+
+    public boolean isBoardSize(Dimension boardSize) {
+        return boardSize.width == getBoardXSize() && boardSize.height == getBoardYSize();
     }
 }

@@ -16,7 +16,7 @@ public interface Theme extends Images {
 
     Color getColor(ColorId colorId);
 
-    enum SoundResourceId { WELCOME, PREDATOR_KILLS, PREY_MOVES, PREDATOR_MOVES }
+    enum SoundResourceId { WELCOME, PREDATOR_KILLS, PREY_MOVES, PREDATOR_MOVES, CONGRATS }
 
     URL getSoundResource(SoundResourceId resourceId);
 

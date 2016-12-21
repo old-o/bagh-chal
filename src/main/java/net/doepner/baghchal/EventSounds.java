@@ -9,7 +9,6 @@ import static net.doepner.baghchal.model.Piece.PREDATOR;
 import static net.doepner.baghchal.theming.Theme.SoundResourceId.PREDATOR_KILLS;
 import static net.doepner.baghchal.theming.Theme.SoundResourceId.PREDATOR_MOVES;
 import static net.doepner.baghchal.theming.Theme.SoundResourceId.PREY_MOVES;
-import static net.doepner.baghchal.theming.Theme.SoundResourceId.WELCOME;
 
 /**
  * Plays sounds as game table events occur
@@ -47,7 +46,7 @@ public class EventSounds implements Listener {
 
     @Override
     public void afterReset() {
-        play(WELCOME);
+//        play(WELCOME);
     }
 
     private void play(SoundResourceId resourceId) {

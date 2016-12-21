@@ -92,6 +92,8 @@ public final class Themes implements Theme, ThemeSelector {
                 final URL resource = getResource("prey" + preyIndex, "wav");
                 preyIndex = (preyIndex % 3) + 1;
                 return resource;
+            case CONGRATS:
+                return getResource("congrats", "wav");
         }
         throw new IllegalArgumentException("Unknown sound : " + resourceId);
     }

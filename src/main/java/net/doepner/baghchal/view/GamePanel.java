@@ -1,6 +1,7 @@
 package net.doepner.baghchal.view;
 
 import net.doepner.baghchal.model.GameTable;
+import net.doepner.baghchal.model.GameTableFactory;
 import net.doepner.baghchal.model.Levels;
 import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.model.Piece;
@@ -16,7 +17,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.RenderingHints.Key;
 import java.awt.event.MouseAdapter;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -38,32 +38,45 @@ import static net.doepner.baghchal.theming.Theme.ColorId.BOARD_EDGE;
 import static net.doepner.baghchal.theming.Theme.ColorId.DIAGONAL;
 import static net.doepner.baghchal.theming.Theme.ColorId.GRID;
 
-public final class GamePanel extends JPanel {
+public class GamePanel extends JPanel {
 
-    private final GameTable gameTable;
     private final Levels levels;
 
     private final BasicStroke stroke = new BasicStroke(3f);
     private final RenderingHints renderingHints = createRenderingHints();
 
     private final Theme theme;
+    private final GameTableFactory gameTableFactory;
+
+    private GameTable gameTable;
 
     private static RenderingHints createRenderingHints() {
-        final Map<Key, Object> map = new HashMap<>();
+        final Map<RenderingHints.Key, Object> map = new HashMap<>();
         map.put(KEY_TEXT_ANTIALIASING, VALUE_TEXT_ANTIALIAS_ON);
         map.put(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
         map.put(KEY_STROKE_CONTROL, VALUE_STROKE_NORMALIZE);
         return new RenderingHints(map);
     }
 
-    public GamePanel(GameTable gameTable, Theme theme, Levels levels) {
-        this.gameTable = gameTable;
+    public GamePanel(GameTableFactory gameTableFactory, Dimension defaultBoardSize, Theme theme, Levels levels) {
+        this.gameTableFactory = gameTableFactory;
         this.levels = levels;
         this.theme = theme;
-        initSize();
+        setBoardSize(defaultBoardSize);
     }
 
-    void initSize() {
+    void setBoardSize(Dimension boardSize) {
+        if (gameTable == null || !gameTable.isBoardSize(boardSize)) {
+            final GameTable oldGameTable = gameTable;
+            gameTable = gameTableFactory.getGameTable(boardSize.width, boardSize.height);
+            if (oldGameTable != null && gameTable != oldGameTable) {
+                oldGameTable.discard();
+            }
+        }
+        setSize();
+    }
+
+    void setSize() {
         final int width = (3 * gameTable.getXSize() * theme.getPieceWidth()) / 2;
         final int height = (3 * gameTable.getYSize() * theme.getPieceHeight()) / 2;
         final Dimension preferredSize = new Dimension(width, height);
@@ -116,14 +129,12 @@ public final class GamePanel extends JPanel {
 
         final int xStep = width / gameTable.getXSize();
         final int yStep = height / gameTable.getYSize();
+        final int xStart = xStep + xStep / 2;
         final int xBoardEnd = xStep * gameTable.getBoardXSize();
+        final int yStart = yStep + yStep / 2;
         final int yBoardEnd = yStep * gameTable.getBoardYSize();
 
         drawBoard(g2, xStep, yStep, xBoardEnd, yBoardEnd);
-
-        final int xStart = xStep + xStep / 2;
-        final int yStart = yStep + yStep / 2;
-
         drawPieces(g2, xStep, yStep, xStart - xStep, yStart - yStep);
     }
 
@@ -135,7 +146,9 @@ public final class GamePanel extends JPanel {
         g2.drawRect(xStep, yStep, xEnd, yEnd);
     }
 
-    private static final Position[] directions = { RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN };
+    private static final Position[] directions = new Position[]{
+            RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN
+    };
 
     private void drawPieces(Graphics2D g2, int xStep, int yStep, int xStart, int yStart) {
         for (Position p : gameTable.getPositions().getAll()) {
@@ -197,5 +210,9 @@ public final class GamePanel extends JPanel {
         removeMouseListener(mouseAdapter);
         removeMouseMotionListener(mouseAdapter);
         removeMouseWheelListener(mouseAdapter);
+    }
+
+    public GameTable getGameTable() {
+        return gameTable;
     }
 }

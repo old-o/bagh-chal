@@ -1,13 +1,13 @@
 package net.doepner.baghchal.control;
 
-import java.awt.event.MouseAdapter;
-
 import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.model.Piece;
 import net.doepner.baghchal.resources.Images;
-import net.doepner.baghchal.view.GamePanel;
 import net.doepner.baghchal.view.DragAndDropHandler;
+import net.doepner.baghchal.view.GamePanel;
+
+import java.awt.event.MouseAdapter;
 
 /**
  * Lets the user control the prey pieces
@@ -27,25 +27,30 @@ public final class UserPlayer implements Player {
     @Override
     public Move play(GameTable gameTable) {
         final Result result = new Result();
+
         final MouseAdapter dndHandler = new DragAndDropHandler(piece, gameTable, gamePanel, images,
-                move -> {
-                    synchronized (result) {
-                        result.move = move;
-                        result.notifyAll();
-                    }
-                });
+                move -> done(result, move));
+
+        gameTable.addDiscardListener(() -> done(result, null));
+
         gamePanel.addMouseAdapter(dndHandler);
         try {
             synchronized (result) {
-                while (result.move == null) {
-                    result.wait();
-                }
+                result.wait();
             }
         } catch (InterruptedException e) {
             throw new IllegalStateException(e);
         }
         gamePanel.removeMouseAdapter(dndHandler);
+
         return result.move;
+    }
+
+    private void done(Result result, Move move) {
+        synchronized (result) {
+            result.move = move;
+            result.notifyAll();
+        }
     }
 
     private static class Result {

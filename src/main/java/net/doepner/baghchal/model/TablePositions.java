@@ -63,7 +63,7 @@ public final class TablePositions {
     }
 
     public boolean isBorder(Position p) {
-        return border.contains(p);
+        return border.contains(p) || borderCorners.contains(p);
     }
 
     public boolean isBorderToBoard(Move move) {
