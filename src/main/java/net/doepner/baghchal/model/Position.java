@@ -39,11 +39,11 @@ public final class Position {
     }
 
     public Position add(Position p) {
-        return add(p.x,p.y);
+        return new Position(x + p.x, y + p.y);
     }
 
-    public Position add(int xStep, int yStep) {
-        return new Position(x + xStep, y + yStep);
+    public Position subtract(Position p) {
+        return new Position(x - p.x, y - p.y);
     }
 
     public boolean isLessOrEqualTo(Position p) {
@@ -55,7 +55,7 @@ public final class Position {
     }
 
     public boolean hasEvenCoordSum() {
-        return (x+y) % 2 == 0;
+        return (x + y) % 2 == 0;
     }
 
     @Override

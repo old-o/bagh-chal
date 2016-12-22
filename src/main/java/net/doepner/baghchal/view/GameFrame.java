@@ -16,12 +16,12 @@ import java.awt.Dimension;
 /**
  * Main frame
  */
-public class GameFrame {
+public final class GameFrame {
 
     private final JFrame frame;
     private final JButton nextLevelBtn;
 
-    private GamePanel gamePanel;
+    private final GamePanel gamePanel;
 
     private final SpinnerNumberModel boardXSizeModel;
     private final SpinnerNumberModel boardYSizeModel;
@@ -96,5 +96,9 @@ public class GameFrame {
         gamePanel.start();
         frame.pack();
         gamePanel.repaint();
+    }
+
+    public GamePanel getGamePanel() {
+        return gamePanel;
     }
 }

@@ -5,6 +5,7 @@ import net.doepner.baghchal.model.Levels;
 import net.doepner.baghchal.model.Move;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +66,7 @@ public final class PredatorStrategy implements Player {
     private static int numberOfPiecesThreatened(Move m, GameTable gameTable) {
         final GameTable b = gameTable.copy();
         b.movePiece(m);
-        final List<Move> jumps = new ArrayList<>();
+        final Collection<Move> jumps = new ArrayList<>();
         for (Move step : b.getStepsWhereAdjacent(PREDATOR, PREY)) {
             b.addPossibleJump(jumps, step);
         }

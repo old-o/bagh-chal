@@ -33,7 +33,6 @@ public final class PreyStrategy implements Player {
                 return getMove(gameTable, borderPosition, boardPosition);
             }
         }
-
         // 2) place on the board edge next to a prey if possible
         // 3) place in a position that cannot be jumped over, preferably next to other prey that can also not be jumped over
         // 3a) if there is a choice to block off an empty position (make it unreachable for predator, do it
@@ -58,25 +57,26 @@ public final class PreyStrategy implements Player {
         return new ArrayList<>(positions);
     }
 
-    private static boolean isSafePosition(Position p, GameTable gameTable) {
-        if (!gameTable.isEmptyAt(p)) {
+    private static boolean isSafePosition(Position p, GameTable table) {
+        if (!table.isEmptyAt(p)) {
             return false;
         }
         for (Position d : Directions.getAll()) {
-            final Move m = new Move(p, p.add(d));
-            if (gameTable.isStepAlongLine(m)) {
-                final Position p3 = p.add(-m.xStep(), -m.yStep());
-                if (gameTable.getPositions().isBoard(p3)) {
-                    final Piece piece2 = gameTable.get(m.p2());
-                    final Piece piece3 = gameTable.get(p3);
-                    if ((piece2 == null || piece2 == PREDATOR)
-                            && (piece3 == null || piece3 == PREDATOR)) {
-                        return false;
-                    }
-                }
+            final Position fore = p.add(d);
+            final Position back = p.subtract(d);
+
+            if (table.isStepAlongLine(new Move(p, fore)) && table.getPositions().isBoard(back)
+                    && isEmptyOrPredator(table.get(fore)) && isEmptyOrPredator(table.get(back))) {
+                // not safe because both neighboring fields are empty or occupied by predator
+                // which means on this position we could be jumped over and killed
+                return false;
             }
         }
         return true;
+    }
+
+    private static boolean isEmptyOrPredator(Piece piece) {
+        return (piece == null) || (piece == PREDATOR);
     }
 
     private static List<Move> getDefensiveMoves(GameTable gameTable) {

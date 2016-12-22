@@ -2,6 +2,7 @@ package net.doepner.baghchal.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Classifies table positions
@@ -17,7 +18,7 @@ public final class TablePositions {
     private final Position topLeft;
     private final Position bottomRight;
 
-    public TablePositions(Position topLeft, Position bottomRight) {
+    TablePositions(Position topLeft, Position bottomRight) {
         this.topLeft = topLeft;
         this.bottomRight = bottomRight;
     }
@@ -49,7 +50,7 @@ public final class TablePositions {
     }
 
     public Iterable<Position> getBorder() {
-        final ArrayList<Position> list = new ArrayList<>(border);
+        final Collection<Position> list = new ArrayList<>(border);
         list.addAll(borderCorners);
         return list;
     }

@@ -12,6 +12,7 @@ import net.doepner.baghchal.resources.AudioPlayer;
 import net.doepner.baghchal.theming.Themes;
 import net.doepner.baghchal.view.GameFrame;
 import net.doepner.baghchal.view.GamePanel;
+import org.guppy4j.Executable;
 import org.guppy4j.SimpleClassPathScanner;
 import org.guppy4j.log.LogProvider;
 import org.guppy4j.log.Slf4jLogProvider;
@@ -21,6 +22,7 @@ import java.awt.Dimension;
 
 import static net.doepner.baghchal.model.Piece.PREDATOR;
 import static net.doepner.baghchal.model.Piece.PREY;
+import static net.doepner.baghchal.theming.Theme.SoundResourceId.CONGRATS;
 
 /**
  * Entry point of the game
@@ -59,8 +61,9 @@ public final class Main {
                 new SpinnerNumberModel(5, 4, 8, 1),
                 new SpinnerNumberModel(5, 4, 8, 1));
 
+        final Executable congrats = () -> audioPlayer.play(themes.getSoundResource(CONGRATS));
 
-        final GameLoop gameLoop = new GameLoop(logProvider, gameFrame, gamePanel, levels, audioPlayer, themes,
+        final GameLoop gameLoop = new GameLoop(logProvider, gameFrame, levels, congrats,
                 preyPlayer, predatorStrategy);
 
         gameLoop.start();

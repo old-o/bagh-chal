@@ -44,13 +44,13 @@ public final class UserPlayer implements Player {
         gamePanel.removeMouseAdapter(dndHandler);
 
         if (result.move == null) {
-            throw new PlayerInterruptedException();
+            throw new PlayerInterruptedException("Game table changed during player's turn!");
         } else {
             return result.move;
         }
     }
 
-    private void done(Result result, Move move) {
+    private static void done(Result result, Move move) {
         synchronized (result) {
             result.move = move;
             result.notifyAll();
