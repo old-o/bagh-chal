@@ -60,7 +60,7 @@ public final class Main {
                 new SpinnerNumberModel(5, 4, 8, 1));
 
 
-        final GameLoop gameLoop = new GameLoop(gameFrame, gamePanel, levels, audioPlayer, themes,
+        final GameLoop gameLoop = new GameLoop(logProvider, gameFrame, gamePanel, levels, audioPlayer, themes,
                 preyPlayer, predatorStrategy);
 
         gameLoop.start();

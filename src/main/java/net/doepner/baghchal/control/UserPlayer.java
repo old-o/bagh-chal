@@ -43,7 +43,11 @@ public final class UserPlayer implements Player {
         }
         gamePanel.removeMouseAdapter(dndHandler);
 
-        return result.move;
+        if (result.move == null) {
+            throw new PlayerInterruptedException();
+        } else {
+            return result.move;
+        }
     }
 
     private void done(Result result, Move move) {
