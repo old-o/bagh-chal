@@ -52,6 +52,7 @@ public final class GameFrame {
         ySizeSpinner.addChangeListener(e -> updateBoardSize());
 
         final JToolBar toolBar = new JToolBar();
+        toolBar.setFloatable(false);
         addTo(toolBar, newGameBtn, nextLevelBtn);
         addTo(toolBar, new JLabel("Theme: "), themeChooser);
         addTo(toolBar, new JLabel("Width: "), xSizeSpinner);
