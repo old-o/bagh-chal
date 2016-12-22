@@ -2,16 +2,9 @@ package net.doepner.baghchal.view;
 
 import net.doepner.baghchal.theming.ThemeSelector;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JToolBar;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.WindowConstants;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import javax.swing.*;
+import javax.swing.JToolBar.Separator;
+import java.awt.*;
 
 /**
  * Main frame
@@ -59,15 +52,24 @@ public final class GameFrame {
         ySizeSpinner.addChangeListener(e -> updateBoardSize());
 
         final JToolBar toolBar = new JToolBar();
-        toolBar.add(newGameBtn);
-        toolBar.add(nextLevelBtn);
-        toolBar.add(themeChooser);
-        toolBar.add(xSizeSpinner);
-        toolBar.add(ySizeSpinner);
+        addTo(toolBar, newGameBtn, nextLevelBtn);
+        addTo(toolBar, new JLabel("Theme: "), themeChooser);
+        addTo(toolBar, new JLabel("Width: "), xSizeSpinner);
+        addTo(toolBar, new JLabel("Height: "), ySizeSpinner);
 
         frame.add(toolBar, BorderLayout.PAGE_START);
         frame.add(new JScrollPane(gamePanel), BorderLayout.CENTER);
+    }
 
+    private static void addTo(JToolBar toolBar, Component... components) {
+        for (Component component : components) {
+            final Dimension size = component.getPreferredSize();
+            component.setMaximumSize(size);
+            component.setMinimumSize(size);
+            component.setPreferredSize(size);
+            toolBar.add(component);
+        }
+        toolBar.add(new Separator(new Dimension(10, 10)));
     }
 
     private void selectTheme(ThemeSelector themeSelector, JComboBox<String> themeChooser) {
