@@ -5,7 +5,7 @@ import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.model.Piece;
 import net.doepner.baghchal.model.Position;
-import net.doepner.baghchal.resources.Images;
+import net.doepner.baghchal.theming.Images;
 
 import java.awt.Component;
 import java.awt.Point;

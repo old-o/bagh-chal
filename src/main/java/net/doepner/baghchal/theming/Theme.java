@@ -1,7 +1,5 @@
 package net.doepner.baghchal.theming;
 
-import net.doepner.baghchal.resources.Images;
-
 import java.awt.Color;
 import java.awt.Paint;
 import java.awt.Stroke;

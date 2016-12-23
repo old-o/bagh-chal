@@ -1,4 +1,4 @@
-package net.doepner.baghchal.resources;
+package net.doepner.baghchal.theming;
 
 import net.doepner.baghchal.model.Piece;
 

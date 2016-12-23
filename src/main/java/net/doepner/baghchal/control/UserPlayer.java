@@ -3,7 +3,7 @@ package net.doepner.baghchal.control;
 import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.model.Piece;
-import net.doepner.baghchal.resources.Images;
+import net.doepner.baghchal.theming.Images;
 import net.doepner.baghchal.view.DragAndDropHandler;
 import net.doepner.baghchal.view.GamePanel;
 

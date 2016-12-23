@@ -32,7 +32,7 @@ import static net.doepner.baghchal.model.Directions.DOWN;
 import static net.doepner.baghchal.model.Directions.RIGHT;
 import static net.doepner.baghchal.model.Directions.RIGHT_DOWN;
 import static net.doepner.baghchal.model.Directions.RIGHT_UP;
-import static net.doepner.baghchal.resources.Images.ImageId.CONGRATS;
+import static net.doepner.baghchal.theming.Images.ImageId.CONGRATS;
 import static net.doepner.baghchal.theming.Theme.ColorId.BACKGROUND;
 import static net.doepner.baghchal.theming.Theme.ColorId.BOARD_EDGE;
 import static net.doepner.baghchal.theming.Theme.ColorId.DIAGONAL;
