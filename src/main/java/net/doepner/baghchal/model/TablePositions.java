@@ -2,7 +2,6 @@ package net.doepner.baghchal.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Classifies table positions
@@ -13,32 +12,27 @@ public final class TablePositions {
     private final Collection<Position> board = new ArrayList<>();
     private final Collection<Position> border = new ArrayList<>();
     private final Collection<Position> corners = new ArrayList<>();
-    private final Collection<Position> borderCorners = new ArrayList<>();
 
-    private final Position topLeft;
-    private final Position bottomRight;
-
-    TablePositions(Position topLeft, Position bottomRight) {
-        this.topLeft = topLeft;
-        this.bottomRight = bottomRight;
-    }
-
-    public void add(Position p) {
-        all.add(p);
-        if (p.isGreaterOrEqualTo(topLeft) && p.isLessOrEqualTo(bottomRight)) {
-            board.add(p);
-            if ((p.x() == topLeft.x() || p.x() == bottomRight.x())
-                    && (p.y() == topLeft.y() || p.y() == bottomRight.y())) {
-                corners.add(p);
-            }
-        } else {
-            if ((p.x() < topLeft.x() || p.x() > bottomRight.x())
-                    && (p.y() < topLeft.y() || p.y() > bottomRight.y())) {
-                borderCorners.add(p);
+    TablePositions(Position topLeft, Position bottomRight, Iterable<Position> positions) {
+        final Collection<Position> borderCorners = new ArrayList<>();
+        for (Position p : positions) {
+            all.add(p);
+            if (p.isGreaterOrEqualTo(topLeft) && p.isLessOrEqualTo(bottomRight)) {
+                board.add(p);
+                if ((p.x() == topLeft.x() || p.x() == bottomRight.x())
+                        && (p.y() == topLeft.y() || p.y() == bottomRight.y())) {
+                    corners.add(p);
+                }
             } else {
-                border.add(p);
+                if ((p.x() < topLeft.x() || p.x() > bottomRight.x())
+                        && (p.y() < topLeft.y() || p.y() > bottomRight.y())) {
+                    borderCorners.add(p);
+                } else {
+                    border.add(p);
+                }
             }
         }
+        border.addAll(borderCorners);
     }
 
     public Iterable<Position> getAll() {
@@ -50,9 +44,7 @@ public final class TablePositions {
     }
 
     public Iterable<Position> getBorder() {
-        final Collection<Position> list = new ArrayList<>(border);
-        list.addAll(borderCorners);
-        return list;
+        return border;
     }
 
     public Iterable<Position> getCorners() {
@@ -64,7 +56,7 @@ public final class TablePositions {
     }
 
     public boolean isBorder(Position p) {
-        return border.contains(p) || borderCorners.contains(p);
+        return border.contains(p);
     }
 
     public boolean isBorderToBoard(Move move) {

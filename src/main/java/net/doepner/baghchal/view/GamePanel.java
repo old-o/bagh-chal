@@ -1,5 +1,6 @@
 package net.doepner.baghchal.view;
 
+import net.doepner.baghchal.model.Direction;
 import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.GameTableFactory;
 import net.doepner.baghchal.model.Levels;
@@ -28,10 +29,10 @@ import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
 import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
 import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
 import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
-import static net.doepner.baghchal.model.Directions.DOWN;
-import static net.doepner.baghchal.model.Directions.RIGHT;
-import static net.doepner.baghchal.model.Directions.RIGHT_DOWN;
-import static net.doepner.baghchal.model.Directions.RIGHT_UP;
+import static net.doepner.baghchal.model.Direction.DOWN;
+import static net.doepner.baghchal.model.Direction.RIGHT;
+import static net.doepner.baghchal.model.Direction.RIGHT_DOWN;
+import static net.doepner.baghchal.model.Direction.RIGHT_UP;
 import static net.doepner.baghchal.theming.Images.ImageId.CONGRATS;
 import static net.doepner.baghchal.theming.Theme.ColorId.BACKGROUND;
 import static net.doepner.baghchal.theming.Theme.ColorId.BOARD_EDGE;
@@ -146,7 +147,7 @@ public class GamePanel extends JPanel {
         g2.drawRect(xStep, yStep, xEnd, yEnd);
     }
 
-    private static final Position[] directions = new Position[]{
+    private static final Direction[] directions = new Direction[]{
             RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN
     };
 
@@ -155,8 +156,8 @@ public class GamePanel extends JPanel {
             final int x = xStart + p.x() * xStep;
             final int y = yStart + p.y() * yStep;
 
-            for (Position d : directions) {
-                final Move step = new Move(p, p.add(d));
+            for (Direction d : directions) {
+                final Move step = new Move(p, d.addTo(p));
                 drawLine(g2, xStep, yStep, x, y, step);
             }
 

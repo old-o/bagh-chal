@@ -31,25 +31,27 @@ public final class GameTable {
     private final Listener listener;
     private final TablePositions positions;
 
-    public GameTable(LogProvider logProvider, int boardXSize, int boardYSize, Setup setup, Listener listener) {
+    public GameTable(LogProvider logProvider, int boardXSize, int boardYSize,
+                     Setup setup, Listener listener) {
         this.logProvider = logProvider;
         this.setup = setup;
         this.listener = listener;
         this.boardXSize = boardXSize;
         this.boardYSize = boardYSize;
         grid = new Piece[boardXSize + 2][boardYSize + 2];
-        positions = getTablePositions(boardXSize, boardYSize, grid);
+        final Position topLeft = new Position(1, 1);
+        final Position bottomRight = new Position(boardXSize, boardYSize);
+        positions = new TablePositions(topLeft, bottomRight, getPositions(grid));
     }
 
-    private static TablePositions getTablePositions(int xSize, int ySize, Piece[][] grid) {
-        final TablePositions tps = new TablePositions(new Position(1, 1), new Position(xSize, ySize));
+    private static Iterable<Position> getPositions(Piece[][] grid) {
+        final Collection<Position> list = new ArrayList<>();
         for (int x = 0; x < grid.length; x++) {
             for (int y = 0; y < grid[x].length; y++) {
-                final Position p = new Position(x, y);
-                tps.add(p);
+                list.add(new Position(x, y));
             }
         }
-        return tps;
+        return list;
     }
 
     public TablePositions getPositions() {
@@ -126,8 +128,8 @@ public final class GameTable {
         final List<Move> steps = new ArrayList<>();
         for (Position p : positions.getBoard()) {
             if (get(p) == movingPiece) {
-                for (Position d : Directions.getAll()) {
-                    final Position p2 = p.add(d);
+                for (Direction d : Direction.values()) {
+                    final Position p2 = d.addTo(p);
                     if (get(p2) == requiredPiece) {
                         final Move step = new Move(p, p2);
                         if (isStepAlongLine(step)) {

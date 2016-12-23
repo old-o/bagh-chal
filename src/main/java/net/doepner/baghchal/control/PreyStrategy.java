@@ -1,6 +1,6 @@
 package net.doepner.baghchal.control;
 
-import net.doepner.baghchal.model.Directions;
+import net.doepner.baghchal.model.Direction;
 import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.model.Piece;
@@ -61,9 +61,9 @@ public final class PreyStrategy implements Player {
         if (!table.isEmptyAt(p)) {
             return false;
         }
-        for (Position d : Directions.getAll()) {
-            final Position fore = p.add(d);
-            final Position back = p.subtract(d);
+        for (Direction d : Direction.values()) {
+            final Position fore = d.addTo(p);
+            final Position back = d.subtractFrom(p);
 
             if (table.isStepAlongLine(new Move(p, fore)) && table.getPositions().isBoard(back)
                     && isEmptyOrPredator(table.get(fore)) && isEmptyOrPredator(table.get(back))) {
