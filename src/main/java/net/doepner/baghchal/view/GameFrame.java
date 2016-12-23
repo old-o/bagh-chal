@@ -1,15 +1,22 @@
 package net.doepner.baghchal.view;
 
+import net.doepner.baghchal.model.Position;
 import net.doepner.baghchal.theming.ThemeSelector;
+import org.guppy4j.log.Log;
+import org.guppy4j.log.LogProvider;
 
 import javax.swing.*;
 import javax.swing.JToolBar.Separator;
 import java.awt.*;
 
+import static org.guppy4j.log.Log.Level.debug;
+
 /**
  * Main frame
  */
 public final class GameFrame {
+
+    private final Log log;
 
     private final JFrame frame;
     private final JButton nextLevelBtn;
@@ -19,9 +26,11 @@ public final class GameFrame {
     private final SpinnerNumberModel boardXSizeModel;
     private final SpinnerNumberModel boardYSizeModel;
 
-    public GameFrame(final GamePanel gamePanel, final ThemeSelector themeSelector,
+    public GameFrame(LogProvider logProvider,
+                     GamePanel gamePanel, ThemeSelector themeSelector,
                      SpinnerNumberModel boardXSizeModel,
                      SpinnerNumberModel boardYSizeModel) {
+        log = logProvider.getLog(getClass());
         this.gamePanel = gamePanel;
 
         this.boardXSizeModel = boardXSizeModel;
@@ -99,6 +108,13 @@ public final class GameFrame {
         gamePanel.start();
         frame.pack();
         gamePanel.repaint();
+
+        final Rectangle screenSize = gamePanel.getGraphicsConfiguration().getBounds();
+        log.as(debug, "Screen size: {} x {}", screenSize.getWidth(), screenSize.getHeight());
+
+        final Position maxPosition = gamePanel.getMaxPosition(screenSize);
+        boardXSizeModel.setMaximum(maxPosition.x());
+        boardYSizeModel.setMaximum(maxPosition.y());
     }
 
     public GamePanel getGamePanel() {

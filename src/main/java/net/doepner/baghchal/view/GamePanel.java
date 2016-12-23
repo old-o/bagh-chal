@@ -10,6 +10,7 @@ import net.doepner.baghchal.model.Position;
 import net.doepner.baghchal.theming.Theme;
 
 import javax.swing.JPanel;
+import java.awt.Stroke;
 import java.awt.BasicStroke;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -18,6 +19,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+
 import java.awt.event.MouseAdapter;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -39,11 +41,11 @@ import static net.doepner.baghchal.theming.Theme.ColorId.BOARD_EDGE;
 import static net.doepner.baghchal.theming.Theme.ColorId.DIAGONAL;
 import static net.doepner.baghchal.theming.Theme.ColorId.GRID;
 
-public class GamePanel extends JPanel {
+public final class GamePanel extends JPanel {
 
     private final Levels levels;
 
-    private final BasicStroke stroke = new BasicStroke(3f);
+    private final Stroke stroke = new BasicStroke(3f);
     private final RenderingHints renderingHints = createRenderingHints();
 
     private final Theme theme;
@@ -84,6 +86,13 @@ public class GamePanel extends JPanel {
         setPreferredSize(preferredSize);
         setMinimumSize(preferredSize);
         setSize(preferredSize);
+    }
+
+    @SuppressWarnings({"NumericCastThatLosesPrecision", "ImplicitNumericConversion"})
+    Position getMaxPosition(Rectangle bounds) {
+        final int x = (int) ((2.0 * bounds.getWidth()) / (3.0 * theme.getPieceWidth()));
+        final int y = (int) ((2.0 * bounds.getHeight()) / (3.0 * theme.getPieceHeight()));
+        return new Position(x - 3, y - 3);
     }
 
     public void start() {
@@ -147,9 +156,7 @@ public class GamePanel extends JPanel {
         g2.drawRect(xStep, yStep, xEnd, yEnd);
     }
 
-    private static final Direction[] directions = new Direction[]{
-            RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN
-    };
+    private static final Direction[] directions = { RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN };
 
     private void drawPieces(Graphics2D g2, int xStep, int yStep, int xStart, int yStart) {
         for (Position p : gameTable.getPositions().getAll()) {
@@ -216,4 +223,5 @@ public class GamePanel extends JPanel {
     public GameTable getGameTable() {
         return gameTable;
     }
+
 }

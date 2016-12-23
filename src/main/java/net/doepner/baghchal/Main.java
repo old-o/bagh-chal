@@ -57,7 +57,7 @@ public final class Main {
         final Player predatorStrategy = new PredatorStrategy(levels);
         final Player predatorPlayer = new UserPlayer(PREDATOR, gamePanel, themes);
 
-        final GameFrame gameFrame = new GameFrame(gamePanel, themes,
+        final GameFrame gameFrame = new GameFrame(logProvider, gamePanel, themes,
                 new SpinnerNumberModel(5, 4, 8, 1),
                 new SpinnerNumberModel(5, 4, 8, 1));
 
