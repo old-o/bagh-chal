@@ -58,8 +58,8 @@ public final class Main {
         final Player predatorPlayer = new UserPlayer(PREDATOR, gamePanel, themes);
 
         final GameFrame gameFrame = new GameFrame(logProvider, gamePanel, themes,
-                new SpinnerNumberModel(5, 4, 8, 1),
-                new SpinnerNumberModel(5, 4, 8, 1));
+                new SpinnerNumberModel(5, 4, 99, 1),
+                new SpinnerNumberModel(5, 4, 99, 1));
 
         final Executable congrats = () -> audioPlayer.play(themes.getSoundResource(CONGRATS));
 

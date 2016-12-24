@@ -5,9 +5,21 @@ import net.doepner.baghchal.theming.ThemeSelector;
 import org.guppy4j.log.Log;
 import org.guppy4j.log.LogProvider;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JToolBar;
 import javax.swing.JToolBar.Separator;
-import java.awt.*;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.WindowConstants;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GraphicsConfiguration;
+import java.awt.Rectangle;
 
 import static org.guppy4j.log.Log.Level.debug;
 
@@ -73,21 +85,23 @@ public final class GameFrame {
 
     private static void addTo(JToolBar toolBar, Component... components) {
         for (Component component : components) {
-            final Dimension size = component.getPreferredSize();
-            component.setMaximumSize(size);
-            component.setMinimumSize(size);
-            component.setPreferredSize(size);
+            updateSizing(component);
             toolBar.add(component);
         }
         toolBar.add(new Separator(new Dimension(10, 10)));
     }
 
+    private static void updateSizing(Component component) {
+        final Dimension size = component.getPreferredSize();
+        component.setMaximumSize(size);
+        component.setMinimumSize(size);
+        component.setPreferredSize(size);
+    }
+
     private void selectTheme(ThemeSelector themeSelector, JComboBox<String> themeChooser) {
         final String themeName = themeChooser.getItemAt(themeChooser.getSelectedIndex());
         themeSelector.selectTheme(themeName);
-        gamePanel.setSize();
-        frame.pack();
-        gamePanel.repaint();
+        updateBoardSize();
     }
 
     public void show() {
@@ -100,21 +114,27 @@ public final class GameFrame {
     }
 
     private void updateBoardSize() {
-        final Number xSize = boardXSizeModel.getNumber();
-        final Number ySize = boardYSizeModel.getNumber();
-        if (xSize != null && ySize != null) {
-            gamePanel.setBoardSize(new Dimension(xSize.intValue(), ySize.intValue()));
+        final GraphicsConfiguration gc = gamePanel.getGraphicsConfiguration();
+        if (gc != null) {
+            final Rectangle screenSize = gc.getBounds();
+            log.as(debug, "Screen size: {} x {}", screenSize.getWidth(), screenSize.getHeight());
+
+            final Position maxPosition = gamePanel.getMaxPosition(screenSize);
+            final int xSize = Math.min(boardXSizeModel.getNumber().intValue(), maxPosition.x());
+            final int ySize = Math.min(boardYSizeModel.getNumber().intValue(), maxPosition.y());
+
+            boardXSizeModel.setMaximum(maxPosition.x());
+            boardYSizeModel.setMaximum(maxPosition.y());
+            boardXSizeModel.setValue(xSize);
+            boardYSizeModel.setValue(ySize);
+
+            gamePanel.setBoardSize(new Dimension(xSize, ySize));
+
+            gamePanel.start();
+            frame.getContentPane().repaint();
+            frame.pack();
+            gamePanel.repaint();
         }
-        gamePanel.start();
-        frame.pack();
-        gamePanel.repaint();
-
-        final Rectangle screenSize = gamePanel.getGraphicsConfiguration().getBounds();
-        log.as(debug, "Screen size: {} x {}", screenSize.getWidth(), screenSize.getHeight());
-
-        final Position maxPosition = gamePanel.getMaxPosition(screenSize);
-        boardXSizeModel.setMaximum(maxPosition.x());
-        boardYSizeModel.setMaximum(maxPosition.y());
     }
 
     public GamePanel getGamePanel() {
