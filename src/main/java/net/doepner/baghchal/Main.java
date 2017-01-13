@@ -12,8 +12,8 @@ import net.doepner.baghchal.resources.AudioPlayer;
 import net.doepner.baghchal.theming.Themes;
 import net.doepner.baghchal.view.GameFrame;
 import net.doepner.baghchal.view.GamePanel;
-import org.guppy4j.Executable;
-import org.guppy4j.SimpleClassPathScanner;
+import org.guppy4j.run.Executable;
+import org.guppy4j.io.SimpleClassPathScanner;
 import org.guppy4j.log.LogProvider;
 import org.guppy4j.log.Slf4jLogProvider;
 

@@ -4,7 +4,7 @@ import net.doepner.baghchal.model.Levels;
 import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.view.GameFrame;
 import net.doepner.baghchal.view.GamePanel;
-import org.guppy4j.Executable;
+import org.guppy4j.run.Executable;
 import org.guppy4j.log.Log;
 import org.guppy4j.log.LogProvider;
 

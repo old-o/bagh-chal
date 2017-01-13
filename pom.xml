@@ -18,7 +18,17 @@
         <dependency>
             <groupId>org.guppy4j</groupId>
             <artifactId>core-impl</artifactId>
-            <version>0.0.6</version>
+            <version>0.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.guppy4j</groupId>
+            <artifactId>io-impl</artifactId>
+            <version>0.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.guppy4j</groupId>
+            <artifactId>static</artifactId>
+            <version>0.0.7</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -44,20 +54,6 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-<!--
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>${mainClass}</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
--->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>

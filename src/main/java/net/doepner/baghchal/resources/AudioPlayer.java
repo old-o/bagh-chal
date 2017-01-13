@@ -13,7 +13,7 @@ import static javax.sound.sampled.AudioSystem.getLine;
 import static javax.sound.sampled.LineEvent.Type.STOP;
 
 /**
- *
+ * Plays sound files (currently just wav)
  */
 public class AudioPlayer {
 

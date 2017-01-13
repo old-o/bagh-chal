@@ -3,7 +3,7 @@ package net.doepner.baghchal.theming;
 import net.doepner.baghchal.model.Piece;
 import net.doepner.baghchal.resources.ImageLoader;
 import net.doepner.baghchal.view.Colors;
-import org.guppy4j.DirectoryLister;
+import org.guppy4j.io.DirectoryLister;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
