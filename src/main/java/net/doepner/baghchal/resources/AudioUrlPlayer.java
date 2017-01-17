@@ -15,12 +15,11 @@ import static javax.sound.sampled.LineEvent.Type.STOP;
 /**
  * Plays sound files (currently just wav)
  */
-public class AudioPlayer {
+public final class AudioUrlPlayer {
 
-    public void play(URL url) {
-        try (AudioInputStream stream = getAudioInputStream(url)) {
-
-            final Clip clip = (Clip) getLine(new Info(Clip.class, stream.getFormat()));
+    public static void play(URL url) {
+        try (final AudioInputStream stream = getAudioInputStream(url);
+             final Clip clip = (Clip) getLine(new Info(Clip.class, stream.getFormat()))) {
 
             clip.open(stream);
             clip.start();

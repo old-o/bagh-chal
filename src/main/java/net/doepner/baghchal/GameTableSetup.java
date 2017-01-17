@@ -16,17 +16,16 @@ import static net.doepner.baghchal.model.Piece.PREY;
 /**
  * Sets up the pieces on the game table
  */
-public final class Setup {
+public final class GameTableSetup {
 
-    public void prepare(GameTable gameTable) {
+    static void prepare(GameTable gameTable) {
         final int boardSize = gameTable.getPositions().getBoardSize();
         final int predatorCount = (boardSize / 5) - 1;
         setCornerPositions(gameTable, PREDATOR, predatorCount);
-
         setBorderPositions(gameTable, PREY, boardSize - 5);
     }
 
-    public void setCornerPositions(GameTable gameTable, Piece piece, int predatorCount) {
+    private static void setCornerPositions(GameTable gameTable, Piece piece, int predatorCount) {
         int remaining = predatorCount;
 
         for (Position p : gameTable.getPositions().getCorners()) {
@@ -38,7 +37,7 @@ public final class Setup {
         }
     }
 
-    private Iterable<Position> getPositionsToFill(GameTable gameTable, int remaining, Piece piece) {
+    private static Iterable<Position> getPositionsToFill(GameTable gameTable, int remaining, Piece piece) {
         final TablePositions positions = gameTable.getPositions();
         if (remaining > 0) {
             final Collection<Position> toFill = new ArrayList<>();
@@ -62,7 +61,7 @@ public final class Setup {
         return Collections.emptyList();
     }
 
-    public void setBorderPositions(GameTable gameTable, Piece piece, int count) {
+    private static void setBorderPositions(GameTable gameTable, Piece piece, int count) {
         for (Position p : gameTable.getPositions().getBorder()) {
             if (count > 0) {
                 gameTable.set(p, piece);

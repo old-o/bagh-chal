@@ -8,7 +8,7 @@ import net.doepner.baghchal.control.UserPlayer;
 import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.GameTableFactory;
 import net.doepner.baghchal.model.Levels;
-import net.doepner.baghchal.resources.AudioPlayer;
+import net.doepner.baghchal.resources.AudioUrlPlayer;
 import net.doepner.baghchal.theming.Themes;
 import net.doepner.baghchal.view.GameFrame;
 import net.doepner.baghchal.view.GamePanel;
@@ -19,6 +19,8 @@ import org.guppy4j.log.Slf4jLogProvider;
 
 import javax.swing.SpinnerNumberModel;
 import java.awt.Dimension;
+import java.net.URL;
+import java.util.function.Consumer;
 
 import static net.doepner.baghchal.model.Piece.PREDATOR;
 import static net.doepner.baghchal.model.Piece.PREY;
@@ -29,7 +31,9 @@ import static net.doepner.baghchal.theming.Theme.SoundResourceId.CONGRATS;
  */
 public final class Main {
 
-    @SuppressWarnings("OverlyCoupledMethod") //
+    // Simplest Dependency Injection is done here without a DI framework. See
+    // https://odoepner.wordpress.com/2017/01/17/diy-dependency-inject-yourself/
+    @SuppressWarnings("OverlyCoupledMethod")
     public static void main(String... args) {
 
         System.setProperty("sun.java2d.opengl", "true");
@@ -45,10 +49,12 @@ public final class Main {
 
         final Levels levels = new Levels(maxLevel);
 
-        final AudioPlayer audioPlayer = new AudioPlayer();
+        final Consumer<URL> audioPlayMethod = AudioUrlPlayer::play;
+        final Consumer<GameTable> tableSetupMethod = GameTableSetup::prepare;
 
         final GameTableFactory gameTableFactory = (xSize, ySize) -> new GameTable(
-                logProvider, xSize, ySize, new Setup(), new EventSounds(audioPlayer, themes));
+                logProvider, xSize, ySize, tableSetupMethod, new EventSounds(audioPlayMethod, themes)
+        );
 
         final GamePanel gamePanel = new GamePanel(gameTableFactory, defaultBoardSize, themes, levels);
 
@@ -61,7 +67,7 @@ public final class Main {
                 new SpinnerNumberModel(5, 4, 99, 1),
                 new SpinnerNumberModel(5, 4, 99, 1));
 
-        final Executable congrats = () -> audioPlayer.play(themes.getSoundResource(CONGRATS));
+        final Executable congrats = () -> AudioUrlPlayer.play(themes.getSoundResource(CONGRATS));
 
         final GameLoop gameLoop = new GameLoop(logProvider, gameFrame, levels, congrats,
                 preyPlayer, predatorStrategy);

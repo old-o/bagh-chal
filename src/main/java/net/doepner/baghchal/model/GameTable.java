@@ -1,7 +1,6 @@
 package net.doepner.baghchal.model;
 
 import net.doepner.baghchal.Listener;
-import net.doepner.baghchal.Setup;
 import org.guppy4j.Lists;
 import org.guppy4j.log.Log;
 import org.guppy4j.log.LogProvider;
@@ -11,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static net.doepner.baghchal.model.Piece.INVALID;
 import static org.guppy4j.log.Log.Level.debug;
@@ -27,14 +27,14 @@ public final class GameTable {
 
     private final Piece[][] grid;
 
-    private final Setup setup;
+    private final Consumer<GameTable> setupMethod;
     private final Listener listener;
     private final TablePositions positions;
 
     public GameTable(LogProvider logProvider, int boardXSize, int boardYSize,
-                     Setup setup, Listener listener) {
+                     Consumer<GameTable> setupMethod, Listener listener) {
         this.logProvider = logProvider;
-        this.setup = setup;
+        this.setupMethod = setupMethod;
         this.listener = listener;
         this.boardXSize = boardXSize;
         this.boardYSize = boardYSize;
@@ -65,7 +65,7 @@ public final class GameTable {
      * @param gameTable An existing GameTable instance
      */
     private GameTable(GameTable gameTable) {
-        this(gameTable.logProvider, gameTable.boardXSize, gameTable.boardYSize, gameTable.setup, Listener.NONE);
+        this(gameTable.logProvider, gameTable.boardXSize, gameTable.boardYSize, gameTable.setupMethod, Listener.NONE);
         for (int x = 0; x < grid.length; x++) {
             System.arraycopy(gameTable.grid[x], 0, grid[x], 0, grid[x].length);
         }
@@ -174,7 +174,7 @@ public final class GameTable {
         for (Piece[] pieces : grid) {
             Arrays.fill(pieces, null);
         }
-        setup.prepare(this);
+        setupMethod.accept(this);
     }
 
     public Piece get(Position p) {
