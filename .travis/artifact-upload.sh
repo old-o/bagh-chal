@@ -11,5 +11,5 @@ if [ -z "$file" ]; then
   exit 1
 else
   echo "Uploading $file to $upload_url"
-  curl --user "${user_info}" --upload-file "${file}" "${upload_url}"
+  curl --user "${user_info}" --upload-file "${file}" "${upload_url}" || exit 1
 fi
