@@ -18,9 +18,9 @@ import static javax.sound.sampled.LineEvent.Type.STOP;
 public final class AudioUrlPlayer {
 
     public static void play(URL url) {
-        try (final AudioInputStream stream = getAudioInputStream(url);
-             final Clip clip = (Clip) getLine(new Info(Clip.class, stream.getFormat()))) {
+        try (final AudioInputStream stream = getAudioInputStream(url)) {
 
+            final Clip clip = (Clip) getLine(new Info(Clip.class, stream.getFormat()));
             clip.open(stream);
             clip.start();
 
