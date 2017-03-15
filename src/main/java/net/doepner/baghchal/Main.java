@@ -12,10 +12,11 @@ import net.doepner.baghchal.resources.AudioUrlPlayer;
 import net.doepner.baghchal.theming.Themes;
 import net.doepner.baghchal.view.GameFrame;
 import net.doepner.baghchal.view.GamePanel;
-import org.guppy4j.run.Executable;
 import org.guppy4j.io.SimpleClassPathScanner;
 import org.guppy4j.log.LogProvider;
 import org.guppy4j.log.Slf4jLogProvider;
+import org.guppy4j.run.Executable;
+import org.guppy4j.text.CharCanvasImpl;
 
 import javax.swing.SpinnerNumberModel;
 import java.awt.Dimension;
@@ -53,7 +54,8 @@ public final class Main {
         final Consumer<GameTable> tableSetupMethod = GameTableSetup::prepare;
 
         final GameTableFactory gameTableFactory = (xSize, ySize) -> new GameTable(
-                logProvider, xSize, ySize, tableSetupMethod, new EventSounds(audioPlayMethod, themes)
+                logProvider, xSize, ySize, tableSetupMethod, new EventSounds(audioPlayMethod, themes),
+                new CharCanvasImpl()
         );
 
         final GamePanel gamePanel = new GamePanel(gameTableFactory, defaultBoardSize, themes, levels);

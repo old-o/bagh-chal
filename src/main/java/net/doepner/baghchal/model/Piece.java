@@ -5,25 +5,28 @@ package net.doepner.baghchal.model;
  */
 public enum Piece implements MoveConstraints {
 
-    PREY {
+    PREY('O') {
         @Override
         public boolean isValid(Move move, GameTable gameTable) {
             return gameTable.getPositions().isBorderToBoard(move)
                     || (gameTable.isBorderEmpty() && gameTable.isStepAlongLine(move));
         }
     },
-    PREDATOR {
+    PREDATOR('X') {
         @Override
         public boolean isValid(Move move, GameTable gameTable) {
             return gameTable.isStepAlongLine(move)
                     || (move.isJump() && (gameTable.get(move.middle()) == PREY));
         }
-    },
-    INVALID {
-        @Override
-        public boolean isValid(Move move, GameTable gameTable) {
-            return false;
-        }
+    };
+
+    private final char c;
+
+    Piece(char c) {
+        this.c = c;
     }
 
+    public char asChar() {
+        return c;
+    }
 }

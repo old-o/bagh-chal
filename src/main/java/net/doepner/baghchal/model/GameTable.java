@@ -4,6 +4,8 @@ import net.doepner.baghchal.Listener;
 import org.guppy4j.Lists;
 import org.guppy4j.log.Log;
 import org.guppy4j.log.LogProvider;
+import org.guppy4j.text.CharCanvas;
+import org.guppy4j.text.CharDrawing;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -12,7 +14,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static net.doepner.baghchal.model.Piece.INVALID;
+import static java.lang.System.lineSeparator;
+import static net.doepner.baghchal.model.Direction.DOWN;
+import static net.doepner.baghchal.model.Direction.RIGHT;
+import static net.doepner.baghchal.model.Direction.RIGHT_DOWN;
+import static net.doepner.baghchal.model.Direction.RIGHT_UP;
 import static org.guppy4j.log.Log.Level.debug;
 
 /**
@@ -20,10 +26,13 @@ import static org.guppy4j.log.Log.Level.debug;
  */
 public final class GameTable {
 
+    private static final Direction[] directions = {RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN};
+
     private final LogProvider logProvider;
 
     private final int boardXSize;
     private final int boardYSize;
+    private final CharCanvas charCanvas;
 
     private final Piece[][] grid;
 
@@ -32,12 +41,14 @@ public final class GameTable {
     private final TablePositions positions;
 
     public GameTable(LogProvider logProvider, int boardXSize, int boardYSize,
-                     Consumer<GameTable> setupMethod, Listener listener) {
+                     Consumer<GameTable> setupMethod, Listener listener,
+                     CharCanvas charCanvas) {
         this.logProvider = logProvider;
         this.setupMethod = setupMethod;
         this.listener = listener;
         this.boardXSize = boardXSize;
         this.boardYSize = boardYSize;
+        this.charCanvas = charCanvas;
         grid = new Piece[boardXSize + 2][boardYSize + 2];
         final Position topLeft = new Position(1, 1);
         final Position bottomRight = new Position(boardXSize, boardYSize);
@@ -62,12 +73,12 @@ public final class GameTable {
      * Copy constructor that will copy the grid array of the provided GameTable instance.
      * The resulting board will support no listener functionality.
      *
-     * @param gameTable An existing GameTable instance
+     * @param gt An existing GameTable instance
      */
-    private GameTable(GameTable gameTable) {
-        this(gameTable.logProvider, gameTable.boardXSize, gameTable.boardYSize, gameTable.setupMethod, Listener.NONE);
+    private GameTable(GameTable gt) {
+        this(gt.logProvider, gt.boardXSize, gt.boardYSize, gt.setupMethod, Listener.NONE, gt.charCanvas);
         for (int x = 0; x < grid.length; x++) {
-            System.arraycopy(gameTable.grid[x], 0, grid[x], 0, grid[x].length);
+            System.arraycopy(gt.grid[x], 0, grid[x], 0, grid[x].length);
         }
     }
 
@@ -94,8 +105,8 @@ public final class GameTable {
 
     public Piece movePiece(Move move) {
         final Piece piece = get(move.p1());
-        if (piece == null || piece == INVALID) {
-            throw new IllegalStateException("Cannot move piece from empty or off-board position:" + move.p1());
+        if (piece == null) {
+            throw new IllegalStateException("Cannot move piece from empty position:" + move.p1());
         } else {
             clear(move.p1());
             set(move.p2(), piece);
@@ -178,11 +189,7 @@ public final class GameTable {
     }
 
     public Piece get(Position p) {
-        try {
-            return grid[p.x()][p.y()];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            return INVALID;
-        }
+        return grid[p.x()][p.y()];
     }
 
     public void set(Position p, Piece piece) {
@@ -236,17 +243,32 @@ public final class GameTable {
     }
 
     private String toString(Move move) {
-        final String nl = System.lineSeparator();
-        final StringBuilder sb = new StringBuilder(nl);
-        sb.append(move).append(nl);
-        for (Piece[] aGrid : grid) {
-            for (Piece piece : aGrid) {
-                sb.append(piece == null ? "    " : piece.toString().substring(0, 4));
-                sb.append('|');
+        // TODO: Unify this with a drawing strategy thing to also cover the AWT drawing
+        // (which is currently done in the GamePanel class)
+        final int xStep = 2;
+        final int yStep = 2;
+        final CharDrawing drawing = charCanvas.newDrawing(getXSize() * xStep, getYSize() * yStep);
+
+        for (Position p : getPositions().getAll()) {
+            final int x = p.x() * xStep;
+            final int y = p.y() * yStep;
+
+            for (Direction d : directions) {
+                final Move step = new Move(p, d.addTo(p));
+                if (isStepAlongLine(step)) {
+                    drawing.addLine(x, y, xStep, yStep, step);
+                }
             }
-            sb.append(nl);
+            final Piece piece = get(p);
+            if (piece == null && positions.isBoard(p)) {
+                drawing.addChar(x, y, '+');
+            }
+            if (piece != null){
+                drawing.addChar(x, y, piece.asChar());
+            }
         }
-        return sb.toString();
+        return lineSeparator() + move.toString()
+                + lineSeparator() + drawing.toString();
     }
 
     private final List<Runnable> discardListeners = new ArrayList<>();
@@ -261,5 +283,9 @@ public final class GameTable {
 
     public boolean isBoardSize(Dimension boardSize) {
         return boardSize.width == getBoardXSize() && boardSize.height == getBoardYSize();
+    }
+
+    public Direction[] getDirections() {
+        return directions;
     }
 }
