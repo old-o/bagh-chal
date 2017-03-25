@@ -1,11 +1,11 @@
 package net.doepner.baghchal.model;
 
-import net.doepner.baghchal.Listener;
-import org.guppy4j.Lists;
-import org.guppy4j.log.Log;
-import org.guppy4j.log.LogProvider;
-import org.guppy4j.text.CharCanvas;
-import org.guppy4j.text.CharDrawing;
+import static java.lang.System.lineSeparator;
+import static net.doepner.baghchal.model.Direction.DOWN;
+import static net.doepner.baghchal.model.Direction.RIGHT;
+import static net.doepner.baghchal.model.Direction.RIGHT_DOWN;
+import static net.doepner.baghchal.model.Direction.RIGHT_UP;
+import static org.guppy4j.log.Log.Level.debug;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -14,12 +14,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static java.lang.System.lineSeparator;
-import static net.doepner.baghchal.model.Direction.DOWN;
-import static net.doepner.baghchal.model.Direction.RIGHT;
-import static net.doepner.baghchal.model.Direction.RIGHT_DOWN;
-import static net.doepner.baghchal.model.Direction.RIGHT_UP;
-import static org.guppy4j.log.Log.Level.debug;
+import org.guppy4j.Lists;
+import org.guppy4j.log.Log;
+import org.guppy4j.log.LogProvider;
+import org.guppy4j.text.CharCanvas;
+import org.guppy4j.text.CharDrawing;
+
+import net.doepner.baghchal.Listener;
 
 /**
  * The game board model
@@ -177,8 +178,8 @@ public final class GameTable {
     }
 
     public boolean isStepAlongLine(Move move) {
-        return move.isStep() && positions.isBoardMove(move)
-                && (move.p1().hasEvenCoordSum() || move.isOneDimensional());
+        return move.isStep() && (move.p1().hasEvenCoordSum() || move.isOneDimensional())
+                && positions.isBoardMove(move);
     }
 
     public void reset() {
@@ -243,35 +244,29 @@ public final class GameTable {
     }
 
     private String toString(Move move) {
-        // TODO: Unify this with a drawing strategy thing to also cover the AWT drawing
-        // (which is currently done in the GamePanel class)
         final int xStep = 2;
         final int yStep = 2;
+
         final CharDrawing drawing = charCanvas.newDrawing(getXSize() * xStep, getYSize() * yStep);
 
-        for (Position p : getPositions().getAll()) {
+        for (Position p : positions.getAll()) {
             final int x = p.x() * xStep;
             final int y = p.y() * yStep;
 
-            for (Direction d : directions) {
-                final Move step = new Move(p, d.addTo(p));
-                if (isStepAlongLine(step)) {
-                    drawing.addLine(x, y, xStep, yStep, step);
-                }
+            for (Move step : getStepsAlongLineFrom(p)) {
+                drawing.addLine(x, y, xStep, yStep, step);
             }
             final Piece piece = get(p);
-            if (piece == null && positions.isBoard(p)) {
-                drawing.addChar(x, y, '+');
-            }
             if (piece != null){
                 drawing.addChar(x, y, piece.asChar());
+            } else if (positions.isBoard(p)) {
+                drawing.addChar(x, y, '+');
             }
         }
-        return lineSeparator() + move.toString()
-                + lineSeparator() + drawing.toString();
+        return lineSeparator() + move + lineSeparator() + drawing;
     }
 
-    private final List<Runnable> discardListeners = new ArrayList<>();
+    private final Collection<Runnable> discardListeners = new ArrayList<>();
 
     public void addDiscardListener(Runnable listener) {
         discardListeners.add(listener);
@@ -282,10 +277,17 @@ public final class GameTable {
     }
 
     public boolean isBoardSize(Dimension boardSize) {
-        return boardSize.width == getBoardXSize() && boardSize.height == getBoardYSize();
+        return boardSize.width == boardXSize && boardSize.height == boardYSize;
     }
 
-    public Direction[] getDirections() {
-        return directions;
+    public Iterable<Move> getStepsAlongLineFrom(Position p) {
+        final Collection<Move> steps = new ArrayList<>();
+        for (Direction d : directions) {
+            final Move m = new Move(p, d.addTo(p));
+            if (isStepAlongLine(m)) {
+                steps.add(m);
+            }
+        }
+        return steps;
     }
 }
