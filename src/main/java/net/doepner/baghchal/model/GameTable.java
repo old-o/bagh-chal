@@ -178,8 +178,8 @@ public final class GameTable {
     }
 
     public boolean isStepAlongLine(Move move) {
-        return move.isStep() && positions.isBoardMove(move)
-                && (move.p1().hasEvenCoordSum() || move.isOneDimensional());
+        return move.isStep() && (move.p1().hasEvenCoordSum() || move.isOneDimensional())
+                && positions.isBoardMove(move);
     }
 
     public void reset() {
@@ -244,35 +244,29 @@ public final class GameTable {
     }
 
     private String toString(Move move) {
-        // TODO: Unify this with a drawing strategy thing to also cover the AWT drawing
-        // (which is currently done in the GamePanel class)
         final int xStep = 2;
         final int yStep = 2;
+
         final CharDrawing drawing = charCanvas.newDrawing(getXSize() * xStep, getYSize() * yStep);
 
-        for (Position p : getPositions().getAll()) {
+        for (Position p : positions.getAll()) {
             final int x = p.x() * xStep;
             final int y = p.y() * yStep;
 
-            for (Direction d : directions) {
-                final Move step = new Move(p, d.addTo(p));
-                if (isStepAlongLine(step)) {
-                    drawing.addLine(x, y, xStep, yStep, step);
-                }
+            for (Move step : getStepsAlongLineFrom(p)) {
+                drawing.addLine(x, y, xStep, yStep, step);
             }
             final Piece piece = get(p);
-            if (piece == null && positions.isBoard(p)) {
-                drawing.addChar(x, y, '+');
-            }
             if (piece != null){
                 drawing.addChar(x, y, piece.asChar());
+            } else if (positions.isBoard(p)) {
+                drawing.addChar(x, y, '+');
             }
         }
-        return lineSeparator() + move.toString()
-                + lineSeparator() + drawing.toString();
+        return lineSeparator() + move + lineSeparator() + drawing;
     }
 
-    private final List<Runnable> discardListeners = new ArrayList<>();
+    private final Collection<Runnable> discardListeners = new ArrayList<>();
 
     public void addDiscardListener(Runnable listener) {
         discardListeners.add(listener);
@@ -283,11 +277,18 @@ public final class GameTable {
     }
 
     public boolean isBoardSize(Dimension boardSize) {
-        return boardSize.width == getBoardXSize() && boardSize.height == getBoardYSize();
+        return boardSize.width == boardXSize && boardSize.height == boardYSize;
     }
 
-    public Direction[] getDirections() {
-        return directions;
+    public Iterable<Move> getStepsAlongLineFrom(Position p) {
+        final Collection<Move> steps = new ArrayList<>();
+        for (Direction d : directions) {
+            final Move m = new Move(p, d.addTo(p));
+            if (isStepAlongLine(m)) {
+                steps.add(m);
+            }
+        }
+        return steps;
     }
 
     public int getMaxStep() {

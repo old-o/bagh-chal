@@ -1,15 +1,17 @@
 package net.doepner.baghchal.view;
 
-import net.doepner.baghchal.model.Direction;
-import net.doepner.baghchal.model.GameTable;
-import net.doepner.baghchal.model.GameTableFactory;
-import net.doepner.baghchal.model.Levels;
-import net.doepner.baghchal.model.Move;
-import net.doepner.baghchal.model.Piece;
-import net.doepner.baghchal.model.Position;
-import net.doepner.baghchal.theming.Theme;
+import static java.awt.RenderingHints.KEY_ANTIALIASING;
+import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
+import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
+import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
+import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
+import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
+import static net.doepner.baghchal.theming.Images.ImageId.CONGRATS;
+import static net.doepner.baghchal.theming.Theme.ColorId.BACKGROUND;
+import static net.doepner.baghchal.theming.Theme.ColorId.BOARD_EDGE;
+import static net.doepner.baghchal.theming.Theme.ColorId.DIAGONAL;
+import static net.doepner.baghchal.theming.Theme.ColorId.GRID;
 
-import javax.swing.JPanel;
 import java.awt.BasicStroke;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -24,17 +26,15 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.awt.RenderingHints.KEY_ANTIALIASING;
-import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
-import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
-import static java.awt.RenderingHints.VALUE_ANTIALIAS_ON;
-import static java.awt.RenderingHints.VALUE_STROKE_NORMALIZE;
-import static java.awt.RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
-import static net.doepner.baghchal.theming.Images.ImageId.CONGRATS;
-import static net.doepner.baghchal.theming.Theme.ColorId.BACKGROUND;
-import static net.doepner.baghchal.theming.Theme.ColorId.BOARD_EDGE;
-import static net.doepner.baghchal.theming.Theme.ColorId.DIAGONAL;
-import static net.doepner.baghchal.theming.Theme.ColorId.GRID;
+import javax.swing.JPanel;
+
+import net.doepner.baghchal.model.GameTable;
+import net.doepner.baghchal.model.GameTableFactory;
+import net.doepner.baghchal.model.Levels;
+import net.doepner.baghchal.model.Move;
+import net.doepner.baghchal.model.Piece;
+import net.doepner.baghchal.model.Position;
+import net.doepner.baghchal.theming.Theme;
 
 public final class GamePanel extends JPanel {
 
@@ -161,13 +161,9 @@ public final class GamePanel extends JPanel {
             final int x = xStart + p.x() * xStep;
             final int y = yStart + p.y() * yStep;
 
-            for (Direction d : gameTable.getDirections()) {
-                final Move m = new Move(p, d.addTo(p));
-                if (gameTable.isStepAlongLine(m)) {
-                    drawLine(g2, xStep, yStep, x, y, m);
-                }
+            for (Move m : gameTable.getStepsAlongLineFrom(p)) {
+                drawLine(g2, xStep, yStep, x, y, m);
             }
-
             final Piece piece = gameTable.get(p);
             if (piece != null) {
                 final BufferedImage img = theme.getImage(piece);

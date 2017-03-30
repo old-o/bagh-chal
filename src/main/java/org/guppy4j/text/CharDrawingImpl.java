@@ -9,18 +9,18 @@ import static java.lang.System.lineSeparator;
  */
 public final class CharDrawingImpl implements CharDrawing {
 
-    private final char[][] c;
+    private final char[][] chars;
 
     CharDrawingImpl(int xDim, int yDim) {
-        c = new char[xDim][yDim];
+        chars = new char[xDim][yDim];
     }
 
     @Override
     public void addLine(int x, int y, int xStep, int yStep, Move step) {
-        c[x + step.xStep()][y + step.yStep()] = lineChar(step);
+        chars[x + step.xStep()][y + step.yStep()] = lineChar(step);
     }
 
-    private char lineChar(Move step) {
+    private static char lineChar(Move step) {
         if (step.isOneDimensional()) {
             return step.xStep() == 0 ? '|' : '-';
         } else {
@@ -30,16 +30,16 @@ public final class CharDrawingImpl implements CharDrawing {
 
     @Override
     public void addChar(int x, int y, char c) {
-        this.c[x][y] = c;
+        chars[x][y] = c;
     }
 
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        for (int y = 0; y < c[0].length; y++) {
+        for (int y = 0; y < chars[0].length; y++) {
             sb.append(lineSeparator());
-            for (int x = 0; x < c.length; x++) {
-                final char c = this.c[x][y];
+            for (char[] ac : chars) {
+                final char c = ac[y];
                 sb.append(c == 0 ? ' ' : c);
             }
         }
