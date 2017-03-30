@@ -130,7 +130,6 @@ public final class GameFrame {
 
             gamePanel.setBoardSize(new Dimension(xSize, ySize));
 
-            gamePanel.start();
             frame.getContentPane().repaint();
             frame.pack();
             gamePanel.repaint();

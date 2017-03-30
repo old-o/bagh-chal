@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static java.lang.Math.max;
 import static java.lang.System.lineSeparator;
 import static net.doepner.baghchal.model.Direction.DOWN;
 import static net.doepner.baghchal.model.Direction.RIGHT;
@@ -287,5 +288,9 @@ public final class GameTable {
 
     public Direction[] getDirections() {
         return directions;
+    }
+
+    public int getMaxStep() {
+        return (max(boardXSize, boardYSize) / 2) - 1;
     }
 }

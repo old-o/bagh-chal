@@ -11,7 +11,7 @@ public final class CharDrawingImpl implements CharDrawing {
 
     private final char[][] c;
 
-    public CharDrawingImpl(int xDim, int yDim) {
+    CharDrawingImpl(int xDim, int yDim) {
         c = new char[xDim][yDim];
     }
 

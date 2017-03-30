@@ -64,17 +64,22 @@ public final class GamePanel extends JPanel {
     }
 
     void setBoardSize(Dimension boardSize) {
+        boolean restart = false;
         if (gameTable == null || !gameTable.isBoardSize(boardSize)) {
             final GameTable oldGameTable = gameTable;
             gameTable = gameTableFactory.getGameTable(boardSize.width, boardSize.height);
-            if (oldGameTable != null && gameTable != oldGameTable) {
+            if (oldGameTable != null) {
                 oldGameTable.discard();
+                restart = true;
             }
         }
         setSize();
+        if (restart) {
+            start();
+        }
     }
 
-    void setSize() {
+    private void setSize() {
         final int width = (3 * gameTable.getXSize() * theme.getPieceWidth()) / 2;
         final int height = (3 * gameTable.getYSize() * theme.getPieceHeight()) / 2;
         final Dimension preferredSize = new Dimension(width, height);

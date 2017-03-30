@@ -22,7 +22,7 @@ public final class GameTableSetup {
         final int boardSize = gameTable.getPositions().getBoardSize();
         final int predatorCount = (boardSize / 5) - 1;
         setCornerPositions(gameTable, PREDATOR, predatorCount);
-        setBorderPositions(gameTable, PREY, boardSize - 5);
+        setBorderPositions(gameTable, PREY, boardSize - 1 - predatorCount);
     }
 
     private static void setCornerPositions(GameTable gameTable, Piece piece, int predatorCount) {
@@ -39,15 +39,17 @@ public final class GameTableSetup {
 
     private static Iterable<Position> getPositionsToFill(GameTable gameTable, int remaining, Piece piece) {
         final TablePositions positions = gameTable.getPositions();
-        if (remaining > 0) {
-            final Collection<Position> toFill = new ArrayList<>();
-            final Iterable<Position> board = positions.getBoard();
-            for (Position p : board) {
-                if (gameTable.get(p) == piece) {
-                    for (Direction d : Direction.values()) {
-                        final Position p1 = d.addTo(p);
+        if (remaining <= 0) {
+            return Collections.emptyList();
+        }
+        final Collection<Position> toFill = new ArrayList<>();
+        for (int i = 1; i < gameTable.getMaxStep(); i++) {
+            for (Direction d : Direction.values()) {
+                for (Position p : positions.getBoard()) {
+                    if (gameTable.get(p) == piece) {
+                        final Position p1 = addSteps(p, d, i);
                         if (positions.isBoard(p1) && gameTable.isEmptyAt(p1)) {
-                            toFill.add(p);
+                            toFill.add(p1);
                             remaining--;
                             if (remaining <= 0) {
                                 return toFill;
@@ -56,9 +58,16 @@ public final class GameTableSetup {
                     }
                 }
             }
-            return toFill;
         }
-        return Collections.emptyList();
+        return toFill;
+    }
+
+    private static Position addSteps(Position p, Direction d, int i) {
+        Position x = p;
+        for (int j = 0; j < i; j++) {
+            x = d.addTo(x);
+        }
+        return x;
     }
 
     private static void setBorderPositions(GameTable gameTable, Piece piece, int count) {
