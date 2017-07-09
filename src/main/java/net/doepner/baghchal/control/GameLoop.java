@@ -4,9 +4,9 @@ import net.doepner.baghchal.model.Levels;
 import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.view.GameFrame;
 import net.doepner.baghchal.view.GamePanel;
-import org.guppy4j.run.Executable;
 import org.guppy4j.log.Log;
 import org.guppy4j.log.LogProvider;
+import org.guppy4j.run.Executable;
 
 import java.util.Arrays;
 
@@ -57,10 +57,11 @@ public final class GameLoop {
         if (playerGaveUp) {
             // TODO: Make this dependent on whether the other player is the user
             congrats.execute();
+            gamePanel.getGameTable().reset();
         } else {
             gamePanel.getGameTable().processMove(move);
-            gamePanel.repaint();
         }
+        gamePanel.repaint();
         levels.setLevelDone(playerGaveUp);
         gameFrame.enableNextLevel(playerGaveUp && !levels.isGameOver());
     }
