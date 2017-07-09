@@ -41,6 +41,11 @@ public final class PreyStrategy implements Player {
         return null;
     }
 
+    @Override
+    public boolean isComputer() {
+        return true;
+    }
+
     private static Move getMove(GameTable gameTable, Position borderPosition, Position boardPosition) {
         final Move m = new Move(borderPosition, boardPosition);
         gameTable.movePiece(m);

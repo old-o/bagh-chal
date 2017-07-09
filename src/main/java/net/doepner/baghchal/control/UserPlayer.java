@@ -10,7 +10,7 @@ import net.doepner.baghchal.view.GamePanel;
 import java.awt.event.MouseAdapter;
 
 /**
- * Lets the user control the prey pieces
+ * Lets the user control pieces
  */
 public final class UserPlayer implements Player {
 
@@ -22,6 +22,11 @@ public final class UserPlayer implements Player {
         this.gamePanel = gamePanel;
         this.images = images;
         this.piece = piece;
+    }
+
+    @Override
+    public boolean isComputer() {
+        return false;
     }
 
     @Override

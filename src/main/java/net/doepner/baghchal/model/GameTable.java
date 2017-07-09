@@ -2,7 +2,6 @@ package net.doepner.baghchal.model;
 
 import net.doepner.baghchal.Listener;
 import org.guppy4j.Lists;
-import org.guppy4j.log.Log;
 import org.guppy4j.log.LogProvider;
 import org.guppy4j.text.CharCanvas;
 import org.guppy4j.text.CharDrawing;
@@ -20,7 +19,6 @@ import static net.doepner.baghchal.model.Direction.DOWN;
 import static net.doepner.baghchal.model.Direction.RIGHT;
 import static net.doepner.baghchal.model.Direction.RIGHT_DOWN;
 import static net.doepner.baghchal.model.Direction.RIGHT_UP;
-import static org.guppy4j.log.Log.Level.debug;
 
 /**
  * The game board model
@@ -87,23 +85,6 @@ public final class GameTable {
         return new GameTable(this);
     }
 
-    public void processMove(Move move) {
-        if (move != null) {
-            final Piece piece = get(move.p2());
-            if (!positions.isBorderToBoard(move) && move.isJump()) {
-                clear(move.middle());
-                listener.afterJump(piece);
-            } else {
-                listener.afterStep(piece);
-            }
-            log().as(debug, toString(move));
-        }
-    }
-
-    private Log log() {
-        return logProvider.getLog(getClass());
-    }
-
     public Piece movePiece(Move move) {
         final Piece piece = get(move.p1());
         if (piece == null) {
@@ -111,8 +92,14 @@ public final class GameTable {
         } else {
             clear(move.p1());
             set(move.p2(), piece);
-            return piece;
         }
+        if (move.isJump() && !positions.isBorderToBoard(move)) {
+            clear(move.middle());
+            listener.afterJump(piece);
+        } else {
+            listener.afterStep(piece);
+        }
+        return piece;
     }
 
     public void setHiddenBorderPieceCount(int count) {
@@ -243,7 +230,7 @@ public final class GameTable {
         return grid[0].length;
     }
 
-    private String toString(Move move) {
+    public String toString(Move move) {
         final int xStep = 2;
         final int yStep = 2;
 

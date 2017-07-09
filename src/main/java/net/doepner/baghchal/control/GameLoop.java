@@ -1,5 +1,6 @@
 package net.doepner.baghchal.control;
 
+import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Levels;
 import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.view.GameFrame;
@@ -43,6 +44,13 @@ public final class GameLoop {
         while (!levels.isGameOver()) {
             for (Player player : players) {
                 try {
+                    if (player.isComputer()) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            log.as(debug, e);
+                        }
+                    }
                     applyMove(player.play(gamePanel.getGameTable()));
                 } catch (PlayerInterruptedException e) {
                     log.as(debug, e);
@@ -53,15 +61,17 @@ public final class GameLoop {
     }
 
     private void applyMove(Move move) {
+        final GameTable gameTable = gamePanel.getGameTable();
         final boolean playerGaveUp = move == null;
         if (playerGaveUp) {
             // TODO: Make this dependent on whether the other player is the user
             congrats.execute();
-            gamePanel.getGameTable().reset();
+            gamePanel.repaint();
+            gameTable.reset();
         } else {
-            gamePanel.getGameTable().processMove(move);
+            gamePanel.repaint();
         }
-        gamePanel.repaint();
+        log.as(debug, gameTable.toString(move));
         levels.setLevelDone(playerGaveUp);
         gameFrame.enableNextLevel(playerGaveUp && !levels.isGameOver());
     }

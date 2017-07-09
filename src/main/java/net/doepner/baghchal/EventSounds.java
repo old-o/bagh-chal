@@ -37,6 +37,9 @@ public final class EventSounds implements Listener {
         if (piece == PREDATOR) {
             play(PREDATOR_MOVES);
         }
+        if (piece == Piece.PREY) {
+            play(PREY_MOVES);
+        }
     }
 
     @Override

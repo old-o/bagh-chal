@@ -38,6 +38,11 @@ public final class PredatorStrategy implements Player {
         return threateningMove != null ? threateningMove : gameTable.tryMoveFrom(possibleSteps);
     }
 
+    @Override
+    public boolean isComputer() {
+        return true;
+    }
+
     private static Move tryThreateningMove(int level, Iterable<Move> possibleMoves, GameTable gameTable) {
         final Map<Integer, List<Move>> threateningMoves = getThreateningMoves(possibleMoves, gameTable);
         for (int i = level; i > 0; i--) {
