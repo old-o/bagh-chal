@@ -13,11 +13,15 @@ import net.doepner.baghchal.theming.Themes;
 import net.doepner.baghchal.view.GameFrame;
 import net.doepner.baghchal.view.GamePanel;
 import org.guppy4j.io.SimpleClassPathScanner;
+import org.guppy4j.log.Log;
 import org.guppy4j.log.LogProvider;
 import org.guppy4j.log.Slf4jLogProvider;
 import org.guppy4j.run.Executable;
 import org.guppy4j.text.CharCanvasImpl;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
 import javax.swing.SpinnerNumberModel;
 import java.awt.Dimension;
 import java.net.URL;
@@ -26,6 +30,7 @@ import java.util.function.Consumer;
 import static net.doepner.baghchal.model.Piece.PREDATOR;
 import static net.doepner.baghchal.model.Piece.PREY;
 import static net.doepner.baghchal.theming.Theme.SoundResourceId.CONGRATS;
+import static org.guppy4j.log.Log.Level.error;
 
 /**
  * Entry point of the game
@@ -40,6 +45,12 @@ public final class Main {
         System.setProperty("sun.java2d.opengl", "true");
 
         final LogProvider logProvider = new Slf4jLogProvider();
+        final Log log = logProvider.getLog(Main.class);
+
+        if (isAudioSystemBroken()) {
+            log.as(error, "Buggy audio system detected. Please adjust your Java sound.properties.");
+            System.exit(1);
+        }
 
         final int maxLevel = 2;
         final Dimension defaultBoardSize = new Dimension(5, 5);
@@ -75,6 +86,15 @@ public final class Main {
                 preyPlayer, predatorStrategy);
 
         gameLoop.start();
+    }
+
+    private static boolean isAudioSystemBroken() {
+        try {
+            final Clip clip = AudioSystem.getClip();
+            return clip == null || clip.getClass().getName().contains("PulseAudioClip");
+        } catch (LineUnavailableException e) {
+            return true;
+        }
     }
 
 }
