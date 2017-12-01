@@ -31,6 +31,7 @@ public final class GameTable {
 
     private final int boardXSize;
     private final int boardYSize;
+
     private final CharCanvas charCanvas;
 
     private final Piece[][] grid;
