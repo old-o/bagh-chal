@@ -63,6 +63,7 @@ public final class GameLoop {
     private void applyMove(Move move) {
         final GameTable gameTable = gamePanel.getGameTable();
         final boolean playerGaveUp = move == null;
+        levels.setLevelDone(playerGaveUp);
         if (playerGaveUp) {
             // TODO: Make this dependent on whether the other player is the user
             congrats.execute();
@@ -72,7 +73,6 @@ public final class GameLoop {
             gamePanel.repaint();
         }
         log.as(debug, gameTable.toString(move));
-        levels.setLevelDone(playerGaveUp);
         gameFrame.enableNextLevel(playerGaveUp && !levels.isGameOver());
     }
 }
