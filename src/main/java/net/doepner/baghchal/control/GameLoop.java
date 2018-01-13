@@ -44,14 +44,8 @@ public final class GameLoop {
         while (!levels.isGameOver()) {
             for (Player player : players) {
                 try {
-                    if (player.isComputer()) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            log.as(debug, e);
-                        }
-                    }
-                    applyMove(player.play(gamePanel.getGameTable()));
+                    processTurn(player);
+
                 } catch (PlayerInterruptedException e) {
                     log.as(debug, e);
                     break;
@@ -60,19 +54,31 @@ public final class GameLoop {
         }
     }
 
-    private void applyMove(Move move) {
+    private void processTurn(Player player) {
+        if (player.isComputer()) {
+            sleepSeconds(1);
+        }
         final GameTable gameTable = gamePanel.getGameTable();
-        final boolean playerGaveUp = move == null;
+        final Move move = player.play(gameTable);
+        final boolean playerGaveUp = (move == null);
+
         levels.setLevelDone(playerGaveUp);
-        if (playerGaveUp) {
-            // TODO: Make this dependent on whether the other player is the user
+        if (playerGaveUp && player.isComputer()) {
             congrats.execute();
-            gamePanel.repaint();
+        }
+        gamePanel.repaint();
+        if (playerGaveUp) {
             gameTable.reset();
-        } else {
-            gamePanel.repaint();
         }
         log.as(debug, gameTable.toString(move));
         gameFrame.enableNextLevel(playerGaveUp && !levels.isGameOver());
+    }
+
+    private void sleepSeconds(int seconds) {
+        try {
+            Thread.sleep(seconds * 1000);
+        } catch (InterruptedException e) {
+            log.as(debug, e);
+        }
     }
 }
