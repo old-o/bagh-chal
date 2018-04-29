@@ -15,6 +15,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -52,8 +53,22 @@ public final class Themes implements Theme, ThemeSelector {
 
     @Override
     public void selectTheme(String themeName) {
-        this.themeName = themeName;
-        colors = new Colors(getProperties(themeName));
+        if (contains(themeNames, themeName)) {
+            this.themeName = themeName;
+            colors = new Colors(getProperties(themeName));
+        } else {
+            selectTheme(themeNames.iterator().next());
+        }
+    }
+
+    // TODO: move to org.guppy4j.Iterables
+    private <T> boolean contains(Iterable<T> iterable, T item) {
+        for (T t : iterable) {
+            if (Objects.equals(t, item)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
