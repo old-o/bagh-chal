@@ -83,7 +83,7 @@ public final class Main {
         final Executable congrats = () -> AudioUrlPlayer.play(themes.getSoundResource(CONGRATS));
 
         final GameLoop gameLoop = new GameLoop(logProvider, gameFrame, levels, congrats,
-                preyPlayer, predatorStrategy);
+                predatorPlayer, preyStrategy);
 
         gameLoop.start();
     }
