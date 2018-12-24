@@ -15,6 +15,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,11 +40,19 @@ public final class Themes implements Theme, ThemeSelector {
     private String themeName;
     private Colors colors;
 
-    public Themes(DirectoryLister directoryLister, String resourceBasePath,
-                  String resourcePattern, String defaultThemeName) {
+    public Themes(DirectoryLister directoryLister, String resourceBasePath, String resourcePattern) {
         this.resourcePattern = resourceBasePath + '/' + resourcePattern;
-        themeNames = directoryLister.getSubDirectories(getClass().getResource(resourceBasePath));
-        selectTheme(defaultThemeName);
+        final URL resource = getClass().getResource(resourceBasePath);
+        if (resource == null) {
+            throw new IllegalStateException("Themes location not found in classpath: " + resourceBasePath);
+        }
+        themeNames = directoryLister.getSubDirectories(resource);
+        final Iterator<String> themesIter = themeNames.iterator();
+        if (themesIter.hasNext()) {
+            selectTheme(themesIter.next());
+        } else {
+            throw new IllegalStateException("No themes found in classpath under " + resourceBasePath);
+        }
     }
 
     @Override

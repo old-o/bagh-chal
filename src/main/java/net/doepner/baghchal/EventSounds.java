@@ -43,13 +43,6 @@ public final class EventSounds implements Listener {
     }
 
     @Override
-    public void afterPicked(Piece piece) {
-        if (piece == Piece.PREY) {
-            play(PREY_MOVES);
-        }
-    }
-
-    @Override
     public void afterReset() {
 //        play(WELCOME);
     }

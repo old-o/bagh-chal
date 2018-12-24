@@ -11,8 +11,6 @@ public interface Listener {
 
     void afterStep(Piece piece);
 
-    void afterPicked(Piece piece);
-
     void afterReset();
 
     Listener NONE = new Listener() {
@@ -24,11 +22,6 @@ public interface Listener {
 
         @Override
         public void afterStep(Piece piece) {
-            // ignore
-        }
-
-        @Override
-        public void afterPicked(Piece piece) {
             // ignore
         }
 

@@ -12,6 +12,7 @@ import java.util.Map;
 
 import static net.doepner.baghchal.model.Piece.PREDATOR;
 import static net.doepner.baghchal.model.Piece.PREY;
+import static org.guppy4j.Lists.getRandomFrom;
 
 /**
  * The computer player's strategy (playing the tigers)
@@ -26,7 +27,7 @@ public final class PredatorStrategy implements Player {
 
     @Override
     public Move play(GameTable gameTable) {
-        final Move take = gameTable.tryMoveFrom(gameTable.getPossibleJumps(PREDATOR, PREY));
+        final Move take = getRandomFrom(gameTable.getPossibleJumps(PREDATOR, PREY));
         if (take != null) {
             return take;
         }
@@ -35,7 +36,7 @@ public final class PredatorStrategy implements Player {
             return null;
         }
         final Move threateningMove = tryThreateningMove(levels.getLevel(), possibleSteps, gameTable);
-        return threateningMove != null ? threateningMove : gameTable.tryMoveFrom(possibleSteps);
+        return threateningMove != null ? threateningMove : getRandomFrom(possibleSteps);
     }
 
     @Override
@@ -46,7 +47,7 @@ public final class PredatorStrategy implements Player {
     private static Move tryThreateningMove(int level, Iterable<Move> possibleMoves, GameTable gameTable) {
         final Map<Integer, List<Move>> threateningMoves = getThreateningMoves(possibleMoves, gameTable);
         for (int i = level; i > 0; i--) {
-            final Move move = gameTable.tryMoveFrom(threateningMoves.get(i));
+            final Move move = getRandomFrom(threateningMoves.get(i));
             if (move != null) {
                 return move;
             }

@@ -1,7 +1,6 @@
 package net.doepner.baghchal.model;
 
 import net.doepner.baghchal.Listener;
-import org.guppy4j.Lists;
 import org.guppy4j.log.LogProvider;
 import org.guppy4j.text.CharCanvas;
 import org.guppy4j.text.CharDrawing;
@@ -86,7 +85,7 @@ public final class GameTable {
         return new GameTable(this);
     }
 
-    public Piece movePiece(Move move) {
+    public void movePiece(Move move) {
         final Piece piece = get(move.p1());
         if (piece == null) {
             throw new IllegalStateException("Cannot move piece from empty position:" + move.p1());
@@ -100,7 +99,6 @@ public final class GameTable {
         } else {
             listener.afterStep(piece);
         }
-        return piece;
     }
 
     public void setHiddenBorderPieceCount(int count) {
@@ -117,7 +115,6 @@ public final class GameTable {
             if (positions.isBorder(p) && hiddenBorderPieceCount > 0) {
                 hiddenBorderPieceCount--;
             }
-            listener.afterPicked(piece);
             return p;
         } else {
             return null;
@@ -140,14 +137,6 @@ public final class GameTable {
             }
         }
         return steps;
-    }
-
-    public Move tryMoveFrom(List<Move> moves) {
-        final Move move = Lists.getRandomFrom(moves);
-        if (move != null) {
-            movePiece(move);
-        }
-        return move;
     }
 
     public List<Move> getPossibleJumps(Piece movingPiece, Piece requiredPiece) {
@@ -194,7 +183,11 @@ public final class GameTable {
     }
 
     public boolean isValid(Move move, MoveConstraints piece) {
-        return !move.isStationary() && isEmptyAt(move.p2()) && piece.isValid(move, this);
+        try {
+            return !move.isStationary() && isEmptyAt(move.p2()) && piece.isValid(move, this);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return false;
+        }
     }
 
     boolean isBorderEmpty() {

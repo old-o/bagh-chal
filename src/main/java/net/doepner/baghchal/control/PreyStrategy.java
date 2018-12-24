@@ -22,17 +22,21 @@ public final class PreyStrategy implements Player {
 
     @Override
     public Move play(GameTable gameTable) {
-        final Move defensiveMove = gameTable.tryMoveFrom(getDefensiveMoves(gameTable));
+        final Move defensiveMove = getRandomFrom(getDefensiveMoves(gameTable));
         if (defensiveMove != null) {
             return defensiveMove;
         }
         final Position borderPosition = gameTable.getBorderPosition(PREY);
         if (borderPosition != null) {
-            final Position boardPosition = getRandomFrom(getSafeBoardPositions(gameTable));
-            if (boardPosition != null) {
-                return getMove(gameTable, borderPosition, boardPosition);
+            final List<Position> safeBoardPositions = getBoardPositions(gameTable, PreyStrategy::rejectUnsafe);
+            final Move move = getMove(borderPosition, safeBoardPositions.isEmpty()
+                    ? getBoardPositions(gameTable, PreyStrategy::rejectDeadly) : safeBoardPositions);
+            if (move != null) {
+                return move;
             }
         }
+
+
         // 2) place on the board edge next to a prey if possible
         // 3) place in a position that cannot be jumped over, preferably next to other prey that can also not be jumped over
         // 3a) if there is a choice to block off an empty position (make it unreachable for predator, do it
@@ -41,43 +45,56 @@ public final class PreyStrategy implements Player {
         return null;
     }
 
+    private interface Rejector {
+        boolean rejects(Position p, GameTable table, Position fore, Position back);
+    }
+
+    private Move getMove(Position borderPosition, List<Position> safeBoardPositions) {
+        final Position boardPosition = getRandomFrom(safeBoardPositions);
+        return new Move(borderPosition, boardPosition);
+    }
+
     @Override
     public boolean isComputer() {
         return true;
     }
 
-    private static Move getMove(GameTable gameTable, Position borderPosition, Position boardPosition) {
-        final Move m = new Move(borderPosition, boardPosition);
-        gameTable.movePiece(m);
-        return m;
-    }
-
-    private static List<Position> getSafeBoardPositions(GameTable gameTable) {
+    private static List<Position> getBoardPositions(GameTable gameTable, Rejector rejector) {
         final Set<Position> positions = new HashSet<>();
         for (Position p : gameTable.getPositions().getBoard()) {
-            if (isSafePosition(p, gameTable)) {
+            if (gameTable.isEmptyAt(p) && isOkPosition(p, gameTable, rejector)) {
                 positions.add(p);
             }
         }
         return new ArrayList<>(positions);
     }
 
-    private static boolean isSafePosition(Position p, GameTable table) {
-        if (!table.isEmptyAt(p)) {
-            return false;
-        }
+    private static boolean isOkPosition(Position p, GameTable table, Rejector rejector) {
         for (Direction d : Direction.values()) {
             final Position fore = d.addTo(p);
             final Position back = d.subtractFrom(p);
 
-            if (table.isStepAlongLine(new Move(p, fore)) && table.getPositions().isBoard(back)
-                    && isEmptyOrPredator(table.get(fore)) && isEmptyOrPredator(table.get(back))) {
+            if (rejector.rejects(p, table, fore, back)) {
                 // not safe because both neighboring fields are empty or occupied by predator
                 // which means on this position we could be jumped over and killed
                 return false;
             }
         }
         return true;
+    }
+
+    private static boolean rejectUnsafe(Position p, GameTable table, Position fore, Position back) {
+        return table.isStepAlongLine(new Move(p, fore)) && table.getPositions().isBoard(back)
+                && isEmptyOrPredator(table.get(fore)) && isEmptyOrPredator(table.get(back));
+    }
+
+    private static boolean rejectDeadly(Position p, GameTable table, Position fore, Position back) {
+        return table.isStepAlongLine(new Move(p, fore)) && table.getPositions().isBoard(back)
+                && (isPredator(table.get(fore)) || isPredator(table.get(back)));
+    }
+
+    private static boolean isPredator(Piece piece) {
+        return piece == PREDATOR;
     }
 
     private static boolean isEmptyOrPredator(Piece piece) {

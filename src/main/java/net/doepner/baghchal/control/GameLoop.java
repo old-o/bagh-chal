@@ -60,8 +60,10 @@ public final class GameLoop {
         }
         final GameTable gameTable = gamePanel.getGameTable();
         final Move move = player.play(gameTable);
+        if (move != null) {
+            gameTable.movePiece(move);
+        }
         final boolean playerGaveUp = (move == null);
-
         levels.setLevelDone(playerGaveUp);
         if (playerGaveUp && player.isComputer()) {
             congrats.execute();

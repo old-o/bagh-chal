@@ -64,16 +64,16 @@ public class DragAndDropHandler extends MouseAdapter {
         if (dragStart != null) {
             final Move move = new Move(dragStart, p);
             final boolean validMove = gameTable.isValid(move, piece);
-            final Position resultingPosition = validMove ? move.p2() : dragStart;
-            gameTable.set(resultingPosition, piece);
-            repaintDraggedAt(e.getPoint());
-            repaintDraggedAt(dragStartPoint);
+            gameTable.set(dragStart, piece);
+            if (validMove) {
+                playFlow.moveDone(move);
+            } else {
+                repaintDraggedAt(e.getPoint());
+                repaintDraggedAt(dragStartPoint);
+            }
             lastDragPoint(null);
             dragStartPoint = null;
             dragStart = null;
-            if (validMove) {
-                playFlow.moveDone(move);
-            }
         }
     }
 
