@@ -11,6 +11,7 @@ import org.guppy4j.run.Executable;
 
 import java.util.Arrays;
 
+import static java.lang.System.lineSeparator;
 import static org.guppy4j.log.Log.Level.debug;
 
 /**
@@ -62,6 +63,7 @@ public final class GameLoop {
         final Move move = player.play(gameTable);
         if (move != null) {
             gameTable.movePiece(move);
+            log.as(debug, lineSeparator() + move + lineSeparator() + gameTable);
         }
         final boolean playerGaveUp = (move == null);
         levels.setLevelDone(playerGaveUp);
@@ -72,7 +74,6 @@ public final class GameLoop {
         if (playerGaveUp) {
             gameTable.reset();
         }
-        log.as(debug, gameTable.toString(move));
         gameFrame.enableNextLevel(playerGaveUp && !levels.isGameOver());
     }
 

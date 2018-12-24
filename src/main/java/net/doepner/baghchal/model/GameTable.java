@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static java.lang.Math.max;
-import static java.lang.System.lineSeparator;
 import static net.doepner.baghchal.model.Direction.DOWN;
 import static net.doepner.baghchal.model.Direction.RIGHT;
 import static net.doepner.baghchal.model.Direction.RIGHT_DOWN;
@@ -224,7 +223,7 @@ public final class GameTable {
         return grid[0].length;
     }
 
-    public String toString(Move move) {
+    public String toString() {
         final int xStep = 2;
         final int yStep = 2;
 
@@ -244,7 +243,7 @@ public final class GameTable {
                 drawing.addChar(x, y, '+');
             }
         }
-        return lineSeparator() + move + lineSeparator() + drawing;
+        return drawing.toString();
     }
 
     private final Collection<Runnable> discardListeners = new ArrayList<>();

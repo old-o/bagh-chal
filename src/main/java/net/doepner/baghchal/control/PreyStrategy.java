@@ -29,10 +29,16 @@ public final class PreyStrategy implements Player {
         final Position borderPosition = gameTable.getBorderPosition(PREY);
         if (borderPosition != null) {
             final List<Position> safeBoardPositions = getBoardPositions(gameTable, PreyStrategy::rejectUnsafe);
-            final Move move = getMove(borderPosition, safeBoardPositions.isEmpty()
-                    ? getBoardPositions(gameTable, PreyStrategy::rejectDeadly) : safeBoardPositions);
-            if (move != null) {
-                return move;
+            if (!safeBoardPositions.isEmpty()) {
+                return getMove(borderPosition, safeBoardPositions);
+            }
+            final List<Position> livableBoardPositions = getBoardPositions(gameTable, PreyStrategy::rejectDeadly);
+            if (!livableBoardPositions.isEmpty()) {
+                return getMove(borderPosition, livableBoardPositions);
+            }
+            final List<Position> emptyBoardPositions = getBoardPositions(gameTable, PreyStrategy::neverReject);
+            if (!emptyBoardPositions.isEmpty()) {
+                return getMove(borderPosition, emptyBoardPositions);
             }
         }
 
@@ -89,8 +95,14 @@ public final class PreyStrategy implements Player {
     }
 
     private static boolean rejectDeadly(Position p, GameTable table, Position fore, Position back) {
+        final Piece fp = table.get(fore);
+        final Piece bp = table.get(back);
         return table.isStepAlongLine(new Move(p, fore)) && table.getPositions().isBoard(back)
-                && (isPredator(table.get(fore)) || isPredator(table.get(back)));
+                && (isPredator(fp) && isEmpty(bp) || isEmpty(fp) && isPredator(bp));
+    }
+
+    private static boolean neverReject(Position p, GameTable table, Position fore, Position back) {
+        return false;
     }
 
     private static boolean isPredator(Piece piece) {
@@ -99,6 +111,10 @@ public final class PreyStrategy implements Player {
 
     private static boolean isEmptyOrPredator(Piece piece) {
         return (piece == null) || (piece == PREDATOR);
+    }
+
+    private static boolean isEmpty(Piece piece) {
+        return piece == null;
     }
 
     private static List<Move> getDefensiveMoves(GameTable gameTable) {
