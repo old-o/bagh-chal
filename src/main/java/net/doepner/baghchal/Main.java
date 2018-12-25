@@ -80,7 +80,8 @@ public final class Main {
 
         final GameFrame gameFrame = new GameFrame(logProvider, gamePanel, themes,
                 new SpinnerNumberModel(5, 4, 99, 1),
-                new SpinnerNumberModel(5, 4, 99, 1));
+                new SpinnerNumberModel(5, 4, 99, 1),
+                players);
 
         final Executable congrats = () -> AudioUrlPlayer.play(themes.getSoundResource(CONGRATS));
 

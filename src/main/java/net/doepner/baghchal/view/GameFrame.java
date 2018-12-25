@@ -1,11 +1,13 @@
 package net.doepner.baghchal.view;
 
+import net.doepner.baghchal.model.Players;
 import net.doepner.baghchal.model.Position;
 import net.doepner.baghchal.theming.ThemeSelector;
 import org.guppy4j.log.Log;
 import org.guppy4j.log.LogProvider;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -21,6 +23,8 @@ import java.awt.Dimension;
 import java.awt.GraphicsConfiguration;
 import java.awt.Rectangle;
 
+import static net.doepner.baghchal.model.Piece.PREDATOR;
+import static net.doepner.baghchal.model.Piece.PREY;
 import static org.guppy4j.log.Log.Level.debug;
 
 /**
@@ -31,7 +35,7 @@ public final class GameFrame {
     private final Log log;
 
     private final JFrame frame;
-    private final JButton nextLevelBtn;
+//    private final JButton nextLevelBtn;
 
     private final GamePanel gamePanel;
 
@@ -41,7 +45,8 @@ public final class GameFrame {
     public GameFrame(LogProvider logProvider,
                      GamePanel gamePanel, ThemeSelector themeSelector,
                      SpinnerNumberModel boardXSizeModel,
-                     SpinnerNumberModel boardYSizeModel) {
+                     SpinnerNumberModel boardYSizeModel,
+                     Players players) {
         log = logProvider.getLog(getClass());
         this.gamePanel = gamePanel;
 
@@ -55,9 +60,9 @@ public final class GameFrame {
         final JButton newGameBtn = new JButton("New Game");
         newGameBtn.addActionListener(e -> gamePanel.start());
 
-        nextLevelBtn = new JButton("Next Level");
-        nextLevelBtn.addActionListener(e -> gamePanel.nextLevel());
-        nextLevelBtn.setEnabled(false);
+//        nextLevelBtn = new JButton("Next Level");
+//        nextLevelBtn.addActionListener(e -> gamePanel.nextLevel());
+//        nextLevelBtn.setEnabled(false);
 
         final JComboBox<String> themeChooser = new JComboBox<>();
         for (String themeName : themeSelector.getAvailableThemeNames()) {
@@ -74,10 +79,18 @@ public final class GameFrame {
 
         final JToolBar toolBar = new JToolBar();
         toolBar.setFloatable(false);
-        addTo(toolBar, newGameBtn, nextLevelBtn);
+        addTo(toolBar, newGameBtn);
         addTo(toolBar, new JLabel("Theme: "), themeChooser);
         addTo(toolBar, new JLabel("Width: "), xSizeSpinner);
         addTo(toolBar, new JLabel("Height: "), ySizeSpinner);
+
+        final JCheckBox predCheck = new JCheckBox();
+        predCheck.addChangeListener(e -> players.setPlayedByComputer(PREDATOR, predCheck.isSelected()));
+        addTo(toolBar, new JLabel("Predators: "), predCheck);
+
+        final JCheckBox preyCheck = new JCheckBox();
+        preyCheck.addChangeListener(e -> players.setPlayedByComputer(PREY, preyCheck.isSelected()));
+        addTo(toolBar, new JLabel("Prey: "), preyCheck);
 
         frame.add(toolBar, BorderLayout.PAGE_START);
         frame.add(new JScrollPane(gamePanel), BorderLayout.CENTER);
@@ -110,7 +123,7 @@ public final class GameFrame {
     }
 
     public void enableNextLevel(boolean enable) {
-        nextLevelBtn.setEnabled(enable);
+//        nextLevelBtn.setEnabled(enable);
     }
 
     private void updateBoardSize() {
