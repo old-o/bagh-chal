@@ -8,6 +8,8 @@ import net.doepner.baghchal.control.UserPlayer;
 import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.GameTableFactory;
 import net.doepner.baghchal.model.Levels;
+import net.doepner.baghchal.model.Piece;
+import net.doepner.baghchal.model.Players;
 import net.doepner.baghchal.resources.AudioUrlPlayer;
 import net.doepner.baghchal.theming.Themes;
 import net.doepner.baghchal.view.GameFrame;
@@ -72,14 +74,17 @@ public final class Main {
         final Player predatorStrategy = new PredatorStrategy(levels);
         final Player predatorPlayer = new UserPlayer(PREDATOR, gamePanel, themes);
 
+        final Players players = new Players(logProvider, preyStrategy, preyPlayer, predatorStrategy, predatorPlayer);
+        players.setPlayedByComputer(Piece.PREY, false);
+        players.setPlayedByComputer(Piece.PREDATOR, false);
+
         final GameFrame gameFrame = new GameFrame(logProvider, gamePanel, themes,
                 new SpinnerNumberModel(5, 4, 99, 1),
                 new SpinnerNumberModel(5, 4, 99, 1));
 
         final Executable congrats = () -> AudioUrlPlayer.play(themes.getSoundResource(CONGRATS));
 
-        final GameLoop gameLoop = new GameLoop(logProvider, gameFrame, levels, congrats,
-                predatorPlayer, preyStrategy);
+        final GameLoop gameLoop = new GameLoop(logProvider, gameFrame, levels, congrats, players);
 
         gameLoop.start();
     }

@@ -3,13 +3,13 @@ package net.doepner.baghchal.control;
 import net.doepner.baghchal.model.GameTable;
 import net.doepner.baghchal.model.Levels;
 import net.doepner.baghchal.model.Move;
+import net.doepner.baghchal.model.Piece;
+import net.doepner.baghchal.model.Players;
 import net.doepner.baghchal.view.GameFrame;
 import net.doepner.baghchal.view.GamePanel;
 import org.guppy4j.log.Log;
 import org.guppy4j.log.LogProvider;
 import org.guppy4j.run.Executable;
-
-import java.util.Arrays;
 
 import static java.lang.System.lineSeparator;
 import static org.guppy4j.log.Log.Level.debug;
@@ -26,16 +26,16 @@ public final class GameLoop {
 
     private final Levels levels;
     private final Executable congrats;
-    private final Iterable<Player> players;
+    private final Players players;
 
     public GameLoop(LogProvider logProvider, GameFrame gameFrame,
-                    Levels levels, Executable congrats, Player... players) {
+                    Levels levels, Executable congrats, Players players) {
         log = logProvider.getLog(getClass());
         this.gameFrame = gameFrame;
         gamePanel = gameFrame.getGamePanel();
         this.levels = levels;
         this.congrats = congrats;
-        this.players = Arrays.asList(players);
+        this.players = players;
     }
 
     public void start() {
@@ -43,9 +43,9 @@ public final class GameLoop {
         gameFrame.show();
 
         while (!levels.isGameOver()) {
-            for (Player player : players) {
+            for (Piece piece : Piece.values()) {
                 try {
-                    processTurn(player);
+                    processTurn(piece);
 
                 } catch (PlayerInterruptedException e) {
                     log.as(debug, e);
@@ -55,19 +55,16 @@ public final class GameLoop {
         }
     }
 
-    private void processTurn(Player player) {
-        if (player.isComputer()) {
-            sleepSeconds(1);
-        }
+    private void processTurn(Piece piece) {
         final GameTable gameTable = gamePanel.getGameTable();
-        final Move move = player.play(gameTable);
+        final Move move = players.play(gameTable, piece);
         if (move != null) {
             gameTable.movePiece(move);
             log.as(debug, lineSeparator() + move + lineSeparator() + gameTable);
         }
         final boolean playerGaveUp = (move == null);
         levels.setLevelDone(playerGaveUp);
-        if (playerGaveUp && player.isComputer()) {
+        if (playerGaveUp && players.isPlayedByComputer(piece)) {
             congrats.execute();
         }
         gamePanel.repaint();
@@ -77,11 +74,4 @@ public final class GameLoop {
         gameFrame.enableNextLevel(playerGaveUp && !levels.isGameOver());
     }
 
-    private void sleepSeconds(int seconds) {
-        try {
-            Thread.sleep(seconds * 1000);
-        } catch (InterruptedException e) {
-            log.as(debug, e);
-        }
-    }
 }
