@@ -38,14 +38,6 @@ public final class Position {
         return 31 * x + y;
     }
 
-    public Position add(Position p) {
-        return new Position(x + p.x, y + p.y);
-    }
-
-    public Position subtract(Position p) {
-        return new Position(x - p.x, y - p.y);
-    }
-
     public boolean isLessOrEqualTo(Position p) {
         return x <= p.x && y <= p.y;
     }

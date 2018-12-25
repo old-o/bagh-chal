@@ -20,6 +20,6 @@ public final class FailHandler implements Thread.UncaughtExceptionHandler {
     @Override
     public void uncaughtException(Thread t, Throwable e) {
         log.as(error, e);
-        showMessageDialog(null, e.getMessage(), "Cannot start", ERROR_MESSAGE);
+        showMessageDialog(null, e.getMessage(), "Error occured", ERROR_MESSAGE);
     }
 }

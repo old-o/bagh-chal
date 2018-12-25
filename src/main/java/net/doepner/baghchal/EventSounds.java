@@ -42,11 +42,6 @@ public final class EventSounds implements Listener {
         }
     }
 
-    @Override
-    public void afterReset() {
-//        play(WELCOME);
-    }
-
     private void play(SoundResourceId resourceId) {
         audioPlayMethod.accept(theme.getSoundResource(resourceId));
     }
