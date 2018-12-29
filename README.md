@@ -7,7 +7,7 @@ Install and run
 
 During the Java installation, make sure to unselect any 3rd party add-ons, like Yahoo browser plugin, etc.
 
-2) [Download and run Bagh-chal](https://bintray.com/artifact/download/odoepner/generic/bagh-chal.jar)
+2)  [ ![Download](https://api.bintray.com/packages/odoepner/generic/bagh-chal/images/download.svg) ](https://bintray.com/odoepner/generic/bagh-chal/_latestVersion)
 
 This will download the file "bagh-chal.jar". When the download is finished double-click it to run the game.
 
