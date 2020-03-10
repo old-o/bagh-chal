@@ -1,7 +1,7 @@
 # config file for travis-ci
 
 language: java
-jdk: oraclejdk8
+jdk: openjdk8
 script: mvn clean verify
 
 after_success: "./.travis/artifact-upload.sh"
