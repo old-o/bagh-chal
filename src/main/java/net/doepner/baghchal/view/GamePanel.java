@@ -1,5 +1,31 @@
 package net.doepner.baghchal.view;
 
+import net.doepner.baghchal.model.GameTable;
+import net.doepner.baghchal.model.GameTableFactory;
+import net.doepner.baghchal.model.Levels;
+import net.doepner.baghchal.model.Move;
+import net.doepner.baghchal.model.Piece;
+import net.doepner.baghchal.model.Position;
+import net.doepner.baghchal.theming.Theme;
+import org.guppy4j.g2d.IntPair;
+import org.guppy4j.g2d.Size;
+
+import javax.swing.JPanel;
+import java.awt.BasicStroke;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
+import java.awt.event.MouseAdapter;
+import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
+
 import static java.awt.RenderingHints.KEY_ANTIALIASING;
 import static java.awt.RenderingHints.KEY_STROKE_CONTROL;
 import static java.awt.RenderingHints.KEY_TEXT_ANTIALIASING;
@@ -12,31 +38,7 @@ import static net.doepner.baghchal.theming.Theme.ColorId.BOARD_EDGE;
 import static net.doepner.baghchal.theming.Theme.ColorId.DIAGONAL;
 import static net.doepner.baghchal.theming.Theme.ColorId.GRID;
 
-import java.awt.BasicStroke;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
-import java.awt.event.MouseAdapter;
-import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.JPanel;
-
-import net.doepner.baghchal.model.GameTable;
-import net.doepner.baghchal.model.GameTableFactory;
-import net.doepner.baghchal.model.Levels;
-import net.doepner.baghchal.model.Move;
-import net.doepner.baghchal.model.Piece;
-import net.doepner.baghchal.model.Position;
-import net.doepner.baghchal.theming.Theme;
-
-public final class GamePanel extends JPanel {
+public final class GamePanel extends JPanel implements GameView {
 
     private final Levels levels;
 
@@ -56,18 +58,19 @@ public final class GamePanel extends JPanel {
         return new RenderingHints(map);
     }
 
-    public GamePanel(GameTableFactory gameTableFactory, Dimension defaultBoardSize, Theme theme, Levels levels) {
+    public GamePanel(GameTableFactory gameTableFactory, IntPair defaultBoardSize,
+                     Theme theme, Levels levels) {
         this.gameTableFactory = gameTableFactory;
         this.levels = levels;
         this.theme = theme;
         setBoardSize(defaultBoardSize);
     }
 
-    void setBoardSize(Dimension boardSize) {
+    public void setBoardSize(Size size) {
         boolean restart = false;
-        if (gameTable == null || !gameTable.isBoardSize(boardSize)) {
+        if (gameTable == null || !gameTable.isBoardSize(size)) {
             final GameTable oldGameTable = gameTable;
-            gameTable = gameTableFactory.getGameTable(boardSize.width, boardSize.height);
+            gameTable = gameTableFactory.getGameTable(size);
             if (oldGameTable != null) {
                 oldGameTable.discard();
                 restart = true;
@@ -89,9 +92,9 @@ public final class GamePanel extends JPanel {
     }
 
     @SuppressWarnings({"NumericCastThatLosesPrecision", "ImplicitNumericConversion"})
-    Position getMaxPosition(Rectangle bounds) {
-        final int x = (int) ((2.0 * bounds.getWidth()) / (3.0 * theme.getPieceWidth()));
-        final int y = (int) ((2.0 * bounds.getHeight()) / (3.0 * theme.getPieceHeight()));
+    public Position getMaxPosition(Size bounds) {
+        final int x = (int) ((2.0 * bounds.getX()) / (3.0 * theme.getPieceWidth()));
+        final int y = (int) ((2.0 * bounds.getY()) / (3.0 * theme.getPieceHeight()));
         return new Position(x - 3, y - 3);
     }
 
@@ -180,17 +183,28 @@ public final class GamePanel extends JPanel {
     private Point lastDragPoint;
     private BufferedImage draggedImage;
 
-    void setLastDragPoint(Point lastDragPoint) {
+    public void setLastDragPoint(Point lastDragPoint) {
         this.lastDragPoint = lastDragPoint;
     }
 
-    Point getLastDragPoint() {
+    public Point getLastDragPoint() {
         return lastDragPoint;
     }
 
-    void repaintForDrag(Rectangle rectangle, BufferedImage image) {
+    public void repaintForDrag(Rectangle rectangle, BufferedImage image) {
         draggedImage = image;
         repaint(rectangle);
+    }
+
+    @Override
+    public Size getScreenSize() {
+        final GraphicsConfiguration gc = getGraphicsConfiguration();
+        if (gc == null) {
+            return null;
+        } else {
+            final Rectangle screenSize = gc.getBounds();
+            return new IntPair(screenSize.x, screenSize.y);
+        }
     }
 
     private void drawDraggedImage(Graphics2D g2) {

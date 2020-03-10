@@ -3,6 +3,8 @@ package net.doepner.baghchal.view;
 import net.doepner.baghchal.model.Players;
 import net.doepner.baghchal.model.Position;
 import net.doepner.baghchal.theming.ThemeSelector;
+import org.guppy4j.g2d.IntPair;
+import org.guppy4j.g2d.Size;
 import org.guppy4j.log.Log;
 import org.guppy4j.log.LogProvider;
 
@@ -20,8 +22,6 @@ import javax.swing.WindowConstants;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GraphicsConfiguration;
-import java.awt.Rectangle;
 
 import static net.doepner.baghchal.model.Piece.PREDATOR;
 import static net.doepner.baghchal.model.Piece.PREY;
@@ -37,13 +37,13 @@ public final class GameFrame {
     private final JFrame frame;
 //    private final JButton nextLevelBtn;
 
-    private final GamePanel gamePanel;
+    private final GameView gamePanel;
 
     private final SpinnerNumberModel boardXSizeModel;
     private final SpinnerNumberModel boardYSizeModel;
 
     public GameFrame(LogProvider logProvider,
-                     GamePanel gamePanel, ThemeSelector themeSelector,
+                     GameView gamePanel, ThemeSelector themeSelector,
                      SpinnerNumberModel boardXSizeModel,
                      SpinnerNumberModel boardYSizeModel,
                      Players players) {
@@ -93,7 +93,7 @@ public final class GameFrame {
         addTo(toolBar, new JLabel("Prey: "), preyCheck);
 
         frame.add(toolBar, BorderLayout.PAGE_START);
-        frame.add(new JScrollPane(gamePanel), BorderLayout.CENTER);
+        frame.add(new JScrollPane(gamePanel.as(Component.class)), BorderLayout.CENTER);
     }
 
     private static void addTo(JToolBar toolBar, Component... components) {
@@ -127,10 +127,9 @@ public final class GameFrame {
     }
 
     private void updateBoardSize() {
-        final GraphicsConfiguration gc = gamePanel.getGraphicsConfiguration();
-        if (gc != null) {
-            final Rectangle screenSize = gc.getBounds();
-            log.as(debug, "Screen size: {} x {}", screenSize.getWidth(), screenSize.getHeight());
+        final Size screenSize = gamePanel.getScreenSize();
+        if (screenSize != null) {
+            log.as(debug, "Screen size: {} x {}", screenSize.getX(), screenSize.getY());
 
             final Position maxPosition = gamePanel.getMaxPosition(screenSize);
             final int xSize = Math.min(boardXSizeModel.getNumber().intValue(), maxPosition.x());
@@ -141,7 +140,7 @@ public final class GameFrame {
             boardXSizeModel.setValue(xSize);
             boardYSizeModel.setValue(ySize);
 
-            gamePanel.setBoardSize(new Dimension(xSize, ySize));
+            gamePanel.setBoardSize(new IntPair(xSize, ySize));
 
             frame.getContentPane().repaint();
             frame.pack();
@@ -149,7 +148,7 @@ public final class GameFrame {
         }
     }
 
-    public GamePanel getGamePanel() {
+    public GameView getGamePanel() {
         return gamePanel;
     }
 }

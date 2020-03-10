@@ -43,7 +43,7 @@ public final class GameTableSetup {
             return Collections.emptyList();
         }
         final Collection<Position> toFill = new ArrayList<>();
-        for (int i = 1; i < gameTable.getMaxStep(); i++) {
+        for (int i = 1; i < gameTable.getMaxStepFromCorner(); i++) {
             for (Direction d : Direction.values()) {
                 for (Position p : positions.getBoard()) {
                     if (gameTable.get(p) == piece) {

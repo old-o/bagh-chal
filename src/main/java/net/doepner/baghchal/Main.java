@@ -14,15 +14,17 @@ import net.doepner.baghchal.resources.AudioUrlPlayer;
 import net.doepner.baghchal.theming.Themes;
 import net.doepner.baghchal.view.GameFrame;
 import net.doepner.baghchal.view.GamePanel;
+import net.doepner.baghchal.view.GameView;
+import org.guppy4j.g2d.IntPair;
 import org.guppy4j.io.SimpleClassPathScanner;
 import org.guppy4j.log.Log;
 import org.guppy4j.log.LogProvider;
 import org.guppy4j.log.Slf4jLogProvider;
 import org.guppy4j.run.Executable;
+import org.guppy4j.run.Startable;
 import org.guppy4j.text.CharCanvasImpl;
 
 import javax.swing.SpinnerNumberModel;
-import java.awt.Dimension;
 import java.net.URL;
 import java.util.function.Consumer;
 
@@ -49,7 +51,7 @@ public final class Main {
 
         System.setProperty("sun.java2d.opengl", "true");
 
-        final Dimension defaultBoardSize = new Dimension(5, 5);
+        final IntPair defaultBoardSize = new IntPair(5, 5);
 
         final String resourceBasePath = "/net/doepner/baghchal/themes";
         final Themes themes = new Themes(new SimpleClassPathScanner(), resourceBasePath, "%s/%s.%s");
@@ -62,12 +64,12 @@ public final class Main {
 
         final EventSounds listener = new EventSounds(audioPlayMethod, themes);
 
-        final GameTableFactory gameTableFactory = (xSize, ySize) -> new GameTable(
-                logProvider, xSize, ySize, tableSetupMethod, listener,
+        final GameTableFactory gameTableFactory = (size) -> new GameTable(
+                logProvider, size, tableSetupMethod, listener,
                 new CharCanvasImpl()
         );
 
-        final GamePanel gamePanel = new GamePanel(gameTableFactory, defaultBoardSize, themes, levels);
+        final GameView gamePanel = new GamePanel(gameTableFactory, defaultBoardSize, themes, levels);
 
         final Player preyStrategy = new PreyStrategy();
         final Player preyPlayer = new UserPlayer(PREY, gamePanel, themes);
@@ -85,12 +87,8 @@ public final class Main {
 
         final Executable congrats = () -> AudioUrlPlayer.play(themes.getSoundResource(CONGRATS));
 
-        final GameLoop gameLoop = new GameLoop(logProvider, gameFrame, levels, congrats, players);
+        final Startable gameLoop = new GameLoop(logProvider, gameFrame, levels, congrats, players);
 
         gameLoop.start();
     }
-
-
-
-
 }

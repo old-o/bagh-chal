@@ -1,18 +1,17 @@
 package net.doepner.baghchal.model;
 
 import net.doepner.baghchal.Listener;
+import org.guppy4j.g2d.Size;
 import org.guppy4j.log.LogProvider;
 import org.guppy4j.text.CharCanvas;
 import org.guppy4j.text.CharDrawing;
 
-import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static java.lang.Math.max;
 import static net.doepner.baghchal.model.Direction.DOWN;
 import static net.doepner.baghchal.model.Direction.RIGHT;
 import static net.doepner.baghchal.model.Direction.RIGHT_DOWN;
@@ -27,8 +26,7 @@ public final class GameTable {
 
     private final LogProvider logProvider;
 
-    private final int boardXSize;
-    private final int boardYSize;
+    private final Size boardSize;
 
     private final CharCanvas charCanvas;
 
@@ -38,18 +36,17 @@ public final class GameTable {
     private final Listener listener;
     private final TablePositions positions;
 
-    public GameTable(LogProvider logProvider, int boardXSize, int boardYSize,
+    public GameTable(LogProvider logProvider, Size boardSize,
                      Consumer<GameTable> setupMethod, Listener listener,
                      CharCanvas charCanvas) {
         this.logProvider = logProvider;
         this.setupMethod = setupMethod;
         this.listener = listener;
-        this.boardXSize = boardXSize;
-        this.boardYSize = boardYSize;
+        this.boardSize = boardSize;
         this.charCanvas = charCanvas;
-        grid = new Piece[boardXSize + 2][boardYSize + 2];
+        grid = new Piece[boardSize.getX() + 2][boardSize.getY() + 2];
         final Position topLeft = new Position(1, 1);
-        final Position bottomRight = new Position(boardXSize, boardYSize);
+        final Position bottomRight = new Position(boardSize.getX(), boardSize.getY());
         positions = new TablePositions(topLeft, bottomRight, getPositions(grid));
     }
 
@@ -74,7 +71,7 @@ public final class GameTable {
      * @param gt An existing GameTable instance
      */
     private GameTable(GameTable gt) {
-        this(gt.logProvider, gt.boardXSize, gt.boardYSize, gt.setupMethod, Listener.NONE, gt.charCanvas);
+        this(gt.logProvider, gt.boardSize, gt.setupMethod, Listener.NONE, gt.charCanvas);
         for (int x = 0; x < grid.length; x++) {
             System.arraycopy(gt.grid[x], 0, grid[x], 0, grid[x].length);
         }
@@ -208,11 +205,11 @@ public final class GameTable {
     }
 
     public int getBoardXSize() {
-        return boardXSize;
+        return boardSize.getX();
     }
 
     public int getBoardYSize() {
-        return boardYSize;
+        return boardSize.getY();
     }
 
     public int getXSize() {
@@ -256,8 +253,8 @@ public final class GameTable {
         discardListeners.forEach(Runnable::run);
     }
 
-    public boolean isBoardSize(Dimension boardSize) {
-        return boardSize.width == boardXSize && boardSize.height == boardYSize;
+    public boolean isBoardSize(Size size) {
+        return boardSize != null && boardSize.isSameAs(size);
     }
 
     public Iterable<Move> getStepsAlongLineFrom(Position p) {
@@ -271,7 +268,7 @@ public final class GameTable {
         return steps;
     }
 
-    public int getMaxStep() {
-        return (max(boardXSize, boardYSize) / 2) - 1;
+    public int getMaxStepFromCorner() {
+        return (boardSize.getMaxDimension() / 2) - 1;
     }
 }

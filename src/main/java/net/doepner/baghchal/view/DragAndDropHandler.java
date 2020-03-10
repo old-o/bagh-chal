@@ -20,7 +20,7 @@ import java.awt.image.BufferedImage;
 public class DragAndDropHandler extends MouseAdapter {
 
     private final GameTable gameTable;
-    private final GamePanel gamePanel;
+    private final GameView gamePanel;
     private final Images images;
 
     private final PlayFlow playFlow;
@@ -29,7 +29,7 @@ public class DragAndDropHandler extends MouseAdapter {
     private Position dragStart;
     private Point dragStartPoint;
 
-    public DragAndDropHandler(Piece piece, GameTable gameTable, GamePanel gamePanel,
+    public DragAndDropHandler(Piece piece, GameTable gameTable, GameView gamePanel,
                               Images images, PlayFlow playFlow) {
         this.piece = piece;
         this.gameTable = gameTable;

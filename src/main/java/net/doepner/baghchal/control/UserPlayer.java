@@ -5,7 +5,7 @@ import net.doepner.baghchal.model.Move;
 import net.doepner.baghchal.model.Piece;
 import net.doepner.baghchal.theming.Images;
 import net.doepner.baghchal.view.DragAndDropHandler;
-import net.doepner.baghchal.view.GamePanel;
+import net.doepner.baghchal.view.GameView;
 
 import java.awt.event.MouseAdapter;
 
@@ -14,11 +14,11 @@ import java.awt.event.MouseAdapter;
  */
 public final class UserPlayer implements Player {
 
-    private final GamePanel gamePanel;
+    private final GameView gamePanel;
     private final Images images;
     private final Piece piece;
 
-    public UserPlayer(Piece piece, GamePanel gamePanel, Images images) {
+    public UserPlayer(Piece piece, GameView gamePanel, Images images) {
         this.gamePanel = gamePanel;
         this.images = images;
         this.piece = piece;
