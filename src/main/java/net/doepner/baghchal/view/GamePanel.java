@@ -203,7 +203,7 @@ public final class GamePanel extends JPanel implements GameView {
             return null;
         } else {
             final Rectangle screenSize = gc.getBounds();
-            return new IntPair(screenSize.x, screenSize.y);
+            return new IntPair(screenSize.width, screenSize.height);
         }
     }
 
