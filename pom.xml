@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.doepner</groupId>
+    <groupId>org.oldo</groupId>
     <artifactId>bagh-chal</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -40,7 +40,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mainClass>net.doepner.baghchal.Main</mainClass>
+        <mainClass>org.oldo.baghchal.Main</mainClass>
     </properties>
 
     <build>
