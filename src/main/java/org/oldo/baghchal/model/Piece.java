@@ -5,14 +5,14 @@ package org.oldo.baghchal.model;
  */
 public enum Piece implements MoveConstraints {
 
-    PREY('O') {
+    PREY('◯') {
         @Override
         public boolean isValid(Move move, GameTable gameTable) {
             return gameTable.getPositions().isBorderToBoard(move)
                     || (gameTable.isBorderEmpty() && gameTable.isStepAlongLine(move));
         }
     },
-    PREDATOR('X') {
+    PREDATOR('⬤') {
         @Override
         public boolean isValid(Move move, GameTable gameTable) {
             return gameTable.isStepAlongLine(move)

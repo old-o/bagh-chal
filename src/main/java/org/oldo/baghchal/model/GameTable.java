@@ -12,10 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static org.oldo.baghchal.model.Direction.DOWN;
-import static org.oldo.baghchal.model.Direction.RIGHT;
-import static org.oldo.baghchal.model.Direction.RIGHT_DOWN;
-import static org.oldo.baghchal.model.Direction.RIGHT_UP;
+import static org.oldo.baghchal.model.Direction.*;
 
 /**
  * The game board model
@@ -237,10 +234,25 @@ public final class GameTable {
             if (piece != null){
                 drawing.addChar(x, y, piece.asChar());
             } else if (positions.isBoard(p)) {
-                drawing.addChar(x, y, '+');
+                drawing.addChar(x, y, getBoardChar(p));
             }
         }
         return drawing.toString();
+    }
+
+    private char getBoardChar(Position p) {
+        if (isBorder(p, UP)) {
+            return isBorder(p, LEFT) ? '┌' : isBorder(p, RIGHT) ? '┐' : '┬';
+        }
+        if (isBorder(p, DOWN)) {
+            return isBorder(p, LEFT) ? '└' : isBorder(p, RIGHT) ? '┘' : '┴';
+        }
+        // otherwise
+        return isBorder(p, LEFT) ? '├' : isBorder(p, RIGHT) ? '┤' : '┼';
+    }
+
+    private boolean isBorder(Position p, Direction up) {
+        return positions.isBorder(up.addTo(p));
     }
 
     private final Collection<Runnable> discardListeners = new ArrayList<>();

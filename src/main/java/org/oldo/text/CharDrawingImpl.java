@@ -22,9 +22,9 @@ public final class CharDrawingImpl implements CharDrawing {
 
     private static char lineChar(Move step) {
         if (step.isOneDimensional()) {
-            return step.xStep() == 0 ? '|' : '-';
+            return step.xStep() == 0 ? '│' : '─';
         } else {
-            return step.xStep() * step.yStep() > 0 ? '\\' : '/';
+            return step.xStep() * step.yStep() > 0 ? '╲' : '╱';
         }
     }
 
