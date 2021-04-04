@@ -40,13 +40,16 @@ import static org.oldo.baghchal.theming.Theme.ColorId.GRID;
 
 public final class GamePanel extends JPanel implements GameView {
 
-    private final Levels levels;
+    private static final int DRAG_FRAME_PADDING = 3;
+    public static final double SPACING = 0.5;
+    private static final double PIECE_SPACE = 1 + SPACING;
 
     private final Stroke stroke = new BasicStroke(3f);
     private final RenderingHints renderingHints = createRenderingHints();
 
-    private final Theme theme;
     private final GameTableFactory gameTableFactory;
+    private final Levels levels;
+    private final Theme theme;
 
     private GameTable gameTable;
 
@@ -63,6 +66,7 @@ public final class GamePanel extends JPanel implements GameView {
         this.gameTableFactory = gameTableFactory;
         this.levels = levels;
         this.theme = theme;
+        setOpaque(true);
         setBoardSize(defaultBoardSize);
     }
 
@@ -83,19 +87,40 @@ public final class GamePanel extends JPanel implements GameView {
     }
 
     private void setSize() {
-        final int width = (3 * gameTable.getXSize() * theme.getPieceWidth()) / 2;
-        final int height = (3 * gameTable.getYSize() * theme.getPieceHeight()) / 2;
+        final int width = (int) (PIECE_SPACE * gameTable.getXSize() * theme.getPieceWidth());
+        final int height = (int) (PIECE_SPACE * gameTable.getYSize() * theme.getPieceHeight());
         final Dimension preferredSize = new Dimension(width, height);
         setPreferredSize(preferredSize);
         setMinimumSize(preferredSize);
         setSize(preferredSize);
     }
 
+    @Override
     @SuppressWarnings({"NumericCastThatLosesPrecision", "ImplicitNumericConversion"})
     public Position getMaxPosition(Size bounds) {
-        final int x = (int) ((2.0 * bounds.getX()) / (3.0 * theme.getPieceWidth()));
-        final int y = (int) ((2.0 * bounds.getY()) / (3.0 * theme.getPieceHeight()));
-        return new Position(x - 3, y - 3);
+        final int px = (int) (PIECE_SPACE * bounds.getX() / theme.getPieceWidth() - DRAG_FRAME_PADDING);
+        final int py = (int) (PIECE_SPACE * bounds.getY() / theme.getPieceHeight() - DRAG_FRAME_PADDING);
+        return new Position(px, py);
+    }
+
+    @Override
+    public Position getPosition(Point point) {
+        return new Position(point.x / xStep(), point.y / yStep());
+    }
+
+    @Override
+    public Point getPoint(Position p) {
+        final int x = (int) ((p.x() + SPACING) * xStep());
+        final int y = (int) ((p.y() + SPACING) * yStep());
+        return new Point(x, y);
+    }
+
+    private int xStep() {
+        return getWidth() / gameTable.getXSize();
+    }
+
+    private int yStep() {
+        return getHeight() / gameTable.getYSize();
     }
 
     public void start() {
@@ -117,38 +142,37 @@ public final class GamePanel extends JPanel implements GameView {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        final int width = getWidth();
-        final int height = getHeight();
-
         final Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHints(renderingHints);
         g2.setColor(getForeground());
 
         if (levels.isLevelDone()) {
-            final BufferedImage congrats = theme.getImage(CONGRATS);
-            g2.drawImage(congrats, width / 2 - congrats.getWidth() / 2, height / 2 - congrats.getHeight(), null);
-            g2.setFont(new Font("SansSerif", 0, 34));
-            final String s = levels.getLevelEndMessage();
-            g2.drawString(s, width / 2 - (g2.getFontMetrics().stringWidth(s) / 2), height / 2 + 20);
+            drawLevelEnded(g2);
         } else {
-            drawGameTable(g2, width, height);
+            drawGameTable(g2);
             drawDraggedImage(g2);
         }
     }
 
-    private void drawGameTable(Graphics2D g2, int width, int height) {
-        setBackground(theme.getColor(BACKGROUND));
-        setOpaque(true);
+    private void drawLevelEnded(Graphics2D g2) {
+        final int width = getWidth();
+        final int height = getHeight();
 
-        final int xStep = width / gameTable.getXSize();
-        final int yStep = height / gameTable.getYSize();
-        final int xStart = xStep + xStep / 2;
+        final BufferedImage congrats = theme.getImage(CONGRATS);
+        g2.drawImage(congrats, width / 2 - congrats.getWidth() / 2, height / 2 - congrats.getHeight(), null);
+        g2.setFont(new Font("SansSerif", 0, 34));
+        final String s = levels.getLevelEndMessage();
+        g2.drawString(s, width / 2 - (g2.getFontMetrics().stringWidth(s) / 2), height / 2 + 20);
+    }
+
+    private void drawGameTable(Graphics2D g2) {
+        final int xStep = xStep();
+        final int yStep = yStep();
         final int xBoardEnd = xStep * gameTable.getBoardXSize();
-        final int yStart = yStep + yStep / 2;
         final int yBoardEnd = yStep * gameTable.getBoardYSize();
 
         drawBoard(g2, xStep, yStep, xBoardEnd, yBoardEnd);
-        drawPieces(g2, xStep, yStep, xStart - xStep, yStart - yStep);
+        drawPieces(g2, xStep, yStep);
     }
 
     private void drawBoard(Graphics2D g2, int xStep, int yStep, int xEnd, int yEnd) {
@@ -159,18 +183,21 @@ public final class GamePanel extends JPanel implements GameView {
         g2.drawRect(xStep, yStep, xEnd, yEnd);
     }
 
-    private void drawPieces(Graphics2D g2, int xStep, int yStep, int xStart, int yStart) {
+    private void drawPieces(Graphics2D g2, int xStep, int yStep) {
         for (Position p : gameTable.getPositions().getAll()) {
-            final int x = xStart + p.x() * xStep;
-            final int y = yStart + p.y() * yStep;
+            final Point point = getPoint(p);
 
             for (Move m : gameTable.getStepsAlongLineFrom(p)) {
-                drawLine(g2, xStep, yStep, x, y, m);
+                drawLine(g2, xStep, yStep, point.x, point.y, m);
             }
             final Piece piece = gameTable.get(p);
             if (piece != null) {
-                final BufferedImage img = theme.getImage(piece);
-                g2.drawImage(img, x - img.getWidth() / 2, y - img.getHeight() / 2, null);
+                final BufferedImage image = theme.getImage(piece);
+                g2.drawImage(image,
+                        point.x - image.getWidth() / 2,
+                        point.y - image.getHeight() / 2,
+                        null
+                );
             }
         }
     }
@@ -187,13 +214,23 @@ public final class GamePanel extends JPanel implements GameView {
         this.lastDragPoint = lastDragPoint;
     }
 
-    public Point getLastDragPoint() {
-        return lastDragPoint;
+    @Override
+    public void notifyDraggedTo(Point point, Piece piece) {
+        draggedImage = theme.getImage(piece);
+        if (lastDragPoint != null) {
+            repaintForDrag(lastDragPoint);
+        }
+        if (point != null) {
+            point.translate(-draggedImage.getWidth() / 2, -draggedImage.getHeight() / 2);
+            if (!point.equals(lastDragPoint)) {
+                repaintForDrag(point);
+            }
+        }
+        setLastDragPoint(point);
     }
 
-    public void repaintForDrag(Rectangle rectangle, BufferedImage image) {
-        draggedImage = image;
-        repaint(rectangle);
+    private void repaintForDrag(Point p) {
+        repaint(addPixels(getRectangle(p, draggedImage), 2));
     }
 
     @Override
@@ -208,12 +245,29 @@ public final class GamePanel extends JPanel implements GameView {
     }
 
     private void drawDraggedImage(Graphics2D g2) {
-        if (lastDragPoint != null) {
+        if (lastDragPoint != null && draggedImage != null) {
             g2.drawImage(draggedImage, lastDragPoint.x, lastDragPoint.y, null);
             g2.setStroke(theme.getDragBoxStroke());
-            g2.drawRect(lastDragPoint.x - 3, lastDragPoint.y - 3,
-                    draggedImage.getWidth() + 6 , draggedImage.getHeight() + 6);
+            final Rectangle r = getRectangle(lastDragPoint, draggedImage);
+            g2.drawRect(r.x, r.y, r.width, r.height);
         }
+    }
+
+    private Rectangle getRectangle(Point point, BufferedImage image) {
+        final int pad = DRAG_FRAME_PADDING;
+        final int x = point.x - pad;
+        final int y = point.y - pad;
+        final int width = image.getWidth() + 2 * pad;
+        final int height = image.getHeight() + 2 * pad;
+        return new Rectangle(x, y, width, height);
+    }
+
+    private static Rectangle addPixels(Rectangle r, int pixels) {
+        return new Rectangle(
+                r.x - pixels, r.y - pixels,
+                r.width + 2 * pixels,
+                r.height + 2 * pixels
+        );
     }
 
     public void addMouseAdapter(MouseAdapter mouseAdapter) {
@@ -230,6 +284,11 @@ public final class GamePanel extends JPanel implements GameView {
 
     public GameTable getGameTable() {
         return gameTable;
+    }
+
+    @Override
+    public void applyThemeChange() {
+        setBackground(theme.getColor(BACKGROUND));
     }
 
 }

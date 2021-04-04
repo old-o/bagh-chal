@@ -2,13 +2,12 @@ package org.oldo.baghchal.view;
 
 import org.guppy4j.run.Startable;
 import org.oldo.baghchal.model.GameTable;
+import org.oldo.baghchal.model.Piece;
 import org.oldo.baghchal.model.Position;
 import org.oldo.g2d.Size;
 
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
-import java.awt.image.BufferedImage;
 
 /**
  * View interface
@@ -19,23 +18,32 @@ public interface GameView extends Startable {
 
     void removeMouseAdapter(MouseAdapter dndHandler);
 
-    void setLastDragPoint(Point p);
+    Position getPosition(Point p);
 
-    Point getLastDragPoint();
-
-    void repaintForDrag(Rectangle rectangle, BufferedImage image);
+    Point getPoint(Position p);
 
     Position getMaxPosition(Size screenSize);
 
     void setBoardSize(Size size);
 
-    void repaint();
-
     Size getScreenSize();
+
+    GameTable getGameTable();
+
+    void applyThemeChange();
+
+    void setLastDragPoint(Point p);
+
+    void notifyDraggedTo(Point point, Piece piece);
+
+    default void notifyDraggedTo(Position p, Piece piece) {
+        notifyDraggedTo(getPoint(p), piece);
+    }
+
+    void repaint();
 
     default <T> T as(Class<T> type) {
         return type.cast(this);
     }
 
-    GameTable getGameTable();
 }

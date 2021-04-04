@@ -7,6 +7,8 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Properties;
 
+import static org.guppy4j.Strings.isNullOrEmpty;
+
 /**
  * UI colors for a game theme
  */
@@ -16,7 +18,9 @@ public final class Colors {
 
     public Colors(Properties properties) {
         for (ColorId colorId : ColorId.values()) {
-            colorMap.put(colorId, Color.decode(properties.getProperty(key(colorId))));
+            final String property = properties.getProperty(key(colorId));
+            final Color color = isNullOrEmpty(property) ? null : Color.decode(property);
+            colorMap.put(colorId, color);
         }
     }
 

@@ -3,7 +3,6 @@ package org.oldo.baghchal.control;
 import org.oldo.baghchal.model.GameTable;
 import org.oldo.baghchal.model.Move;
 import org.oldo.baghchal.model.Piece;
-import org.oldo.baghchal.theming.Images;
 import org.oldo.baghchal.view.DragAndDropHandler;
 import org.oldo.baghchal.view.GameView;
 
@@ -14,13 +13,11 @@ import java.awt.event.MouseAdapter;
  */
 public final class UserPlayer implements Player {
 
-    private final GameView gamePanel;
-    private final Images images;
+    private final GameView view;
     private final Piece piece;
 
-    public UserPlayer(Piece piece, GameView gamePanel, Images images) {
-        this.gamePanel = gamePanel;
-        this.images = images;
+    public UserPlayer(Piece piece, GameView view) {
+        this.view = view;
         this.piece = piece;
     }
 
@@ -33,12 +30,10 @@ public final class UserPlayer implements Player {
     public Move play(GameTable gameTable) {
         final Result result = new Result();
 
-        final MouseAdapter dndHandler = new DragAndDropHandler(piece, gameTable, gamePanel, images,
-                move -> done(result, move));
-
+        final MouseAdapter dndHandler = new DragAndDropHandler(gameTable, view, move -> done(result, move), piece);
         gameTable.addDiscardListener(() -> done(result, null));
 
-        gamePanel.addMouseAdapter(dndHandler);
+        view.addMouseAdapter(dndHandler);
         try {
             synchronized (result) {
                 result.wait();
@@ -46,7 +41,7 @@ public final class UserPlayer implements Player {
         } catch (InterruptedException e) {
             throw new IllegalStateException(e);
         }
-        gamePanel.removeMouseAdapter(dndHandler);
+        view.removeMouseAdapter(dndHandler);
 
         if (result.move == null) {
             throw new PlayerInterruptedException("Game table changed during player's turn!");

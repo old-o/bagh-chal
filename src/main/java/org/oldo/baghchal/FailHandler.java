@@ -2,8 +2,6 @@ package org.oldo.baghchal;
 
 import org.guppy4j.log.Log;
 
-import static javax.swing.JOptionPane.ERROR_MESSAGE;
-import static javax.swing.JOptionPane.showMessageDialog;
 import static org.guppy4j.log.Log.Level.error;
 
 /**
@@ -20,6 +18,5 @@ public final class FailHandler implements Thread.UncaughtExceptionHandler {
     @Override
     public void uncaughtException(Thread t, Throwable e) {
         log.as(error, e);
-        showMessageDialog(null, e.getMessage(), "Error occured", ERROR_MESSAGE);
     }
 }

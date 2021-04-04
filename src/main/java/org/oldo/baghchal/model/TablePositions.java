@@ -70,4 +70,5 @@ public final class TablePositions {
     public boolean isBoardMove(Move move) {
         return isBoard(move.p1()) && isBoard(move.p2());
     }
+
 }

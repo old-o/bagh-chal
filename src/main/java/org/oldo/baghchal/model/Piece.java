@@ -5,18 +5,18 @@ package org.oldo.baghchal.model;
  */
 public enum Piece implements MoveConstraints {
 
-    PREY('◯') {
+    PREY('⬤') {
         @Override
         public boolean isValid(Move move, GameTable gameTable) {
-            return gameTable.getPositions().isBorderToBoard(move)
-                    || (gameTable.isBorderEmpty() && gameTable.isStepAlongLine(move));
+//            return true;
+//            return isStepOrJumpOverOtherPiece(move, gameTable);
+            return isPlacementOrStep(move, gameTable);
         }
     },
-    PREDATOR('⬤') {
+    PREDATOR('◯') {
         @Override
         public boolean isValid(Move move, GameTable gameTable) {
-            return gameTable.isStepAlongLine(move)
-                    || (move.isJump() && (gameTable.get(move.middle()) == PREY));
+            return isStepOrJumpOverOtherPiece(move, gameTable);
         }
     };
 
@@ -29,4 +29,5 @@ public enum Piece implements MoveConstraints {
     public char asChar() {
         return c;
     }
+
 }

@@ -21,13 +21,17 @@ public final class Players {
     private Player preyPlayer;
     private Player predatorPlayer;
 
-    public Players(LogProvider logProvider, Player preyStrategy, Player preyUser,
+    public Players(LogProvider logProvider,
+                   Player preyStrategy, Player preyUser,
                    Player predatorStrategy, Player predatorUser) {
         log = logProvider.getLog(getClass());
         this.preyStrategy = preyStrategy;
         this.preyUser = preyUser;
         this.predatorStrategy = predatorStrategy;
         this.predatorUser = predatorUser;
+        // initially assume human players
+        preyPlayer = preyUser;
+        predatorPlayer = predatorUser;
     }
 
     public void setPlayedByComputer(Piece piece, boolean computer) {

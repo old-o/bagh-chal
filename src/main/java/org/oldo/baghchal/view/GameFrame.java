@@ -2,6 +2,7 @@ package org.oldo.baghchal.view;
 
 import org.guppy4j.log.Log;
 import org.guppy4j.log.LogProvider;
+import org.oldo.baghchal.model.Piece;
 import org.oldo.baghchal.model.Players;
 import org.oldo.baghchal.model.Position;
 import org.oldo.baghchal.theming.ThemeSelector;
@@ -24,8 +25,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 
 import static org.guppy4j.log.Log.Level.debug;
-import static org.oldo.baghchal.model.Piece.PREDATOR;
-import static org.oldo.baghchal.model.Piece.PREY;
 
 /**
  * Main frame
@@ -37,28 +36,30 @@ public final class GameFrame {
     private final JFrame frame;
 //    private final JButton nextLevelBtn;
 
-    private final GameView gamePanel;
+    private final GameView view;
 
     private final SpinnerNumberModel boardXSizeModel;
     private final SpinnerNumberModel boardYSizeModel;
 
-    public GameFrame(LogProvider logProvider,
-                     GameView gamePanel, ThemeSelector themeSelector,
+    public GameFrame(String title, LogProvider logProvider,
+                     GameView view, ThemeSelector themeSelector,
                      SpinnerNumberModel boardXSizeModel,
                      SpinnerNumberModel boardYSizeModel,
-                     Players players) {
+                     Players players,
+                     Piece piece1, String piece1Name,
+                     Piece piece2, String piece2Name) {
         log = logProvider.getLog(getClass());
-        this.gamePanel = gamePanel;
+        this.view = view;
 
         this.boardXSizeModel = boardXSizeModel;
         this.boardYSizeModel = boardYSizeModel;
 
-        frame = new JFrame("Bagh-Chal");
+        frame = new JFrame(title);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
         final JButton newGameBtn = new JButton("New Game");
-        newGameBtn.addActionListener(e -> gamePanel.start());
+        newGameBtn.addActionListener(e -> view.start());
 
 //        nextLevelBtn = new JButton("Next Level");
 //        nextLevelBtn.addActionListener(e -> gamePanel.nextLevel());
@@ -84,16 +85,17 @@ public final class GameFrame {
         addTo(toolBar, new JLabel("Width: "), xSizeSpinner);
         addTo(toolBar, new JLabel("Height: "), ySizeSpinner);
 
-        final JCheckBox predCheck = new JCheckBox();
-        predCheck.addChangeListener(e -> players.setPlayedByComputer(PREDATOR, predCheck.isSelected()));
-        addTo(toolBar, new JLabel("Predators: "), predCheck);
-
-        final JCheckBox preyCheck = new JCheckBox();
-        preyCheck.addChangeListener(e -> players.setPlayedByComputer(PREY, preyCheck.isSelected()));
-        addTo(toolBar, new JLabel("Prey: "), preyCheck);
+        addPlayedByComputerCheckbox(players, piece1, piece1Name, toolBar);
+        addPlayedByComputerCheckbox(players, piece2, piece2Name, toolBar);
 
         frame.add(toolBar, BorderLayout.PAGE_START);
-        frame.add(new JScrollPane(gamePanel.as(Component.class)), BorderLayout.CENTER);
+        frame.add(new JScrollPane(view.as(Component.class)), BorderLayout.CENTER);
+    }
+
+    private void addPlayedByComputerCheckbox(Players players, Piece piece, String name, JToolBar toolBar) {
+        final JCheckBox checkbox = new JCheckBox();
+        checkbox.addChangeListener(e -> players.setPlayedByComputer(piece, checkbox.isSelected()));
+        addTo(toolBar, new JLabel(name + ": "), checkbox);
     }
 
     private static void addTo(JToolBar toolBar, Component... components) {
@@ -114,6 +116,7 @@ public final class GameFrame {
     private void selectTheme(ThemeSelector themeSelector, JComboBox<String> themeChooser) {
         final String themeName = themeChooser.getItemAt(themeChooser.getSelectedIndex());
         themeSelector.selectTheme(themeName);
+        view.applyThemeChange();
         updateBoardSize();
     }
 
@@ -127,11 +130,11 @@ public final class GameFrame {
     }
 
     private void updateBoardSize() {
-        final Size screenSize = gamePanel.getScreenSize();
+        final Size screenSize = view.getScreenSize();
         if (screenSize != null) {
             log.as(debug, "Screen size: {} x {}", screenSize.getX(), screenSize.getY());
 
-            final Position maxPosition = gamePanel.getMaxPosition(screenSize);
+            final Position maxPosition = view.getMaxPosition(screenSize);
             final int xSize = Math.min(boardXSizeModel.getNumber().intValue(), maxPosition.x());
             final int ySize = Math.min(boardYSizeModel.getNumber().intValue(), maxPosition.y());
 
@@ -140,15 +143,15 @@ public final class GameFrame {
             boardXSizeModel.setValue(xSize);
             boardYSizeModel.setValue(ySize);
 
-            gamePanel.setBoardSize(new IntPair(xSize, ySize));
+            view.setBoardSize(new IntPair(xSize, ySize));
 
             frame.getContentPane().repaint();
             frame.pack();
-            gamePanel.repaint();
+            view.repaint();
         }
     }
 
-    public GameView getGamePanel() {
-        return gamePanel;
+    public GameView getView() {
+        return view;
     }
 }

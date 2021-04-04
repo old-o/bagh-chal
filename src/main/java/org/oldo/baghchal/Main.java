@@ -1,5 +1,6 @@
 package org.oldo.baghchal;
 
+import com.formdev.flatlaf.FlatDarkLaf;
 import org.guppy4j.io.SimpleClassPathScanner;
 import org.guppy4j.log.Log;
 import org.guppy4j.log.LogProvider;
@@ -14,7 +15,6 @@ import org.oldo.baghchal.control.UserPlayer;
 import org.oldo.baghchal.model.GameTable;
 import org.oldo.baghchal.model.GameTableFactory;
 import org.oldo.baghchal.model.Levels;
-import org.oldo.baghchal.model.Piece;
 import org.oldo.baghchal.model.Players;
 import org.oldo.baghchal.resources.AudioUrlPlayer;
 import org.oldo.baghchal.theming.Themes;
@@ -28,6 +28,7 @@ import javax.swing.SpinnerNumberModel;
 import java.net.URL;
 import java.util.function.Consumer;
 
+import static java.lang.invoke.MethodHandles.lookup;
 import static org.oldo.baghchal.model.Piece.PREDATOR;
 import static org.oldo.baghchal.model.Piece.PREY;
 import static org.oldo.baghchal.theming.Theme.SoundResourceId.CONGRATS;
@@ -43,11 +44,12 @@ public final class Main {
     public static void main(String... args) {
 
         final LogProvider logProvider = new Slf4jLogProvider();
-        final Log log = logProvider.getLog(Main.class);
+        final Log log = logProvider.getLog(lookup().lookupClass());
 
         Thread.setDefaultUncaughtExceptionHandler(new FailHandler(log));
 
         new AudioSystemChecker().run();
+        FlatDarkLaf.install();
 
         System.setProperty("sun.java2d.opengl", "true");
 
@@ -60,30 +62,30 @@ public final class Main {
         final Levels levels = new Levels(maxLevel);
 
         final Consumer<URL> audioPlayMethod = AudioUrlPlayer::play;
-        final Consumer<GameTable> tableSetupMethod = GameTableSetup::prepare;
+        final Consumer<GameTable> tableSetupMethod = BaghChalSetup::prepare;
+//        final Consumer<GameTable> tableSetupMethod = gameTable -> AlquerqueSetup.prepare(gameTable, PREDATOR, PREY);
 
         final EventSounds listener = new EventSounds(audioPlayMethod, themes);
 
-        final GameTableFactory gameTableFactory = (size) -> new GameTable(
-                logProvider, size, tableSetupMethod, listener,
-                new CharCanvasImpl()
-        );
+        final CharCanvasImpl charCanvas = new CharCanvasImpl();
+
+        final GameTableFactory gameTableFactory =
+                (size) -> new GameTable(logProvider, size, tableSetupMethod, listener, charCanvas);
 
         final GameView gamePanel = new GamePanel(gameTableFactory, defaultBoardSize, themes, levels);
 
         final Player preyStrategy = new PreyStrategy();
-        final Player preyPlayer = new UserPlayer(PREY, gamePanel, themes);
-        final Player predatorStrategy = new PredatorStrategy(levels);
-        final Player predatorPlayer = new UserPlayer(PREDATOR, gamePanel, themes);
+//        final Player preyStrategy = new PredatorStrategy(levels, PREY, PREDATOR);
+        final Player preyPlayer = new UserPlayer(PREY, gamePanel);
+        final Player predatorStrategy = new PredatorStrategy(levels, PREDATOR, PREY);
+        final Player predatorPlayer = new UserPlayer(PREDATOR, gamePanel);
 
         final Players players = new Players(logProvider, preyStrategy, preyPlayer, predatorStrategy, predatorPlayer);
-        players.setPlayedByComputer(Piece.PREY, false);
-        players.setPlayedByComputer(Piece.PREDATOR, false);
 
-        final GameFrame gameFrame = new GameFrame(logProvider, gamePanel, themes,
+        final GameFrame gameFrame = new GameFrame("Bagh-Chal", logProvider, gamePanel, themes,
                 new SpinnerNumberModel(5, 4, 99, 1),
                 new SpinnerNumberModel(5, 4, 99, 1),
-                players);
+                players, PREDATOR, "Predators", PREY, "Prey");
 
         final Executable congrats = () -> AudioUrlPlayer.play(themes.getSoundResource(CONGRATS));
 

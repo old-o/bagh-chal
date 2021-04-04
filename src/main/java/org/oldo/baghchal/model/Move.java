@@ -1,6 +1,7 @@
 package org.oldo.baghchal.model;
 
 import static java.lang.Math.abs;
+import static org.guppy4j.Booleans.not;
 
 /**
  * From / to coordinates of a move on the game table
@@ -24,7 +25,9 @@ public class Move {
     }
 
     public boolean isJump() {
-        return xDiff() == 2 || yDiff() == 2 ;
+        return  xDiff() == 2 && yDiff() == 0
+                || xDiff() == 0 && yDiff() == 2
+                || xDiff() == 2 && yDiff() == 2;
     }
 
     Position middle() {

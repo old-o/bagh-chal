@@ -3,6 +3,7 @@ package org.oldo.baghchal.control;
 import org.oldo.baghchal.model.GameTable;
 import org.oldo.baghchal.model.Levels;
 import org.oldo.baghchal.model.Move;
+import org.oldo.baghchal.model.Piece;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,17 +22,22 @@ public final class PredatorStrategy implements Player {
 
     private final Levels levels;
 
-    public PredatorStrategy(Levels levels) {
+    private final Piece mine;
+    private final Piece opponent;
+
+    public PredatorStrategy(Levels levels, Piece mine, Piece opponent) {
         this.levels = levels;
+        this.mine = mine;
+        this.opponent = opponent;
     }
 
     @Override
     public Move play(GameTable gameTable) {
-        final Move take = getRandomFrom(gameTable.getPossibleJumps(PREDATOR, PREY));
+        final Move take = getRandomFrom(gameTable.getPossibleJumps(mine, opponent));
         if (take != null) {
             return take;
         }
-        final List<Move> possibleSteps = gameTable.getStepsWhereAdjacent(PREDATOR, null);
+        final List<Move> possibleSteps = gameTable.getStepsWhereAdjacent(mine, null);
         if (possibleSteps.isEmpty()) {
             return null;
         }
@@ -44,7 +50,7 @@ public final class PredatorStrategy implements Player {
         return true;
     }
 
-    private static Move tryThreateningMove(int level, Iterable<Move> possibleMoves, GameTable gameTable) {
+    private Move tryThreateningMove(int level, Iterable<Move> possibleMoves, GameTable gameTable) {
         final Map<Integer, List<Move>> threateningMoves = getThreateningMoves(possibleMoves, gameTable);
         for (int i = level; i > 0; i--) {
             final Move move = getRandomFrom(threateningMoves.get(i));
@@ -55,7 +61,7 @@ public final class PredatorStrategy implements Player {
         return null;
     }
 
-    private static Map<Integer, List<Move>> getThreateningMoves(Iterable<Move> possibleMoves, GameTable gameTable) {
+    private Map<Integer, List<Move>> getThreateningMoves(Iterable<Move> possibleMoves, GameTable gameTable) {
         final Map<Integer, List<Move>> threateningMoves = new HashMap<>();
         for (int i = 1; i <= 8; i++) {
             threateningMoves.put(i, new ArrayList<>());
@@ -69,11 +75,11 @@ public final class PredatorStrategy implements Player {
         return threateningMoves;
     }
 
-    private static int numberOfPiecesThreatened(Move m, GameTable gameTable) {
+    private int numberOfPiecesThreatened(Move m, GameTable gameTable) {
         final GameTable b = gameTable.copy();
         b.movePiece(m);
         final Collection<Move> jumps = new ArrayList<>();
-        for (Move step : b.getStepsWhereAdjacent(PREDATOR, PREY)) {
+        for (Move step : b.getStepsWhereAdjacent(mine, opponent)) {
             b.addPossibleJump(jumps, step);
         }
         return jumps.size();

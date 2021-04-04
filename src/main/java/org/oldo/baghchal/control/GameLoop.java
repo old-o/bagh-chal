@@ -13,6 +13,7 @@ import org.oldo.baghchal.view.GameFrame;
 import org.oldo.baghchal.view.GameView;
 
 import static java.lang.System.lineSeparator;
+import static org.guppy4j.Booleans.not;
 import static org.guppy4j.log.Log.Level.debug;
 
 /**
@@ -33,7 +34,7 @@ public final class GameLoop implements Startable {
                     Levels levels, Executable congrats, Players players) {
         log = logProvider.getLog(getClass());
         this.gameFrame = gameFrame;
-        gamePanel = gameFrame.getGamePanel();
+        gamePanel = gameFrame.getView();
         this.levels = levels;
         this.congrats = congrats;
         this.players = players;
@@ -43,7 +44,7 @@ public final class GameLoop implements Startable {
         gamePanel.start();
         gameFrame.show();
 
-        while (!levels.isGameOver()) {
+        while (not(levels.isGameOver())) {
             for (Piece piece : Piece.values()) {
                 try {
                     processTurn(piece);

@@ -16,7 +16,7 @@ import static org.oldo.baghchal.model.Piece.PREY;
 /**
  * Sets up the pieces on the game table
  */
-public final class GameTableSetup {
+public final class BaghChalSetup {
 
     static void prepare(GameTable gameTable) {
         final int boardSize = gameTable.getPositions().getBoardSize();

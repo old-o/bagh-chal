@@ -86,7 +86,7 @@ public final class GameTable {
             clear(move.p1());
             set(move.p2(), piece);
         }
-        if (move.isJump() && !positions.isBorderToBoard(move)) {
+        if (move.isJump() && positions.isBoardMove(move)) {
             clear(move.middle());
             listener.afterJump(piece);
         } else {
