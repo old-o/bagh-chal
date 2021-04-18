@@ -61,7 +61,12 @@ public final class Main {
         final int maxLevel = 2;
         final Levels levels = new Levels(maxLevel);
 
-        final Consumer<URL> audioPlayMethod = AudioUrlPlayer::play;
+        final Consumer<URL> audioPlayMethod = url -> {
+            if (url != null) {
+                AudioUrlPlayer.play(url);
+            }
+        };
+
         final Consumer<GameTable> tableSetupMethod = BaghChalSetup::prepare;
 //        final Consumer<GameTable> tableSetupMethod = gameTable -> AlquerqueSetup.prepare(gameTable, PREDATOR, PREY);
 
