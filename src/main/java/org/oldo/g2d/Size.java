@@ -5,16 +5,16 @@ package org.oldo.g2d;
  */
 public interface Size {
 
-    int getX();
+    int x();
 
-    int getY();
+    int y();
 
-    default boolean isSameAs(Size size) {
-        return getX() == size.getX() && getY() == size.getY();
+    default boolean sameAs(Size size) {
+        return x() == size.x() && y() == size.y();
     }
 
     default int getMaxDimension() {
-        return Math.max(getX(), getY());
+        return Math.max(x(), y());
     }
 
 }

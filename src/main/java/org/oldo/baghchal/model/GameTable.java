@@ -4,7 +4,6 @@ import org.guppy4j.log.LogProvider;
 import org.oldo.baghchal.Listener;
 import org.oldo.g2d.Size;
 import org.oldo.text.CharCanvas;
-import org.oldo.text.CharDrawing;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +11,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static org.guppy4j.Booleans.not;
 import static org.oldo.baghchal.model.Direction.*;
 
 /**
@@ -19,7 +19,9 @@ import static org.oldo.baghchal.model.Direction.*;
  */
 public final class GameTable {
 
-    private static final Direction[] directions = {RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN};
+    private static final Direction[] directions = {
+            RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN
+    };
 
     private final LogProvider logProvider;
 
@@ -33,6 +35,8 @@ public final class GameTable {
     private final Listener listener;
     private final TablePositions positions;
 
+    private final TableToString tableToString;
+
     public GameTable(LogProvider logProvider, Size boardSize,
                      Consumer<GameTable> setupMethod, Listener listener,
                      CharCanvas charCanvas) {
@@ -41,10 +45,11 @@ public final class GameTable {
         this.listener = listener;
         this.boardSize = boardSize;
         this.charCanvas = charCanvas;
-        grid = new Piece[boardSize.getX() + 2][boardSize.getY() + 2];
+        grid = new Piece[boardSize.x() + 2][boardSize.y() + 2];
         final Position topLeft = new Position(1, 1);
-        final Position bottomRight = new Position(boardSize.getX(), boardSize.getY());
+        final Position bottomRight = new Position(boardSize.x(), boardSize.y());
         positions = new TablePositions(topLeft, bottomRight, getPositions(grid));
+        tableToString = new TableToString(this, charCanvas);
     }
 
     private static Iterable<Position> getPositions(Piece[][] grid) {
@@ -177,7 +182,7 @@ public final class GameTable {
 
     public boolean isValid(Move move, MoveConstraints piece) {
         try {
-            return !move.isStationary() && isEmptyAt(move.p2()) && piece.isValid(move, this);
+            return not(move.isStationary()) && isEmptyAt(move.p2()) && piece.isValid(move, this);
         } catch (ArrayIndexOutOfBoundsException e) {
             return false;
         }
@@ -202,11 +207,11 @@ public final class GameTable {
     }
 
     public int getBoardXSize() {
-        return boardSize.getX();
+        return boardSize.x();
     }
 
     public int getBoardYSize() {
-        return boardSize.getY();
+        return boardSize.y();
     }
 
     public int getXSize() {
@@ -215,44 +220,6 @@ public final class GameTable {
 
     public int getYSize() {
         return grid[0].length;
-    }
-
-    public String toString() {
-        final int xStep = 2;
-        final int yStep = 2;
-
-        final CharDrawing drawing = charCanvas.newDrawing(getXSize() * xStep, getYSize() * yStep);
-
-        for (Position p : positions.getAll()) {
-            final int x = p.x() * xStep;
-            final int y = p.y() * yStep;
-
-            for (Move step : getStepsAlongLineFrom(p)) {
-                drawing.addLine(x, y, xStep, yStep, step);
-            }
-            final Piece piece = get(p);
-            if (piece != null){
-                drawing.addChar(x, y, piece.asChar());
-            } else if (positions.isBoard(p)) {
-                drawing.addChar(x, y, getBoardChar(p));
-            }
-        }
-        return drawing.toString();
-    }
-
-    private char getBoardChar(Position p) {
-        if (isBorder(p, UP)) {
-            return isBorder(p, LEFT) ? '┌' : isBorder(p, RIGHT) ? '┐' : '┬';
-        }
-        if (isBorder(p, DOWN)) {
-            return isBorder(p, LEFT) ? '└' : isBorder(p, RIGHT) ? '┘' : '┴';
-        }
-        // otherwise
-        return isBorder(p, LEFT) ? '├' : isBorder(p, RIGHT) ? '┤' : '┼';
-    }
-
-    private boolean isBorder(Position p, Direction up) {
-        return positions.isBorder(up.addTo(p));
     }
 
     private final Collection<Runnable> discardListeners = new ArrayList<>();
@@ -266,7 +233,7 @@ public final class GameTable {
     }
 
     public boolean isBoardSize(Size size) {
-        return boardSize != null && boardSize.isSameAs(size);
+        return boardSize != null && boardSize.sameAs(size);
     }
 
     public Iterable<Move> getStepsAlongLineFrom(Position p) {
@@ -282,5 +249,10 @@ public final class GameTable {
 
     public int getMaxStepFromCorner() {
         return (boardSize.getMaxDimension() / 2) - 1;
+    }
+
+    @Override
+    public String toString() {
+        return tableToString.toString();
     }
 }

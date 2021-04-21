@@ -13,11 +13,11 @@ public final class IntPair implements Size {
         this.y = y;
     }
 
-    public int getX() {
+    public int x() {
         return x;
     }
 
-    public int getY() {
+    public int y() {
         return y;
     }
 
@@ -29,7 +29,7 @@ public final class IntPair implements Size {
         if (other == null || getClass() != other.getClass()) {
             return false;
         }
-        return isSameAs((IntPair) other);
+        return sameAs((IntPair) other);
     }
 
     @Override

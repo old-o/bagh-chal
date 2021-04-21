@@ -98,8 +98,8 @@ public final class GamePanel extends JPanel implements GameView {
     @Override
     @SuppressWarnings({"NumericCastThatLosesPrecision", "ImplicitNumericConversion"})
     public Position getMaxPosition(Size bounds) {
-        final int px = (int) (PIECE_SPACE * bounds.getX() / theme.getPieceWidth() - DRAG_FRAME_PADDING);
-        final int py = (int) (PIECE_SPACE * bounds.getY() / theme.getPieceHeight() - DRAG_FRAME_PADDING);
+        final int px = (int) (PIECE_SPACE * bounds.x() / theme.getPieceWidth() - DRAG_FRAME_PADDING);
+        final int py = (int) (PIECE_SPACE * bounds.y() / theme.getPieceHeight() - DRAG_FRAME_PADDING);
         return new Position(px, py);
     }
 
@@ -160,7 +160,7 @@ public final class GamePanel extends JPanel implements GameView {
 
         final BufferedImage congrats = theme.getImage(CONGRATS);
         g2.drawImage(congrats, width / 2 - congrats.getWidth() / 2, height / 2 - congrats.getHeight(), null);
-        g2.setFont(new Font("SansSerif", 0, 34));
+        g2.setFont(new Font("SansSerif", Font.PLAIN, 34));
         final String s = levels.getLevelEndMessage();
         g2.drawString(s, width / 2 - (g2.getFontMetrics().stringWidth(s) / 2), height / 2 + 20);
     }

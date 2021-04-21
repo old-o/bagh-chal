@@ -2,6 +2,7 @@ package org.oldo.baghchal.view;
 
 import org.guppy4j.log.Log;
 import org.guppy4j.log.LogProvider;
+import org.oldo.baghchal.model.GameTable;
 import org.oldo.baghchal.model.Piece;
 import org.oldo.baghchal.model.Players;
 import org.oldo.baghchal.model.Position;
@@ -132,7 +133,7 @@ public final class GameFrame {
     private void updateBoardSize() {
         final Size screenSize = view.getScreenSize();
         if (screenSize != null) {
-            log.as(debug, "Screen size: {} x {}", screenSize.getX(), screenSize.getY());
+            log.as(debug, "Screen size: {} x {}", screenSize.x(), screenSize.y());
 
             final Position maxPosition = view.getMaxPosition(screenSize);
             final int xSize = Math.min(boardXSizeModel.getNumber().intValue(), maxPosition.x());
@@ -151,7 +152,16 @@ public final class GameFrame {
         }
     }
 
-    public GameView getView() {
-        return view;
+    public void start() {
+        view.start();
+        show();
+    }
+
+    public void repaintView() {
+        view.repaint();
+    }
+
+    public GameTable getGameTable() {
+        return view.getGameTable();
     }
 }

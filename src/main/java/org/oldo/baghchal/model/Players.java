@@ -4,6 +4,9 @@ import org.guppy4j.log.Log;
 import org.guppy4j.log.LogProvider;
 import org.oldo.baghchal.control.Player;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.guppy4j.log.Log.Level.debug;
 
 /**
@@ -12,6 +15,8 @@ import static org.guppy4j.log.Log.Level.debug;
 public final class Players {
 
     private final Log log;
+
+    private final List<Piece> pieces = Arrays.asList(Piece.values());
 
     private final Player preyStrategy;
     private final Player preyUser;
@@ -32,6 +37,10 @@ public final class Players {
         // initially assume human players
         preyPlayer = preyUser;
         predatorPlayer = predatorUser;
+    }
+
+    public Iterable<? extends Piece> getPieces() {
+        return pieces;
     }
 
     public void setPlayedByComputer(Piece piece, boolean computer) {
@@ -57,7 +66,7 @@ public final class Players {
 
     private void sleepSeconds(int seconds) {
         try {
-            Thread.sleep(seconds * 1000);
+            Thread.sleep(seconds * 1000L);
         } catch (InterruptedException e) {
             log.as(debug, e);
         }

@@ -10,7 +10,6 @@ import org.oldo.baghchal.model.Move;
 import org.oldo.baghchal.model.Piece;
 import org.oldo.baghchal.model.Players;
 import org.oldo.baghchal.view.GameFrame;
-import org.oldo.baghchal.view.GameView;
 
 import static java.lang.System.lineSeparator;
 import static org.guppy4j.Booleans.not;
@@ -24,7 +23,6 @@ public final class GameLoop implements Startable {
     private final Log log;
 
     private final GameFrame gameFrame;
-    private final GameView gamePanel;
 
     private final Levels levels;
     private final Executable congrats;
@@ -34,18 +32,16 @@ public final class GameLoop implements Startable {
                     Levels levels, Executable congrats, Players players) {
         log = logProvider.getLog(getClass());
         this.gameFrame = gameFrame;
-        gamePanel = gameFrame.getView();
         this.levels = levels;
         this.congrats = congrats;
         this.players = players;
     }
 
     public void start() {
-        gamePanel.start();
-        gameFrame.show();
+        gameFrame.start();
 
         while (not(levels.isGameOver())) {
-            for (Piece piece : Piece.values()) {
+            for (Piece piece : players.getPieces()) {
                 try {
                     processTurn(piece);
 
@@ -58,7 +54,7 @@ public final class GameLoop implements Startable {
     }
 
     private void processTurn(Piece piece) {
-        final GameTable gameTable = gamePanel.getGameTable();
+        final GameTable gameTable = gameFrame.getGameTable();
         final Move move = players.play(gameTable, piece);
         if (move != null) {
             gameTable.movePiece(move);
@@ -69,11 +65,12 @@ public final class GameLoop implements Startable {
         if (playerGaveUp && players.isPlayedByComputer(piece)) {
             congrats.execute();
         }
-        gamePanel.repaint();
+        gameFrame.repaintView();
         if (playerGaveUp) {
             gameTable.reset();
         }
-        gameFrame.enableNextLevel(playerGaveUp && !levels.isGameOver());
+        final boolean nextLevel = playerGaveUp && not(levels.isGameOver());
+        gameFrame.enableNextLevel(nextLevel);
     }
 
 }
