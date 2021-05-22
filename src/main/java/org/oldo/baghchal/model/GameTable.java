@@ -88,7 +88,7 @@ public final class GameTable {
         if (piece == null) {
             throw new IllegalStateException("Cannot move piece from empty position:" + move.p1());
         } else {
-            clear(move.p1());
+            pick(move.p1(), piece);
             set(move.p2(), piece);
         }
         if (move.isJump() && positions.isBoardMove(move)) {

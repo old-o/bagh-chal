@@ -33,7 +33,7 @@ public class TableToString {
                 drawing.addLine(x, y, xStep, yStep, step);
             }
             final Piece piece = gameTable.get(p);
-            if (piece != null){
+            if (piece != null) {
                 drawing.addChar(x, y, piece.asChar());
             } else if (positions().isBoard(p)) {
                 drawing.addChar(x, y, getBoardChar(p));
@@ -49,12 +49,13 @@ public class TableToString {
         if (isBorder(p, DOWN)) {
             return isBorder(p, LEFT) ? '└' : isBorder(p, RIGHT) ? '┘' : '┴';
         }
-        // otherwise
-        return isBorder(p, LEFT) ? '├' : isBorder(p, RIGHT) ? '┤' : '┼';
+        else {
+            return isBorder(p, LEFT) ? '├' : isBorder(p, RIGHT) ? '┤' : '┼';
+        }
     }
 
-    private boolean isBorder(Position p, Direction up) {
-        return positions().isBorder(up.addTo(p));
+    private boolean isBorder(Position p, Direction d) {
+        return positions().isBorder(d.addTo(p));
     }
 
     private TablePositions positions() {

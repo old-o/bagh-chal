@@ -49,9 +49,9 @@ public class DragAndDropHandler extends MouseAdapter {
     public void mouseReleased(MouseEvent e) {
         final Position p = view.getPosition(e.getPoint());
         if (dragStart != null) {
+            gameTable.set(dragStart, piece);
             final Move move = new Move(dragStart, p);
             final boolean validMove = gameTable.isValid(move, piece);
-            gameTable.set(dragStart, piece);
             if (validMove) {
                 playFlow.moveDone(move);
             } else {
