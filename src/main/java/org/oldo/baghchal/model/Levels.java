@@ -47,4 +47,7 @@ public final class Levels {
         this.levelDone = levelDone;
     }
 
+    public boolean isNextLevelAvailable() {
+        return level < maxLevel && levelDone;
+    }
 }

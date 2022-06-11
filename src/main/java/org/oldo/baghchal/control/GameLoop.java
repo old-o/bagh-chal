@@ -56,21 +56,20 @@ public final class GameLoop implements Startable {
     private void processTurn(Piece piece) {
         final GameTable gameTable = gameFrame.getGameTable();
         final Move move = players.play(gameTable, piece);
-        if (move != null) {
-            gameTable.movePiece(move);
-            log.as(debug, lineSeparator() + move + lineSeparator() + gameTable);
-        }
         final boolean playerGaveUp = (move == null);
         levels.setLevelDone(playerGaveUp);
-        if (playerGaveUp && players.isPlayedByComputer(piece)) {
-            congrats.execute();
-        }
-        gameFrame.repaintView();
         if (playerGaveUp) {
+            if (players.isPlayedByComputer(piece)) {
+                congrats.execute();
+            }
+            gameFrame.repaintView();
             gameTable.reset();
+        } else {
+            gameTable.movePiece(move);
+            log.as(debug, lineSeparator() + move + lineSeparator() + gameTable);
+            gameFrame.repaintView();
         }
-        final boolean nextLevel = playerGaveUp && not(levels.isGameOver());
-        gameFrame.enableNextLevel(nextLevel);
+        gameFrame.enableNextLevel(levels.isNextLevelAvailable());
     }
 
 }
