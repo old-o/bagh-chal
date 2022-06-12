@@ -79,7 +79,7 @@ public final class Main {
 
         final GameView gamePanel = new GamePanel(gameTableFactory, defaultBoardSize, themes, levels);
 
-        final Player preyStrategy = new PreyStrategy();
+        final Player preyStrategy = new PreyStrategy(PREY, PREDATOR);
 //        final Player preyStrategy = new PredatorStrategy(levels, PREY, PREDATOR);
         final Player preyPlayer = new UserPlayer(PREY, gamePanel);
         final Player predatorStrategy = new PredatorStrategy(levels, PREDATOR, PREY);

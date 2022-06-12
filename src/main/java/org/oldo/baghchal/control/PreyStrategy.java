@@ -12,13 +12,19 @@ import java.util.List;
 import java.util.Set;
 
 import static org.guppy4j.Lists.getRandomFrom;
-import static org.oldo.baghchal.model.Piece.PREDATOR;
-import static org.oldo.baghchal.model.Piece.PREY;
 
 /**
- * Computer player for prey pieces
+ * Computer player for defensive pieces
  */
 public final class PreyStrategy implements Player {
+
+    private final Piece opponent;
+    private final Piece mine;
+
+    public PreyStrategy(Piece mine, Piece opponent) {
+        this.mine = mine;
+        this.opponent = opponent;
+    }
 
     @Override
     public Move play(GameTable gameTable) {
@@ -26,13 +32,13 @@ public final class PreyStrategy implements Player {
         if (defensiveMove != null) {
             return defensiveMove;
         }
-        final Position borderPosition = gameTable.getBorderPosition(PREY);
+        final Position borderPosition = gameTable.getBorderPosition(mine);
         if (borderPosition != null) {
-            final List<Position> safeBoardPositions = getBoardPositions(gameTable, PreyStrategy::rejectUnsafe);
+            final List<Position> safeBoardPositions = getBoardPositions(gameTable, this::rejectUnsafe);
             if (!safeBoardPositions.isEmpty()) {
                 return getMove(borderPosition, safeBoardPositions);
             }
-            final List<Position> livableBoardPositions = getBoardPositions(gameTable, PreyStrategy::rejectDeadly);
+            final List<Position> livableBoardPositions = getBoardPositions(gameTable, this::rejectDeadly);
             if (!livableBoardPositions.isEmpty()) {
                 return getMove(borderPosition, livableBoardPositions);
             }
@@ -89,42 +95,42 @@ public final class PreyStrategy implements Player {
         return true;
     }
 
-    private static boolean rejectUnsafe(Position p, GameTable table, Position fore, Position back) {
+    private boolean rejectUnsafe(Position p, GameTable table, Position fore, Position back) {
         return table.isStepAlongLine(new Move(p, fore)) && table.getPositions().isBoard(back)
-                && isEmptyOrPredator(table.get(fore)) && isEmptyOrPredator(table.get(back));
+                && isEmptyOrOpponent(table.get(fore)) && isEmptyOrOpponent(table.get(back));
     }
 
-    private static boolean rejectDeadly(Position p, GameTable table, Position fore, Position back) {
+    private boolean rejectDeadly(Position p, GameTable table, Position fore, Position back) {
         final Piece fp = table.get(fore);
         final Piece bp = table.get(back);
         return table.isStepAlongLine(new Move(p, fore)) && table.getPositions().isBoard(back)
-                && (isPredator(fp) && isEmpty(bp) || isEmpty(fp) && isPredator(bp));
+                && (isOpponent(fp) && isEmpty(bp) || isEmpty(fp) && isOpponent(bp));
     }
 
     private static boolean neverReject(Position p, GameTable table, Position fore, Position back) {
         return false;
     }
 
-    private static boolean isPredator(Piece piece) {
-        return piece == PREDATOR;
+    private boolean isOpponent(Piece piece) {
+        return piece == opponent;
     }
 
-    private static boolean isEmptyOrPredator(Piece piece) {
-        return (piece == null) || (piece == PREDATOR);
+    private boolean isEmptyOrOpponent(Piece piece) {
+        return (piece == null) || (piece == opponent);
     }
 
     private static boolean isEmpty(Piece piece) {
         return piece == null;
     }
 
-    private static List<Move> getDefensiveMoves(GameTable gameTable) {
+    private List<Move> getDefensiveMoves(GameTable gameTable) {
         final List<Move> defenseMoves = new ArrayList<>();
-        for (Move possibleJump : gameTable.getPossibleJumps(PREDATOR, PREY)) {
+        for (Move possibleJump : gameTable.getPossibleJumps(opponent, mine)) {
             final Position p2 = possibleJump.p2();
             for (Position p1 : gameTable.getPositions().getAll()) {
-                if (gameTable.get(p1) == PREY) {
+                if (gameTable.get(p1) == mine) {
                     final Move move = new Move(p1, p2);
-                    if (gameTable.isValid(move, PREY)) {
+                    if (gameTable.isValid(move, mine)) {
                         defenseMoves.add(move);
                     }
                 }
